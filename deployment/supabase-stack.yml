@@ -1,0 +1,484 @@
+version: '3.8'
+
+# ============================================================
+# Greyin Platform - Self-Hosted Supabase Stack
+# ============================================================
+# 
+# Services:
+#   - PostgreSQL (database)
+#   - Kong (API gateway)
+#   - PostgREST (REST API)
+#   - GoTrue (authentication)
+#   - Realtime (WebSocket server)
+#   - Storage (file uploads)
+#   - Studio (admin UI)
+#   - Meta (database management)
+#
+# Network: Connects to existing edjitsu-prod_edjitsu-network for Traefik
+# ============================================================
+
+services:
+  # ===========================
+  # PostgreSQL Database
+  # ===========================
+  supabase_db:
+    image: supabase/postgres:15.1.0.117
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXP: ${JWT_EXPIRY}
+    volumes:
+      - supabase_db_data:/var/lib/postgresql/data
+    networks:
+      - supabase_internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===========================
+  # Kong API Gateway
+  # ===========================
+  kong:
+    image: kong:2.8.1
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    ports:
+      - target: 8000
+        published: 8000
+        mode: host
+    volumes:
+      - ./config/kong.yml:/var/lib/kong/kong.yml:ro
+    networks:
+      - supabase_internal
+      - edjitsu-prod_edjitsu-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      labels:
+        # API endpoint
+        - "traefik.enable=true"
+        - "traefik.docker.network=edjitsu-prod_edjitsu-network"
+        
+        # HTTPS router for API
+        - "traefik.http.routers.supabase-api-secure.rule=Host(`${API_DOMAIN}`)"
+        - "traefik.http.routers.supabase-api-secure.entrypoints=websecure"
+        - "traefik.http.routers.supabase-api-secure.tls=true"
+        - "traefik.http.routers.supabase-api-secure.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.supabase-api-secure.service=supabase-api"
+        
+        # HTTP router (redirect to HTTPS)
+        - "traefik.http.routers.supabase-api.rule=Host(`${API_DOMAIN}`)"
+        - "traefik.http.routers.supabase-api.entrypoints=web"
+        - "traefik.http.routers.supabase-api.middlewares=redirect-to-https"
+        
+        # Service definition
+        - "traefik.http.services.supabase-api.loadbalancer.server.port=8000"
+    depends_on:
+      - supabase_analytics
+
+  # ===========================
+  # PostgREST (REST API)
+  # ===========================
+  rest:
+    image: postgrest/postgrest:v12.0.1
+    environment:
+      PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@supabase_db:5432/postgres
+      PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
+      PGRST_DB_ANON_ROLE: ${PGRST_DB_ANON_ROLE}
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: ${PGRST_DB_USE_LEGACY_GUCS}
+      PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET}
+      PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
+    networks:
+      - supabase_internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    depends_on:
+      - supabase_db
+
+  # ===========================
+  # GoTrue (Authentication)
+  # ===========================
+  auth:
+    image: supabase/gotrue:v2.132.3
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${API_EXTERNAL_URL}
+      
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@supabase_db:5432/postgres?search_path=auth
+      
+      GOTRUE_SITE_URL: ${SITE_URL}
+      GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
+      GOTRUE_DISABLE_SIGNUP: "false"
+      
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: ${JWT_DEFAULT_GROUP_NAME}
+      GOTRUE_JWT_EXP: ${JWT_EXPIRY}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
+      GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
+      GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
+      GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
+
+      # Was set in deployment/.env but never actually referenced here, so
+      # this service silently ran on GoTrue's real built-in default (30/hr)
+      # this whole time instead of the intended value -- confirmed live via
+      # `docker service inspect supabase_auth` showing no such env var set
+      # at all. Wiring it up for real now.
+      GOTRUE_RATE_LIMIT_EMAIL_SENT: ${GOTRUE_RATE_LIMIT_EMAIL_SENT}
+      
+      # SMTP
+      GOTRUE_SMTP_HOST: ${GOTRUE_SMTP_HOST}
+      GOTRUE_SMTP_PORT: ${GOTRUE_SMTP_PORT}
+      GOTRUE_SMTP_USER: ${GOTRUE_SMTP_USER}
+      GOTRUE_SMTP_PASS: ${GOTRUE_SMTP_PASS}
+      GOTRUE_SMTP_ADMIN_EMAIL: ${GOTRUE_SMTP_ADMIN_EMAIL}
+      GOTRUE_SMTP_SENDER_NAME: ${GOTRUE_SMTP_SENDER_NAME}
+      
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
+
+      # Custom "Confirm signup" template that shows {{ .Token }} (a 6-digit
+      # code) instead of the default confirmation-link-only template, so the
+      # /verify page can take a typed code via supabase.auth.verifyOtp().
+      # Template file itself lives in apps/deepedge/public/email-templates
+      # (deepedge, formerly greyin-b2b, formerly ExpertEdge) and is served
+      # from whatever domain that app answers on -- was greyin.net until an
+      # earlier phase of this project moved that app onto its own
+      # subdomain and greyin.net started serving greyin-hub instead, which
+      # has no such file (confirmed 404). That left every real signup
+      # across all 7 apps silently failing to load a confirmation template
+      # since that migration -- found while verifying an earlier brand
+      # rename via e2e, not caused by it. Pointed at the domain that
+      # actually serves the file now.
+      GOTRUE_MAILER_TEMPLATES_CONFIRMATION: https://deepedge.greyin.net/email-templates/confirm-signup.html
+    networks:
+      - supabase_internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    depends_on:
+      - supabase_db
+
+  # ===========================
+  # Realtime (WebSocket Server)
+  # ===========================
+  realtime:
+    image: supabase/realtime:v2.25.35
+    environment:
+      PORT: 4000
+      DB_HOST: supabase_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: postgres
+      DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
+      DB_ENC_KEY: supabaserealtime
+      API_JWT_SECRET: ${JWT_SECRET}
+      FLY_ALLOC_ID: fly123
+      FLY_APP_NAME: realtime
+      SECRET_KEY_BASE: ${JWT_SECRET}
+      ERL_AFLAGS: -proto_dist inet_tcp
+      ENABLE_TAILSCALE: "false"
+      DNS_NODES: "''"
+    networks:
+      - supabase_internal
+    # This service's Erlang/BEAM runtime cannot resolve `supabase_db` via
+    # Docker's embedded DNS (127.0.0.11), even though every other service on
+    # this same network (PostgREST, GoTrue, storage...) and a plain
+    # `getent hosts`/`nslookup` run from inside this exact container both
+    # resolve it correctly -- confirmed 2026-09-02 this was failing since
+    # the stack's very first deploy (continuous `Postgrex.Protocol failed to
+    # connect ... non-existing domain :nxdomain` in every prior container
+    # instance's logs), a known class of bug where Erlang's own resolver
+    # doesn't behave like glibc's getaddrinfo in this DNS environment. This
+    # static hosts entry sidesteps DNS for this one connection entirely.
+    # 10.0.2.19 is supabase_db's Swarm service VIP (Mode: vip), stable
+    # across container restarts/redeploys as long as the service itself
+    # isn't removed and recreated -- re-verify with
+    # `docker service inspect supabase_supabase_db --format
+    # '{{json .Endpoint.VirtualIPs}}'` if this service is ever removed and
+    # redeployed, since the VIP is only guaranteed for the service's
+    # current lifetime, not across a delete+recreate.
+    extra_hosts:
+      - "supabase_db:10.0.2.19"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    depends_on:
+      - supabase_db
+
+  # ===========================
+  # Storage (File Uploads)
+  # ===========================
+  storage:
+    image: supabase/storage-api:v0.43.11
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@supabase_db:5432/postgres
+      FILE_SIZE_LIMIT: ${FILE_SIZE_LIMIT}
+      STORAGE_BACKEND: ${STORAGE_BACKEND}
+      FILE_STORAGE_BACKEND_PATH: ${STORAGE_FILE_PATH}
+      TENANT_ID: ${TENANT_ID}
+      REGION: us-east-1
+      GLOBAL_S3_BUCKET: supabase-storage
+      ENABLE_IMAGE_TRANSFORMATION: "true"
+      IMGPROXY_URL: http://imgproxy:5001
+    volumes:
+      - supabase_storage_data:/var/lib/storage
+    networks:
+      - supabase_internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    depends_on:
+      - supabase_db
+      - rest
+
+  # ===========================
+  # Image Proxy (Image Transformation)
+  # ===========================
+  imgproxy:
+    image: darthsim/imgproxy:v3.8.0
+    environment:
+      IMGPROXY_BIND: ":5001"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
+    volumes:
+      - supabase_storage_data:/var/lib/storage:ro
+    networks:
+      - supabase_internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # ===========================
+  # Meta (Database Management)
+  # ===========================
+  meta:
+    image: supabase/postgres-meta:v0.68.0
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: supabase_db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - supabase_internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    depends_on:
+      - supabase_db
+
+  # ===========================
+  # Studio (Admin UI)
+  # ===========================
+  studio:
+    image: supabase/studio:latest
+    environment:
+      STUDIO_PG_META_URL: http://meta:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      
+      DEFAULT_ORGANIZATION_NAME: Greyin
+      DEFAULT_PROJECT_NAME: Greyin Platform
+      
+      SUPABASE_URL: ${SUPABASE_PUBLIC_URL}
+      SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
+      SUPABASE_ANON_KEY: ${ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      
+      # Database connection for Studio
+      POSTGRES_HOST: supabase_db
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      
+      # Bind to all interfaces
+      HOSTNAME: "0.0.0.0"
+      PORT: "3000"
+    networks:
+      - supabase_internal
+      - edjitsu-prod_edjitsu-network
+    healthcheck:
+      disable: true
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 20
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+      labels:
+        # Studio UI
+        - "traefik.enable=true"
+        - "traefik.docker.network=edjitsu-prod_edjitsu-network"
+        
+        # Security Middlewares
+        # Basic Auth - username: admin, password: Infy@121238
+        - "traefik.http.middlewares.studio-auth.basicauth.users=admin:$$2y$$05$$ywbDbmYVHI2/LFlW.Azx6OSKdBoIuN8fI4E5/4R.tl3zy0/J2N6wO"
+        - "traefik.http.middlewares.studio-auth.basicauth.realm=Greyin Studio Admin"
+        
+        # IP Allowlist - Allow local network and server IP
+        # Add your IP addresses here (comma-separated)
+        - "traefik.http.middlewares.studio-ipallowlist.ipallowlist.sourcerange=127.0.0.1/32,192.168.1.0/24,115.99.15.185/32"
+        
+        # HTTPS router with security middlewares
+        - "traefik.http.routers.supabase-studio-secure.rule=Host(`${STUDIO_DOMAIN}`)"
+        - "traefik.http.routers.supabase-studio-secure.entrypoints=websecure"
+        - "traefik.http.routers.supabase-studio-secure.tls=true"
+        - "traefik.http.routers.supabase-studio-secure.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.supabase-studio-secure.service=supabase-studio"
+        - "traefik.http.routers.supabase-studio-secure.middlewares=studio-ipallowlist,studio-auth"
+        
+        # HTTP router (redirect to HTTPS)
+        - "traefik.http.routers.supabase-studio.rule=Host(`${STUDIO_DOMAIN}`)"
+        - "traefik.http.routers.supabase-studio.entrypoints=web"
+        - "traefik.http.routers.supabase-studio.middlewares=redirect-to-https"
+        
+        # Service definition
+        - "traefik.http.services.supabase-studio.loadbalancer.server.port=3000"
+        - "traefik.http.services.supabase-studio.loadbalancer.server.scheme=http"
+        
+        # Redirect middleware
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+    depends_on:
+      - meta
+
+  # ===========================
+  # Analytics (Optional)
+  # ===========================
+  supabase_analytics:
+    image: supabase/logflare:1.4.0
+    environment:
+      LOGFLARE_NODE_HOST: 127.0.0.1
+      DB_USERNAME: postgres
+      DB_DATABASE: postgres
+      DB_HOSTNAME: supabase_db
+      DB_PORT: 5432
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_SCHEMA: _analytics
+      LOGFLARE_API_KEY: ${SERVICE_ROLE_KEY}
+      LOGFLARE_SINGLE_TENANT: "true"
+      LOGFLARE_SUPABASE_MODE: "true"
+      LOGFLARE_MIN_CLUSTER_SIZE: 1
+      POSTGRES_BACKEND_URL: postgresql://postgres:${POSTGRES_PASSWORD}@supabase_db:5432/postgres
+      POSTGRES_BACKEND_SCHEMA: _analytics
+      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
+    networks:
+      - supabase_internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    depends_on:
+      - supabase_db
+
+# ============================================================
+# NETWORKS
+# ============================================================
+networks:
+  # Internal network for Supabase services
+  supabase_internal:
+    driver: overlay
+    attachable: true
+  
+  # External network (existing Traefik network)
+  edjitsu-prod_edjitsu-network:
+    external: true
+
+# ============================================================
+# VOLUMES
+# ============================================================
+volumes:
+  supabase_db_data:
+    driver: local
+  supabase_storage_data:
+    driver: local

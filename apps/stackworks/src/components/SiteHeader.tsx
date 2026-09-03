@@ -1,0 +1,217 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { FlaskConical, Menu, X, ChevronDown, Home, MessageSquareHeart, Building2, BookOpen, Users, Briefcase, Telescope } from 'lucide-react'
+import { PILLARS } from './EcosystemWidget'
+import { NotificationBell } from './NotificationBell'
+import { createClient } from '@/lib/supabase/client'
+
+const NAV_LINKS = [
+  { href: '/projects', label: 'Browse Projects' },
+  { href: '/people', label: 'People' },
+  { href: '/applications', label: 'My Applications' },
+  { href: '/search', label: 'Ecosystem Search' },
+]
+
+const OTHER_PILLARS = PILLARS.filter((p) => p.key !== 'stackworks')
+
+// Same icon-per-pillar mapping the Hub's own header/homepage use -- gives
+// "More Platforms" a real visual mark per pillar instead of just a color
+// dot, for easier recognition/jump. Kept in sync by hand (no shared
+// source), matching this platform's established per-app duplication
+// convention.
+const PILLAR_ICONS: Record<string, typeof Building2> = {
+  deepedge: Building2,
+  greymatters: BookOpen,
+  saltnpepper: Users,
+  flexpro: Briefcase,
+  stackworks: FlaskConical,
+  longlist: Telescope,
+}
+
+/**
+ * The audit's worst mobile finding: this header's nav text used to
+ * overlap and clip the "StackWorks" wordmark on a phone screen, with the
+ * "Sign Up" button cut off mid-word. Real collapse behavior instead of
+ * an unbounded flex row fixes it.
+ */
+export function SiteHeader() {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [exploreOpen, setExploreOpen] = useState(false)
+  const [platformsOpen, setPlatformsOpen] = useState(false)
+  // null while checking -- rendering nothing until resolved avoids a
+  // flash of "Sign In" for an already-logged-in visitor, which was the
+  // actual audited bug (this header used to render Sign In/Sign Up
+  // unconditionally, on every page, regardless of session state).
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let active = true
+    createClient().auth.getUser().then(({ data: { user } }) => {
+      if (active) setIsLoggedIn(!!user)
+    })
+    return () => { active = false }
+  }, [])
+
+  return (
+    <header className="bg-white border-b">
+      <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <a href="https://greyin.net" className="flex items-center min-w-0">
+          <FlaskConical className="h-8 w-8 text-teal-600 flex-shrink-0" />
+          <span className="ml-2 text-2xl font-bold truncate">StackWorks</span>
+        </a>
+
+        <nav className="hidden md:flex items-center gap-6 flex-shrink-0">
+          <a href="https://greyin.net" className="flex items-center gap-1 text-gray-700 hover:text-teal-600" title="Back to the Greyin ecosystem hub">
+            <Home className="h-4 w-4" />
+            Home
+          </a>
+          <div className="relative group">
+            <button className="text-gray-700 hover:text-teal-600 transition flex items-center gap-1">
+              Explore
+              <ChevronDown className="h-4 w-4" />
+            </button>
+            <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
+              {NAV_LINKS.map((link) => (
+                <Link key={link.href} href={link.href} className="block px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-teal-600 transition">
+                  {link.label}
+                </Link>
+              ))}
+              <a href="https://greyin.net/feedback?app=stackworks" className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-teal-600 transition border-t border-gray-100" title="Send feedback to the Greyin team">
+                <MessageSquareHeart className="h-4 w-4" />
+                Feedback
+              </a>
+            </div>
+          </div>
+          <div className="relative group">
+            <button className="text-gray-700 hover:text-teal-600 transition flex items-center gap-1">
+              More Platforms
+              <ChevronDown className="h-4 w-4" />
+            </button>
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
+              {OTHER_PILLARS.map((p) => {
+                const Icon = PILLAR_ICONS[p.key]
+                return (
+                  <a key={p.key} href={p.url} className="block px-4 py-3 hover:bg-gray-50 transition border-b border-gray-100 last:border-b-0">
+                    <div className="font-semibold text-gray-900 flex items-center gap-2">
+                      <Icon className="h-4 w-4 flex-shrink-0" style={{ color: p.color }} aria-hidden="true" />
+                      {p.label}
+                    </div>
+                    <div className="text-sm text-gray-600">{p.description}</div>
+                  </a>
+                )
+              })}
+            </div>
+          </div>
+          {isLoggedIn === true ? (
+            <>
+                <NotificationBell />
+              <Link href="/dashboard" className="text-gray-700 hover:text-teal-600">Dashboard</Link>
+              <form action="/auth/logout" method="POST">
+                <button type="submit" className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 whitespace-nowrap">Sign Out</button>
+              </form>
+            </>
+          ) : isLoggedIn === false ? (
+            <>
+              <Link href="/login" className="text-gray-700 hover:text-teal-600">Sign In</Link>
+              <Link href="/signup" className="bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 whitespace-nowrap">
+                Sign Up
+              </Link>
+            </>
+          ) : null}
+        </nav>
+
+        <button
+          type="button"
+          className="md:hidden p-2 -mr-2 text-gray-700 flex-shrink-0"
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileOpen}
+        >
+          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
+
+      {mobileOpen && (
+        <nav className="md:hidden border-t bg-white px-4 py-4 space-y-1">
+          <a href="https://greyin.net" className="flex items-center gap-2 py-2.5 text-gray-700 hover:text-teal-600" onClick={() => setMobileOpen(false)}>
+            <Home className="h-4 w-4" />
+            Home
+          </a>
+
+          <button
+            type="button"
+            className="w-full flex items-center justify-between py-2.5 text-gray-700"
+            onClick={() => setExploreOpen((v) => !v)}
+            aria-expanded={exploreOpen}
+          >
+            Explore
+            <ChevronDown className={`h-4 w-4 transition-transform ${exploreOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {exploreOpen && (
+            <div className="pl-3 space-y-1 pb-1">
+              {NAV_LINKS.map((link) => (
+                <Link key={link.href} href={link.href} className="block py-2 text-sm text-gray-600 hover:text-teal-600" onClick={() => setMobileOpen(false)}>
+                  {link.label}
+                </Link>
+              ))}
+              <a href="https://greyin.net/feedback?app=stackworks" className="flex items-center gap-2 py-2 text-sm text-gray-600 hover:text-teal-600" onClick={() => setMobileOpen(false)}>
+                <MessageSquareHeart className="h-4 w-4" />
+                Feedback
+              </a>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="w-full flex items-center justify-between py-2.5 text-gray-700"
+            onClick={() => setPlatformsOpen((v) => !v)}
+            aria-expanded={platformsOpen}
+          >
+            More Platforms
+            <ChevronDown className={`h-4 w-4 transition-transform ${platformsOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {platformsOpen && (
+            <div className="pl-3 space-y-1 pb-1">
+              {OTHER_PILLARS.map((p) => {
+                const Icon = PILLAR_ICONS[p.key]
+                return (
+                  <a key={p.key} href={p.url} className="flex items-center gap-2 py-2 text-sm text-gray-600">
+                    <Icon className="h-4 w-4 flex-shrink-0" style={{ color: p.color }} aria-hidden="true" />
+                    {p.label}
+                  </a>
+                )
+              })}
+            </div>
+          )}
+
+          <div className="pt-3 border-t border-gray-200 flex flex-col gap-2">
+            {isLoggedIn === true ? (
+              <>
+                <NotificationBell />
+                <Link href="/dashboard" className="text-center py-2.5 text-gray-700 border border-gray-300 rounded-lg" onClick={() => setMobileOpen(false)}>
+                  Dashboard
+                </Link>
+                <form action="/auth/logout" method="POST">
+                  <button type="submit" className="w-full text-center py-2.5 bg-teal-600 text-white rounded-lg">
+                    Sign Out
+                  </button>
+                </form>
+              </>
+            ) : isLoggedIn === false ? (
+              <>
+                <Link href="/login" className="text-center py-2.5 text-gray-700 border border-gray-300 rounded-lg" onClick={() => setMobileOpen(false)}>
+                  Sign In
+                </Link>
+                <Link href="/signup" className="text-center py-2.5 bg-teal-600 text-white rounded-lg" onClick={() => setMobileOpen(false)}>
+                  Sign Up
+                </Link>
+              </>
+            ) : null}
+          </div>
+        </nav>
+      )}
+    </header>
+  )
+}

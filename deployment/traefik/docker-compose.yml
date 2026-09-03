@@ -1,0 +1,28 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Dashboard (optional, secure it in production)
+    networks:
+      - traefik_proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+      - ./traefik.yml:/traefik.yml:ro
+    environment:
+      - TZ=Asia/Kolkata
+    labels:
+      - "traefik.enable=true"
+      # Dashboard (optional - remove if not needed)
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.greyin.net`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+
+networks:
+  traefik_proxy:
+    external: true

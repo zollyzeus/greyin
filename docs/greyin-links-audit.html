@@ -1,0 +1,477 @@
+<title>Greyin Links Audit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #F4F5F7;
+    --surface: #FFFFFF;
+    --surface-2: #ECEEF1;
+    --text: #1B2028;
+    --text-muted: #5B6472;
+    --text-faint: #8A93A0;
+    --border: #DFE3E8;
+    --accent: #3A5B8C;
+    --accent-soft: #E7EDF5;
+    --accent-text: #2C4568;
+    --risk-high-bg: #FBEAE9;
+    --risk-high-text: #9A2F2A;
+    --risk-med-bg: #FBF1DF;
+    --risk-med-text: #8A5F16;
+    --risk-low-bg: #E7F3EB;
+    --risk-low-text: #2E6B41;
+    --code-bg: #ECEEF1;
+    --shadow: 0 1px 2px rgba(20,23,28,0.04), 0 4px 16px rgba(20,23,28,0.05);
+    --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+    --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171C;
+      --surface: #1B1F26;
+      --surface-2: #232833;
+      --text: #E7E9EC;
+      --text-muted: #9AA3AF;
+      --text-faint: #6C7684;
+      --border: #2B303A;
+      --accent: #7CA0D4;
+      --accent-soft: #223349;
+      --accent-text: #9DBBE6;
+      --risk-high-bg: #3A2422;
+      --risk-high-text: #E39A94;
+      --risk-med-bg: #382E1B;
+      --risk-med-text: #E3C078;
+      --risk-low-bg: #1D3324;
+      --risk-low-text: #8FD1A2;
+      --code-bg: #232833;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171C;
+    --surface: #1B1F26;
+    --surface-2: #232833;
+    --text: #E7E9EC;
+    --text-muted: #9AA3AF;
+    --text-faint: #6C7684;
+    --border: #2B303A;
+    --accent: #7CA0D4;
+    --accent-soft: #223349;
+    --accent-text: #9DBBE6;
+    --risk-high-bg: #3A2422;
+    --risk-high-text: #E39A94;
+    --risk-med-bg: #382E1B;
+    --risk-med-text: #E3C078;
+    --risk-low-bg: #1D3324;
+    --risk-low-text: #8FD1A2;
+    --code-bg: #232833;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--accent-soft); }
+
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+  }
+
+  header.page-head { margin-bottom: 3rem; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin-bottom: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 1.6rem;
+    height: 1px;
+    background: var(--accent);
+    display: inline-block;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    line-height: 1.1;
+    margin: 0 0 0.9rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .dek { color: var(--text-muted); font-size: 1.05rem; max-width: 64ch; margin: 0; }
+  .meta-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-faint);
+    flex-wrap: wrap;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.6rem 1.8rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 3.5rem;
+  }
+  .summary-card p { margin: 0 0 0.7rem; }
+  .summary-card p:last-child { margin-bottom: 0; }
+  .summary-card strong { color: var(--text); }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 3.5rem;
+  }
+  .stat {
+    background: var(--surface);
+    padding: 1.3rem 1.2rem;
+    text-align: center;
+  }
+  .stat .n {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 500;
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .stat .n.high { color: var(--risk-high-text); }
+  .stat .n.med { color: var(--risk-med-text); }
+  .stat .n.low { color: var(--risk-low-text); }
+  .stat .lbl {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  section.part { margin-bottom: 4rem; }
+  .part-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.9rem;
+    margin-bottom: 1.8rem;
+  }
+  .part-head h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; margin: 0; }
+  .part-head .count { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-faint); white-space: nowrap; }
+
+  h3.group-title {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 2.2rem 0 1rem;
+  }
+  h3.group-title:first-child { margin-top: 0; }
+
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 0.8rem;
+  }
+  .finding-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+  .finding-title { font-weight: 600; font-size: 0.98rem; }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .chip.high { background: var(--risk-high-bg); color: var(--risk-high-text); }
+  .chip.med { background: var(--risk-med-bg); color: var(--risk-med-text); }
+  .chip.low { background: var(--risk-low-bg); color: var(--risk-low-text); }
+
+  .finding p { margin: 0.4rem 0; color: var(--text-muted); font-size: 0.94rem; }
+  .finding pre {
+    background: var(--code-bg);
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    margin: 0.6rem 0;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .finding table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.6rem 0;
+    font-size: 0.85rem;
+  }
+  .finding table th, .finding table td {
+    text-align: left;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .finding table th {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-faint);
+    font-weight: 500;
+  }
+
+  code, .path {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--surface-2);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+    color: var(--text);
+    word-break: break-word;
+  }
+
+  .verdict-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--border);
+    color: var(--text-faint);
+  }
+  .verdict-box.used { color: var(--risk-low-text); }
+
+  .shortlist {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 14px;
+    padding: 1.6rem 1.8rem;
+    margin-top: 2rem;
+  }
+  .shortlist h3 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin: 0 0 1rem;
+    color: var(--accent-text);
+  }
+  .shortlist ol { margin: 0; padding-left: 1.3rem; }
+  .shortlist li { margin-bottom: 0.5rem; font-size: 0.95rem; }
+  .shortlist li:last-child { margin-bottom: 0; }
+
+  footer.note {
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-faint);
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 560px) {
+    .wrap { padding: 2.5rem 1.1rem 4rem; }
+    .part-head { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+    .stat-row { grid-template-columns: 1fr; }
+    .finding table { display: block; overflow-x: auto; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="page-head">
+    <div class="eyebrow">Internal review · greyin platform</div>
+    <h1>Every link that goes nowhere</h1>
+    <p class="dek">A monorepo-wide sweep across all 6 apps for links pointing at routes that don't exist, routes with nothing pointing at them, and links that are simply wired wrong. Read-only — nothing here was changed.</p>
+    <div class="meta-row">
+      <span>22 Aug 2026</span>
+      <span>233 routes enumerated</span>
+      <span>6 apps + e2e suite</span>
+    </div>
+  </header>
+
+  <div class="stat-row">
+    <div class="stat"><span class="n high">1</span><span class="lbl">Cross-app dead link, systemic</span></div>
+    <div class="stat"><span class="n med">18</span><span class="lbl">Single-app dead links</span></div>
+    <div class="stat"><span class="n low">0</span><span class="lbl">Confirmed unused routes</span></div>
+  </div>
+
+  <div class="summary-card">
+    <p><strong>Dead links:</strong> one systemic bug worth fixing first — every app's <code>/notifications</code> page renders the shared, ecosystem-wide notifications table as same-origin links, so a StackEdge notification about a job referral links to <code>stackedge.greyin.net/jobs/{id}</code>, which doesn't exist there. The rest are boilerplate: <code>/terms</code>/<code>/privacy</code> missing across every signup page, plus a handful of dead footer/nav links concentrated in greyin-b2b and GreyMatters.</p>
+    <p><strong>Unused routes:</strong> genuinely none. Three routes looked unreferenced on a first pass but all three turned out to be legitimate external entry points (a payment webhook, a legacy-URL redirect shim, a post-payment success page reached via string concatenation rather than a template literal) — confirmed, not just assumed.</p>
+    <p><strong>Invalid links:</strong> one real one — a "Save Job" button on the b2b job page that looks clickable but does nothing at all, in a Server Component with no way to wire it. The nested-<code>&lt;Link&gt;</code> bug class from earlier this session was checked everywhere and doesn't recur. A handful of optional-chaining hrefs are inconsistent with their own surrounding guards but the underlying data can't actually be null today — worth a tidy-up, not a fire.</p>
+  </div>
+
+  <section class="part">
+    <div class="part-head">
+      <h2>Dead links</h2>
+      <span class="count">1 cross-app + 18 single-app</span>
+    </div>
+
+    <h3 class="group-title">Cross-app · notifications rendered same-origin</h3>
+
+    <div class="finding">
+      <div class="finding-head">
+        <span class="finding-title">Every pillar's own <code>/notifications</code> page links relative, not by pillar</span>
+        <span class="chip high">Systemic · confirmed</span>
+      </div>
+      <p>Identical across all 5 content apps, e.g. <code>apps/stackedge/src/app/notifications/page.tsx:50</code>:</p>
+      <pre>&lt;Link key={n.id} href={n.link || '#'} className="block p-4 hover:bg-gray-50"&gt;</pre>
+      <p>The shared <code>notifications</code> table is ecosystem-wide and each page queries it by user only, not by pillar — so a user sees every notification ever sent to them on whichever app's <code>/notifications</code> they happen to open, and the link resolves against <em>that</em> app's own domain.</p>
+      <table>
+        <tr><th>link value</th><th>only real on</th><th>404s on</th></tr>
+        <tr><td><code>/employer/jobs/{'{id}'}/applications</code></td><td>greyin-b2b</td><td>blog, freeagent, saltnpepper, stackedge</td></tr>
+        <tr><td><code>/posts/{'{slug}'}</code></td><td>greymatters</td><td>b2b, freeagent, saltnpepper, stackedge</td></tr>
+        <tr><td><code>/discussions/{'{id}'}</code></td><td>saltnpepper</td><td>b2b, blog, freeagent, stackedge</td></tr>
+        <tr><td><code>/orders/{'{id}'}</code>, <code>/earnings</code></td><td>freeagent</td><td>b2b, blog, saltnpepper, stackedge</td></tr>
+        <tr><td><code>/asks/{'{id}'}</code></td><td>stackedge</td><td>b2b, blog, freeagent, saltnpepper</td></tr>
+        <tr><td><code>/messages/{'{id}'}</code></td><td>b2b + saltnpepper</td><td>blog, freeagent, stackedge</td></tr>
+      </table>
+      <p><code>/projects/{'{id}'}</code> is the one accidental survivor — saltnpepper still 301-redirects legacy <code>/projects*</code> paths to StackEdge (see the unused-routes section below).</p>
+      <p>The e2e suite already exercises this exact broken path and passes: <code>e2e/tests/cross-platform/referral-cross-app.spec.ts:59</code> visits saltnpepper's <code>/notifications</code> and asserts a <code>/jobs/{'{id}'}</code> referral notification's <em>text</em> is visible — never that the link resolves. Clicking it 404s.</p>
+    </div>
+
+    <h3 class="group-title">greyin-b2b</h3>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title">Footer links to <code>/post-job</code>, <code>/career-advice</code>, <code>/about</code>, <code>/contact</code>, <code>/privacy</code></span><span class="chip med">Confirmed</span></div>
+      <p><code>apps/greyin-b2b/src/app/page.tsx:221,232,238,239,240</code> — none of these route folders exist. The real post-a-job path is <code>/employer/post-job</code>.</p>
+    </div>
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title"><code>/terms</code> and <code>/privacy</code> on login &amp; signup</span><span class="chip med">Confirmed</span></div>
+      <p><code>apps/greyin-b2b/src/app/login/page.tsx:128,132</code>, <code>apps/greyin-b2b/src/app/signup/page.tsx:187,191</code>.</p>
+    </div>
+
+    <h3 class="group-title">greymatters-blog</h3>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title"><code>/about</code> in the site-wide header nav</span><span class="chip med">Confirmed</span></div>
+      <p><code>apps/greymatters-blog/src/components/SiteHeader.tsx:12</code> and a second copy at <code>apps/greymatters-blog/src/app/posts/[slug]/page.tsx:109</code> — rendered on every page via <code>NAV_LINKS</code>, so this is the most-visible dead link on the whole platform.</p>
+    </div>
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title">Every post tag links to <code>/tags/{'{tag}'}</code></span><span class="chip high">Confirmed</span></div>
+      <p><code>apps/greymatters-blog/src/app/posts/[slug]/page.tsx:195</code> — there is no <code>/tags</code> route folder in this app or any app. Every tag chip on every published post is a 404.</p>
+    </div>
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title"><code>/terms</code> and <code>/privacy</code> on signup</span><span class="chip med">Confirmed</span></div>
+      <p><code>apps/greymatters-blog/src/app/signup/page.tsx:138,142</code>.</p>
+    </div>
+
+    <h3 class="group-title">freeagent · saltnpepper · stackedge</h3>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title">Same <code>/terms</code> / <code>/privacy</code> gap on every signup page</span><span class="chip low">Confirmed, boilerplate</span></div>
+      <p><code>freeagent-marketplace/src/app/signup/page.tsx:185,189</code> &middot; <code>saltnpepper-community/src/app/signup/page.tsx:148,152</code> &middot; <code>stackedge/src/app/signup/page.tsx:189,193</code>. No other dead links found in these three apps.</p>
+    </div>
+
+    <h3 class="group-title">Verified clean</h3>
+    <div class="finding">
+      <p style="margin:0"><strong>greyin-hub</strong> — every outbound link to the other 5 pillars' domains resolves correctly (dashboard, pivoting, reentry, login, EcosystemWidget — all checked individually).<br><strong>Every <code>PILLAR_DOMAINS</code> cross-app path template</strong> (posts, jobs, gigs, discussions, projects — the pattern the new activity feed and Ecosystem Search both use) resolves correctly in every app, including the recently-fixed FreeAgent <code>/sellers/{'{id}'}</code> link — confirmed not regressed.</p>
+    </div>
+  </section>
+
+  <section class="part">
+    <div class="part-head">
+      <h2>Unused routes</h2>
+      <span class="count">0 confirmed dead · 3 checked and cleared</span>
+    </div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title"><code>api/webhooks/razorpay-subscriptions/route.ts</code> (greyin-b2b)</span><span class="chip low">Used externally</span></div>
+      <p>Zero in-app references anywhere — but it's a Razorpay-hosted webhook target configured in the Razorpay dashboard, not in code, same pattern as FreeAgent's own payment webhook (which <em>does</em> have e2e coverage). Worth flagging separately: this is the one webhook of the two with <strong>no e2e test at all</strong> — an untested production money path, not a dead route.</p>
+    </div>
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title"><code>projects/[[...path]]/route.ts</code> (saltnpepper)</span><span class="chip low">Used externally</span></div>
+      <p>A deliberate legacy-URL shim (its own comment explains it) 301-redirecting stale <code>saltnpepper.greyin.net/projects*</code> bookmarks to StackEdge, from before "The Lab" moved apps. Zero in-app links, reachable only from old external bookmarks — and, incidentally, the one thing currently saving the <code>/projects/{'{id}'}</code> notification link from 404ing on saltnpepper (see above).</p>
+    </div>
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title"><code>orders/[id]/success/page.tsx</code> (freeagent)</span><span class="chip low">False positive, now confirmed</span></div>
+      <p>Missed on a first pass because its only entry point uses string concatenation, not a template literal: <code>checkout/[id]/page.tsx:220</code> — <code>window.location.href = '/orders/' + data.orderId + '/success'</code>. Genuinely used; also has no e2e coverage of its own.</p>
+    </div>
+    <div class="finding">
+      <p style="margin:0">Every other route with an e2e <code>page.goto</code> also has a real in-app link, redirect, form action, or webhook target — no route was found reachable <em>only</em> via the test suite and nowhere else, which would have been the strongest "actually dead in production" signal.</p>
+    </div>
+  </section>
+
+  <section class="part">
+    <div class="part-head">
+      <h2>Invalid links</h2>
+      <span class="count">1 confirmed · rest cleared</span>
+    </div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title">"Save Job" button does nothing</span><span class="chip high">Confirmed</span></div>
+      <p><code>apps/greyin-b2b/src/app/jobs/[id]/page.tsx:117</code> — an async Server Component with no client JS available:</p>
+      <pre>&lt;button className="border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 font-semibold"&gt;
+  Save Job
+&lt;/button&gt;</pre>
+      <p>No <code>onClick</code>, no <code>form</code> attribute, not inside a <code>&lt;form&gt;</code> — a complete no-op, sitting directly between two working controls (Apply Now, Refer a Friend), so it reads as functional. The two other server-component buttons found outside a form elsewhere in the codebase both correctly use the HTML5 <code>form="..."</code> association attribute — this is the one instance that doesn't.</p>
+    </div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title">Nested <code>&lt;Link&gt;</code>/<code>&lt;a&gt;</code> — checked everywhere, zero recurrences</span><span class="chip low">Clean</span></div>
+      <p>A tag-depth scanner across every <code>.tsx</code> file in all 6 apps found no instance of the bug class fixed earlier this session on the job-listing card. That fix (<code>apps/greyin-b2b/src/app/jobs/page.tsx</code>) is confirmed still correct and hasn't regressed.</p>
+    </div>
+
+    <div class="finding">
+      <div class="finding-head"><span class="finding-title">Optional-chaining hrefs inconsistent with their own surrounding guards</span><span class="chip low">Cosmetic, not live</span></div>
+      <p>Five spots interpolate an optionally-chained id into an href (<code>gig.seller?.id</code>, <code>job.companies?.id</code> ×2, <code>app.jobs?.id</code>, <code>app.project_asks?.id</code>, <code>project?.id</code>) while the surrounding markup treats the same field as nullable elsewhere on the page — so the pattern is inconsistent, even though every one of these is backed by a <code>NOT NULL</code> foreign key with an open SELECT policy on the parent table, meaning it can't actually resolve to <code>/undefined</code> today. Worth a consistency pass, not urgent.</p>
+    </div>
+
+    <div class="finding">
+      <p style="margin:0">Checked and clear: malformed template literals, stray <code>${'{}'}</code>, double-slash concatenation, wrong-variable interpolation (one apparent hit turned out to be an intentional Next.js routing workaround, not a bug), destructive actions wired as GET instead of POST, and forms with no <code>action</code> (all intentional same-page GET submits).</p>
+    </div>
+  </section>
+
+  <div class="shortlist">
+    <h3>Suggested fix order</h3>
+    <ol>
+      <li>Shared <code>/notifications</code> link rendered same-origin across all 5 apps — the one systemic bug, and the highest-traffic one</li>
+      <li><code>/tags/{'{tag}'}</code> — every tag chip on every published GreyMatters post 404s</li>
+      <li><code>/about</code> in GreyMatters' site-wide header nav — visible on every page</li>
+      <li>"Save Job" no-op button on the b2b job detail page</li>
+      <li><code>/terms</code> / <code>/privacy</code> across all 5 signup pages, plus b2b's 4 dead footer links</li>
+      <li>Optional-chaining href consistency pass (lowest priority — not currently reachable)</li>
+    </ol>
+  </div>
+
+  <footer class="note">
+    Read-only sweep across 233 enumerated routes, all 6 apps' source, and the e2e suite. File paths and line numbers reflect the codebase at the time of the audit — verify before acting, code moves. Nothing here was implemented.
+  </footer>
+
+</div>

@@ -1,0 +1,39 @@
+# Dependencies
+**/node_modules/
+
+# Next.js build output
+**/.next/
+**/out/
+**/build/
+
+# Environment / secrets -- never commit real credentials.
+# .env.example files are intentionally NOT matched by these patterns.
+**/.env
+**/.env.local
+**/.env.*.local
+deployment/.secret-backups/
+
+# Deployment secrets embedded directly in these files (not env-var
+# references) -- a live signed Supabase service_role JWT in kong.yml,
+# and Let's Encrypt's private key material in acme.json. Excluded rather
+# than sanitized, to avoid shipping a template that silently drifts from
+# what's actually deployed.
+deployment/config/kong.yml
+deployment/traefik/letsencrypt/
+
+# E2E test run artifacts (regenerated, not source)
+e2e/test-results/
+e2e/playwright-report/
+
+# Large binary archives -- not source, and exceed GitHub's 100MB
+# per-file limit anyway.
+/greyin_b1.7z
+/greyin_b2.7z
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

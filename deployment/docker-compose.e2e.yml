@@ -1,0 +1,198 @@
+version: '3.8'
+
+# ============================================================
+# Greyin Platform - Isolated E2E Test Backend
+# ============================================================
+#
+# A throwaway Supabase stack for e2e runs, modeled on
+# supabase-stack.yml but deliberately smaller: no Studio (no
+# human ever looks at this database) and no Analytics/Logflare
+# (optional in prod, and its own migration bootstrap would just
+# slow down every single test run for a service nothing here
+# calls). Runs as plain `docker compose` (not a swarm stack) —
+# `docker compose ... down -v` is what actually deletes the
+# volume; `up` alone never touches an existing one, so this is
+# safe to leave defined without a container running.
+#
+# Reuses the SAME JWT_SECRET/ANON_KEY/SERVICE_ROLE_KEY and
+# config/kong.yml as production — safe to do because this is a
+# completely separate Postgres instance/volume/network; the keys
+# only need to be internally consistent (GoTrue signs, PostgREST
+# and Kong verify against the same secret), not secret from the
+# prod stack they happen to match.
+# ============================================================
+
+services:
+  db:
+    image: supabase/postgres:15.1.0.117
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXP: ${JWT_EXPIRY}
+    ports:
+      - "127.0.0.1:${E2E_DB_PORT:-54329}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+  kong:
+    image: kong:2.8.1
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    ports:
+      - "127.0.0.1:${E2E_KONG_PORT:-8180}:8000"
+    volumes:
+      - ./config/kong.yml:/var/lib/kong/kong.yml:ro
+    depends_on:
+      rest:
+        condition: service_started
+      auth:
+        condition: service_started
+
+  rest:
+    image: postgrest/postgrest:v12.0.1
+    environment:
+      PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+      PGRST_DB_SCHEMAS: public,storage,graphql_public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET}
+      PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  auth:
+    image: supabase/gotrue:v2.132.3
+    # The supabase/postgres image does an internal restart shortly after
+    # first boot to apply config generated during its own init scripts —
+    # pg_isready (db's healthcheck) can report healthy in the narrow
+    # window before that happens, so `depends_on: service_healthy` alone
+    # isn't a hard guarantee on a fresh volume. restart_policy makes a
+    # crash on that race a transient hiccup instead of a dead stack.
+    restart: on-failure:5
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: http://localhost:${E2E_KONG_PORT:-8180}
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?search_path=auth
+      GOTRUE_SITE_URL: ${E2E_SITE_URL}
+      GOTRUE_URI_ALLOW_LIST: ${E2E_REDIRECT_URLS}
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: ${JWT_EXPIRY}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      GOTRUE_MAILER_AUTOCONFIRM: "false"
+      # GoTrue's default email-send rate limit (30/hour) is tuned for real
+      # traffic — a parallel e2e run can create dozens of accounts within
+      # seconds and was getting every signup past the first ~30 rejected
+      # outright with 429 "Email rate limit exceeded" (confirmed via
+      # `docker logs ..._auth-1`), not any real capacity problem. Tests
+      # never read the actual email anyway (confirmTestUserEmail/
+      # getRecoveryOtp go through the admin API), so this only needs to be
+      # high enough that GoTrue stops blocking the request itself.
+      GOTRUE_RATE_LIMIT_EMAIL_SENT: "3600"
+      GOTRUE_EXTERNAL_PHONE_ENABLED: "false"
+      GOTRUE_SMS_AUTOCONFIRM: "false"
+      GOTRUE_SMTP_HOST: ${GOTRUE_SMTP_HOST}
+      GOTRUE_SMTP_PORT: ${GOTRUE_SMTP_PORT}
+      GOTRUE_SMTP_USER: ${GOTRUE_SMTP_USER}
+      GOTRUE_SMTP_PASS: ${GOTRUE_SMTP_PASS}
+      GOTRUE_SMTP_ADMIN_EMAIL: ${GOTRUE_SMTP_ADMIN_EMAIL}
+      GOTRUE_SMTP_SENDER_NAME: "Greyin Platform (e2e)"
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
+      GOTRUE_MAILER_TEMPLATES_CONFIRMATION: https://greyin.net/email-templates/confirm-signup.html
+    depends_on:
+      db:
+        condition: service_healthy
+
+  storage:
+    image: supabase/storage-api:v0.43.11
+    restart: on-failure:5
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+      FILE_SIZE_LIMIT: "52428800"
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: greyin-e2e
+      REGION: us-east-1
+      GLOBAL_S3_BUCKET: supabase-storage
+      ENABLE_IMAGE_TRANSFORMATION: "true"
+      IMGPROXY_URL: http://imgproxy:5001
+    volumes:
+      - storage_data:/var/lib/storage
+    depends_on:
+      db:
+        condition: service_healthy
+      rest:
+        condition: service_started
+
+  imgproxy:
+    image: darthsim/imgproxy:v3.8.0
+    environment:
+      IMGPROXY_BIND: ":5001"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      IMGPROXY_USE_ETAG: "true"
+    volumes:
+      - storage_data:/var/lib/storage:ro
+
+  meta:
+    image: supabase/postgres-meta:v0.68.0
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  realtime:
+    image: supabase/realtime:v2.25.35
+    environment:
+      PORT: 4000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: postgres
+      DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
+      DB_ENC_KEY: supabaserealtime
+      API_JWT_SECRET: ${JWT_SECRET}
+      FLY_ALLOC_ID: fly123
+      FLY_APP_NAME: realtime
+      SECRET_KEY_BASE: ${JWT_SECRET}
+      ERL_AFLAGS: -proto_dist inet_tcp
+      ENABLE_TAILSCALE: "false"
+      DNS_NODES: "''"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  # No `driver_opts`/host bind — an anonymous-per-project named volume,
+  # deleted along with everything else by `docker compose down -v`.
+  storage_data:

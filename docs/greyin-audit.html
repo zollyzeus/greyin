@@ -1,0 +1,536 @@
+<title>Greyin Competitive Audit</title>
+<meta name="description" content="Feature-by-feature audit of Greyin's six pillars against ten industry platforms, with user-value scoring and an engagement forecast.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#F4F5F7; --surface:#FFFFFF; --surface-2:#ECEEF2; --surface-3:#E4E6EC;
+    --ink:#14161C; --ink-soft:#565B68; --ink-faint:#8A8F9C;
+    --border:#DFE1E7; --border-soft:#EAEBEF;
+    --accent:#C2410C; --accent-soft:#FCEEE3; --accent-ink:#7C2D0E;
+    --good:#15803D; --good-soft:#E8F5EC;
+    --mid:#A16207; --mid-soft:#FBF1DD;
+    --gap:#B91C1C; --gap-soft:#FBE9E9;
+    --uniq:#4338CA; --uniq-soft:#EDECFB;
+    --font-display:'Fraunces',ui-serif,Georgia,serif;
+    --font-body:'Public Sans',ui-sans-serif,system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15171C; --surface:#1C1F26; --surface-2:#22252D; --surface-3:#2A2E38;
+      --ink:#EDEEF2; --ink-soft:#AFB4C0; --ink-faint:#767C8A;
+      --border:#31353F; --border-soft:#282C35;
+      --accent:#F0783A; --accent-soft:#3A2417; --accent-ink:#FBBE9C;
+      --good:#4ADE80; --good-soft:#152A1D;
+      --mid:#F4C05C; --mid-soft:#2E2410;
+      --gap:#F87171; --gap-soft:#301616;
+      --uniq:#9A96F0; --uniq-soft:#211F3C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15171C; --surface:#1C1F26; --surface-2:#22252D; --surface-3:#2A2E38;
+    --ink:#EDEEF2; --ink-soft:#AFB4C0; --ink-faint:#767C8A;
+    --border:#31353F; --border-soft:#282C35;
+    --accent:#F0783A; --accent-soft:#3A2417; --accent-ink:#FBBE9C;
+    --good:#4ADE80; --good-soft:#152A1D;
+    --mid:#F4C05C; --mid-soft:#2E2410;
+    --gap:#F87171; --gap-soft:#301616;
+    --uniq:#9A96F0; --uniq-soft:#211F3C;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--font-body); font-size:15.5px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--accent-soft); color:var(--accent-ink); }
+  h1,h2,h3,h4{ font-family:var(--font-display); font-weight:600; text-wrap:balance; margin:0; color:var(--ink); }
+  a{ color:inherit; }
+  .mono{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
+
+  /* ---------- Shell ---------- */
+  .shell{ display:grid; grid-template-columns:248px minmax(0,1fr); max-width:1360px; margin:0 auto; }
+  @media (max-width:900px){ .shell{ grid-template-columns:1fr; } .nav{ display:none; } }
+
+  .nav{
+    position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+    padding:32px 20px 32px 28px; border-right:1px solid var(--border);
+  }
+  .nav-brand{ display:flex; align-items:baseline; gap:8px; margin-bottom:28px; }
+  .nav-brand .mark{ font-family:var(--font-display); font-weight:700; font-size:20px; color:var(--accent); }
+  .nav-brand .sub{ font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.08em; }
+  .nav ol{ list-style:none; margin:0; padding:0; counter-reset:sec; }
+  .nav li{ counter-increment:sec; margin-bottom:2px; }
+  .nav a{
+    display:flex; gap:10px; padding:7px 10px; border-radius:7px; text-decoration:none;
+    font-size:13px; color:var(--ink-soft); font-weight:500;
+  }
+  .nav a:hover{ background:var(--surface-2); color:var(--ink); }
+  .nav a::before{
+    content:counter(sec,decimal-leading-zero); font-family:var(--font-mono); font-size:11px;
+    color:var(--ink-faint); padding-top:1px;
+  }
+
+  main{ min-width:0; padding:40px 40px 120px; }
+  @media (max-width:900px){ main{ padding:28px 20px 90px; } }
+  section{ padding-top:64px; margin-top:-24px; }
+  section:first-of-type{ padding-top:0; }
+
+  /* ---------- Hero ---------- */
+  .hero-kicker{
+    display:inline-flex; align-items:center; gap:8px; font-size:12px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin-bottom:14px;
+  }
+  .hero-kicker::before{ content:''; width:7px; height:7px; border-radius:50%; background:var(--accent); }
+  h1.title{ font-size:clamp(30px,4vw,44px); line-height:1.08; letter-spacing:-.01em; max-width:16ch; }
+  .hero-dek{ font-size:17px; color:var(--ink-soft); max-width:62ch; margin-top:16px; }
+  .hero-meta{ display:flex; flex-wrap:wrap; gap:8px 22px; margin-top:22px; font-size:13px; color:var(--ink-faint); }
+  .hero-meta b{ color:var(--ink-soft); font-weight:600; }
+
+  .stat-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:36px; }
+  @media (max-width:760px){ .stat-row{ grid-template-columns:repeat(2,1fr); } }
+  .stat-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 18px 16px;
+  }
+  .stat-card .n{ font-family:var(--font-mono); font-size:28px; font-weight:600; letter-spacing:-.01em; }
+  .stat-card .n.good{ color:var(--good); } .stat-card .n.gap{ color:var(--gap); } .stat-card .n.uniq{ color:var(--uniq); }
+  .stat-card .l{ font-size:12.5px; color:var(--ink-soft); margin-top:5px; line-height:1.4; }
+
+  /* ---------- Section headers ---------- */
+  .sec-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:6px; }
+  .sec-num{ font-family:var(--font-mono); color:var(--accent); font-weight:600; font-size:14px; }
+  h2.sec-title{ font-size:26px; }
+  .sec-dek{ color:var(--ink-soft); max-width:70ch; margin:10px 0 28px; font-size:14.5px; }
+
+  /* ---------- Methodology callout ---------- */
+  .callout{
+    background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent);
+    border-radius:10px; padding:18px 20px; margin:18px 0 30px; font-size:13.5px; color:var(--ink-soft);
+  }
+  .callout b{ color:var(--ink); }
+  .callout .tag{
+    display:inline-block; font-family:var(--font-mono); font-size:10.5px; font-weight:600; letter-spacing:.04em;
+    text-transform:uppercase; color:var(--accent); background:var(--accent-soft); padding:2px 8px; border-radius:5px;
+    margin-bottom:10px;
+  }
+
+  /* ---------- Platform roster ---------- */
+  .roster{ display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; }
+  .plat-card{ background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:16px; }
+  .plat-card .pn{ font-weight:700; font-size:15px; }
+  .plat-card .pp{
+    font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:.03em; text-transform:uppercase;
+    color:var(--accent-ink); background:var(--accent-soft); display:inline-block; padding:2px 7px; border-radius:5px;
+    margin:8px 0 8px;
+  }
+  .plat-card p{ margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
+
+  /* ---------- Matrix ---------- */
+  .matrix-scroll{ overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
+  table.matrix{ border-collapse:collapse; width:100%; min-width:1180px; font-size:12.5px; }
+  table.matrix th, table.matrix td{ padding:10px 12px; border-bottom:1px solid var(--border-soft); text-align:center; white-space:nowrap; }
+  table.matrix th{
+    position:sticky; top:0; background:var(--surface-2); font-family:var(--font-mono); font-weight:600;
+    font-size:10.5px; text-transform:uppercase; letter-spacing:.02em; color:var(--ink-soft); z-index:2;
+  }
+  table.matrix td:first-child, table.matrix th:first-child{
+    position:sticky; left:0; background:var(--surface); text-align:left; white-space:normal;
+    max-width:230px; font-weight:600; font-size:12.5px; z-index:1; border-right:1px solid var(--border);
+  }
+  table.matrix th:first-child{ background:var(--surface-2); z-index:3; }
+  table.matrix th.greyin-col, table.matrix td.greyin-col{ background:var(--accent-soft); }
+  table.matrix tr:last-child td{ border-bottom:none; }
+  .dot{ display:inline-block; width:9px; height:9px; border-radius:50%; }
+  .dot.y{ background:var(--good); } .dot.p{ background:var(--mid); } .dot.n{ background:var(--border-soft); border:1px solid var(--border); }
+  .dot.u{ background:var(--uniq); }
+  .matrix-legend{ display:flex; flex-wrap:wrap; gap:16px; padding:12px 14px; border-top:1px solid var(--border); font-size:12px; color:var(--ink-soft); }
+  .matrix-legend span{ display:inline-flex; align-items:center; gap:6px; }
+
+  /* ---------- Verdict badge ---------- */
+  .verdict{
+    display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10.5px; font-weight:600;
+    letter-spacing:.03em; text-transform:uppercase; padding:3px 9px; border-radius:6px; white-space:nowrap;
+  }
+  .verdict.ahead{ background:var(--good-soft); color:var(--good); }
+  .verdict.parity{ background:var(--mid-soft); color:var(--mid); }
+  .verdict.behind{ background:var(--gap-soft); color:var(--gap); }
+  .verdict.unique{ background:var(--uniq-soft); color:var(--uniq); }
+
+  /* ---------- Deep dive cards ---------- */
+  .dive{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px 26px; margin-bottom:18px; }
+  .dive-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+  .dive-head h3{ font-size:19px; }
+  .dive-vs{ font-size:12.5px; color:var(--ink-faint); margin-top:4px; }
+  .dive-vs b{ color:var(--ink-soft); font-weight:600; }
+  .dive-cols{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:14px; }
+  @media (max-width:640px){ .dive-cols{ grid-template-columns:1fr; } }
+  .dive-col h4{ font-family:var(--font-body); font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; }
+  .dive-col.strength h4{ color:var(--good); } .dive-col.gap h4{ color:var(--gap); }
+  .dive-col ul{ margin:0; padding-left:18px; }
+  .dive-col li{ margin-bottom:6px; font-size:13.5px; color:var(--ink-soft); line-height:1.5; }
+  .dive-col li::marker{ color:var(--ink-faint); }
+  .rec{ margin-top:14px; padding:12px 14px; background:var(--surface-2); border-radius:8px; font-size:13px; color:var(--ink-soft); }
+  .rec b{ color:var(--ink); font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; margin-right:8px; }
+
+  /* ---------- Priority list ---------- */
+  .prio{ display:flex; flex-direction:column; gap:10px; }
+  .prio-row{
+    display:grid; grid-template-columns:34px 1fr auto; gap:16px; align-items:center;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 18px;
+  }
+  .prio-rank{ font-family:var(--font-mono); font-size:18px; font-weight:600; color:var(--accent); }
+  .prio-main .t{ font-weight:600; font-size:14.5px; }
+  .prio-main .d{ font-size:12.5px; color:var(--ink-soft); margin-top:3px; }
+  .prio-score{ text-align:right; }
+  .prio-score .v{ font-family:var(--font-mono); font-weight:600; font-size:15px; }
+  .prio-score .l{ font-size:10px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.04em; }
+
+  /* ---------- Forecast ---------- */
+  .funnel{ display:flex; flex-direction:column; gap:2px; margin:20px 0 8px; }
+  .funnel-row{ display:grid; grid-template-columns:150px 1fr 190px; align-items:center; gap:14px; }
+  @media (max-width:640px){ .funnel-row{ grid-template-columns:110px 1fr 130px; } }
+  .funnel-label{ font-size:12.5px; color:var(--ink-soft); font-weight:600; }
+  .funnel-track{ height:26px; background:var(--surface-2); border-radius:6px; position:relative; overflow:hidden; }
+  .funnel-fill{ position:absolute; inset:0 auto 0 0; border-radius:6px; }
+  .funnel-fill.base{ background:var(--accent); }
+  .funnel-range{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft); text-align:right; }
+  .funnel-range b{ color:var(--ink); }
+
+  .scenario-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:24px; }
+  @media (max-width:700px){ .scenario-row{ grid-template-columns:1fr; } }
+  .scenario{ border:1px solid var(--border); border-radius:12px; padding:18px; background:var(--surface); }
+  .scenario.base{ border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset; }
+  .scenario .sn{ font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); font-weight:600; }
+  .scenario.base .sn{ color:var(--accent); }
+  .scenario h4{ font-family:var(--font-display); font-size:17px; margin:6px 0 12px; }
+  .scenario dl{ margin:0; display:grid; gap:8px; }
+  .scenario dt{ font-size:11.5px; color:var(--ink-faint); }
+  .scenario dd{ margin:0; font-family:var(--font-mono); font-weight:600; font-size:14.5px; }
+
+  .lever-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:14px; }
+  @media (max-width:700px){ .lever-grid{ grid-template-columns:1fr; } }
+  .lever-box{ border:1px solid var(--border); border-radius:12px; padding:18px 20px; background:var(--surface); }
+  .lever-box h4{ font-size:13px; text-transform:uppercase; letter-spacing:.04em; font-family:var(--font-body); font-weight:700; margin-bottom:10px; }
+  .lever-box.have h4{ color:var(--good); } .lever-box.next h4{ color:var(--accent); }
+  .lever-box ul{ margin:0; padding-left:18px; }
+  .lever-box li{ font-size:13.5px; color:var(--ink-soft); margin-bottom:7px; line-height:1.5; }
+
+  /* ---------- footer ---------- */
+  footer{ margin-top:70px; padding-top:24px; border-top:1px solid var(--border); font-size:12px; color:var(--ink-faint); }
+  footer a{ color:var(--ink-soft); text-decoration:underline; text-decoration-color:var(--border); }
+  .src-list{ columns:2; gap:24px; margin-top:10px; }
+  @media (max-width:640px){ .src-list{ columns:1; } }
+  .src-list div{ break-inside:avoid; margin-bottom:6px; font-size:11.5px; }
+</style>
+
+<div class="shell">
+  <nav class="nav">
+    <div class="nav-brand"><span class="mark">Greyin</span><span class="sub">Audit</span></div>
+    <ol>
+      <li><a href="#roster">Platform roster</a></li>
+      <li><a href="#matrix">Capability matrix</a></li>
+      <li><a href="#expertedge">ExpertEdge</a></li>
+      <li><a href="#freeagent">FreeAgent</a></li>
+      <li><a href="#stackedge">StackEdge</a></li>
+      <li><a href="#community">Salt &amp; Pepper</a></li>
+      <li><a href="#greymatters">GreyMatters</a></li>
+      <li><a href="#mentor">Mentor sessions</a></li>
+      <li><a href="#priorities">Priority opportunities</a></li>
+      <li><a href="#forecast">Engagement forecast</a></li>
+      <li><a href="#sources">Sources &amp; method</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <section id="top">
+      <div class="hero-kicker">Competitive audit · August 2026</div>
+      <h1 class="title">Greyin against ten platforms that already won one piece of this game</h1>
+      <p class="hero-dek">Greyin runs six pillars — hiring, freelance work, build-to-prove-yourself, community, publishing, and mentorship — under one identity and one trust score. Every pillar has a category leader that does that one thing better today. This audit scores Greyin's actual shipped feature set (55 functional requirements, verified in <span class="mono">docs/greyin-requirements-traceability.xlsx</span>) against each of them, then models what engagement could look like from here.</p>
+      <div class="hero-meta">
+        <span><b>18</b> capability areas scored</span>
+        <span><b>10</b> platforms benchmarked</span>
+        <span><b>6</b> Greyin pillars covered</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat-card"><div class="n good">6</div><div class="l">areas where Greyin is ahead or category-unique</div></div>
+        <div class="stat-card"><div class="n">7</div><div class="l">areas at rough feature parity</div></div>
+        <div class="stat-card"><div class="n gap">5</div><div class="l">areas clearly behind an established leader</div></div>
+        <div class="stat-card"><div class="n uniq">4</div><div class="l">capabilities no single competitor offers in one product</div></div>
+      </div>
+    </section>
+
+    <section id="roster">
+      <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title">The comparison set</h2></div>
+      <p class="sec-dek">Ten platforms, each the reference point for one thing Greyin also does. Picked for name recognition and feature depth, not size — Toptal and Blind are small; they still set the bar in their lane.</p>
+      <div class="roster">
+        <div class="plat-card"><div class="pn">LinkedIn</div><div class="pp">ExpertEdge</div><p>Professional network, job board, and feed. The default identity layer for a working professional.</p></div>
+        <div class="plat-card"><div class="pn">Indeed</div><div class="pp">ExpertEdge</div><p>Highest-volume job search. Wins on reach and application throughput, not relationships.</p></div>
+        <div class="plat-card"><div class="pn">Glassdoor</div><div class="pp">ExpertEdge</div><p>Company reviews and crowd-sourced salary data, open to anyone claiming to have worked somewhere.</p></div>
+        <div class="plat-card"><div class="pn">Upwork</div><div class="pp">FreeAgent</div><p>General freelance marketplace with milestone escrow; 0–15% variable service fee since May 2025.</p></div>
+        <div class="plat-card"><div class="pn">Fiverr</div><div class="pp">FreeAgent</div><p>Seller-first gig catalog, flat 20% commission, buyer service fee on top.</p></div>
+        <div class="plat-card"><div class="pn">Toptal</div><div class="pp">FreeAgent · StackEdge</div><p>Accepts roughly the top 3% of applicants after a rigorous screen; 0% commission to freelancers.</p></div>
+        <div class="plat-card"><div class="pn">GitHub</div><div class="pp">StackEdge</div><p>The default place a builder's real output lives — contribution history as a public track record.</p></div>
+        <div class="plat-card"><div class="pn">Blind</div><div class="pp">Salt &amp; Pepper</div><p>Work-email-verified anonymous community; salary comparison by role, location, and level. 9M+ verified users.</p></div>
+        <div class="plat-card"><div class="pn">Medium</div><div class="pp">GreyMatters</div><p>Open long-form publishing with algorithmic distribution and a reader-funded Partner Program.</p></div>
+        <div class="plat-card"><div class="pn">Topmate</div><div class="pp">Mentor sessions</div><p>Creator-led 1:1s, webinars, cohorts, and paid DMs from one link. 10% commission direct, 20% via marketplace.</p></div>
+      </div>
+    </section>
+
+    <section id="matrix">
+      <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title">Capability matrix</h2></div>
+      <p class="sec-dek">Eighteen capability areas, scored against each of the ten platforms plus Greyin. A full dot means the capability is a first-class, shipped feature; a half dot means a thin or partial version exists.</p>
+      <div class="matrix-scroll">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th>LinkedIn</th><th>Indeed</th><th>Glassdoor</th><th>Upwork</th><th>Fiverr</th>
+              <th>Toptal</th><th>GitHub</th><th>Blind</th><th>Medium</th><th>Topmate</th>
+              <th class="greyin-col">Greyin</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Job search &amp; apply</td><td><span class="dot y"></span></td><td><span class="dot y"></span></td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Verified-only company reviews</td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Salary benchmarking</td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Talent search (recruiter-side)</td><td><span class="dot y"></span></td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot y"></span></td><td><span class="dot p"></span></td><td><span class="dot y"></span></td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Freelance marketplace + escrow</td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot y"></span></td><td><span class="dot y"></span></td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Centrally vetted talent tier</td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot p"></span></td></tr>
+            <tr><td>Open peer skill endorsements</td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Interaction-gated skill ratings</td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot p"></span></td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot u"></span></td></tr>
+            <tr><td>Approval-gated written recommendations</td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Verified build / outcome track record</td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot p"></span></td><td><span class="dot p"></span></td><td><span class="dot p"></span></td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Anonymous verified-employee discussion</td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Long-form publishing</td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Paid 1:1 mentorship booking</td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot y"></span></td><td class="greyin-col"><span class="dot p"></span></td></tr>
+            <tr><td>Mentor monetization breadth (courses, cohorts, digital products)</td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot y"></span></td><td class="greyin-col"><span class="dot n"></span></td></tr>
+            <tr><td>Unified cross-pillar trust score</td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot u"></span></td></tr>
+            <tr><td>"Worked together" discovery from real transactions</td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot u"></span></td></tr>
+            <tr><td>Cross-pillar natural-language search</td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot u"></span></td></tr>
+            <tr><td>Career-transition tracks (pivot / re-entry)</td><td><span class="dot p"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot y"></span></td></tr>
+            <tr><td>Referral tracking</td><td><span class="dot y"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td><span class="dot n"></span></td><td class="greyin-col"><span class="dot p"></span></td></tr>
+          </tbody>
+        </table>
+        <div class="matrix-legend">
+          <span><span class="dot y"></span> First-class</span>
+          <span><span class="dot p"></span> Partial / thin</span>
+          <span><span class="dot n"></span> Not offered</span>
+          <span><span class="dot u"></span> Greyin-unique combination</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="expertedge">
+      <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title">Pillar deep-dives</h2></div>
+      <p class="sec-dek">Where each Greyin pillar actually stands against the platform that owns its category today.</p>
+
+      <div class="dive">
+        <div class="dive-head">
+          <div><h3>ExpertEdge</h3><div class="dive-vs">vs <b>LinkedIn</b> · <b>Indeed</b> · <b>Glassdoor</b></div></div>
+          <span class="verdict parity">Parity, with one real edge</span>
+        </div>
+        <div class="dive-cols">
+          <div class="dive-col strength"><h4>Ahead</h4><ul>
+            <li>Company reviews require a real, RLS-verified application on file — Glassdoor accepts any claimed employee, which is why its reviews skew toward the aggrieved and the incentivized. Greyin's gate trades review volume for review trust.</li>
+            <li>Candidate profile stays open (skills, endorsements, recommendations) even behind the search paywall — LinkedIn gates almost everything behind a login wall.</li>
+          </ul></div>
+          <div class="dive-col gap"><h4>Behind</h4><ul>
+            <li>Job volume and reach — Indeed's whole model is throughput; a new job board cannot match that on day one.</li>
+            <li>Salary data depth — Glassdoor and Levels.fyi have years of crowd-sourced submissions; Greyin's k-anonymized (n≥3) trend view is more private but structurally thinner until volume grows.</li>
+          </ul></div>
+        </div>
+        <div class="rec"><b>Priority</b>Employer-side distribution (job syndication, SEO-indexed listings) matters more than any single feature gap here — the review-trust edge is real but won't be felt until review volume exists to feel it.</div>
+      </div>
+    </section>
+
+    <section id="freeagent">
+      <div class="dive">
+        <div class="dive-head">
+          <div><h3>FreeAgent</h3><div class="dive-vs">vs <b>Upwork</b> · <b>Fiverr</b> · <b>Toptal</b></div></div>
+          <span class="verdict parity">Parity on mechanics, behind on scale</span>
+        </div>
+        <div class="dive-cols">
+          <div class="dive-col strength"><h4>Ahead</h4><ul>
+            <li>Skill ratings are gated to a real chat + accepted-application interaction and revisable after a verified outcome — Upwork/Fiverr ratings are order-completion-only and easy to game with a friendly review exchange.</li>
+            <li>No flat 20% haircut like Fiverr; escrow/webhook lifecycle mirrors Upwork's model without a separate buyer fee layer.</li>
+          </ul></div>
+          <div class="dive-col gap"><h4>Behind</h4><ul>
+            <li>No centrally-vetted "top 3%" tier the way Toptal has — Greyin's Verified Expert gate is a threshold + governance vote, not a screened admission process, so it reads as a weaker trust signal to a client comparing options.</li>
+            <li>Liquidity — cold-start is real on both sides of a marketplace; Upwork/Fiverr's advantage is almost entirely accumulated supply, not feature depth.</li>
+          </ul></div>
+        </div>
+        <div class="rec"><b>Priority</b>Consider a visible, harder-edged vetting badge above Verified Expert for top-tier freelancers — the Toptal comparison is the one prospective clients will make first.</div>
+      </div>
+    </section>
+
+    <section id="stackedge">
+      <div class="dive">
+        <div class="dive-head">
+          <div><h3>StackEdge</h3><div class="dive-vs">vs <b>GitHub</b> · <b>Toptal</b></div></div>
+          <span class="verdict unique">Different trust model, not a clone</span>
+        </div>
+        <div class="dive-cols">
+          <div class="dive-col strength"><h4>Ahead</h4><ul>
+            <li>GitHub shows that you committed code; it says nothing about whether it shipped, whether anyone accepted it, or whether it was any good. StackEdge's verification engine (AI review + human score + Builder finalization) closes exactly that gap.</li>
+            <li>"Worked together" discovery turns a completed collaboration into a mutual, verifiable relationship — GitHub has no equivalent; a shared repo doesn't prove two people actually worked together.</li>
+          </ul></div>
+          <div class="dive-col gap"><h4>Behind</h4><ul>
+            <li>Zero brand recognition as a portfolio destination — a recruiter looks at a GitHub profile by reflex; nobody reflexively checks a StackEdge track record yet.</li>
+            <li>No public API / embeddable badge — GitHub's contribution graph is famously portable (embedded in resumes, personal sites); StackEdge's track record currently lives only inside the app.</li>
+          </ul></div>
+        </div>
+        <div class="rec"><b>Priority</b>An embeddable, shareable track-record badge (image or widget) would let StackEdge's actual differentiator — verified outcomes, not just activity — travel to resumes and LinkedIn profiles instead of staying locked in-app.</div>
+      </div>
+    </section>
+
+    <section id="community">
+      <div class="dive">
+        <div class="dive-head">
+          <div><h3>Salt &amp; Pepper</h3><div class="dive-vs">vs <b>Blind</b></div></div>
+          <span class="verdict parity">Same model, tiny community</span>
+        </div>
+        <div class="dive-cols">
+          <div class="dive-col strength"><h4>Ahead</h4><ul>
+            <li>Anonymous posting plus karma sits inside the same identity graph as endorsements, recommendations, and the Greyin Score — Blind's anonymity is total and disconnected from any reputation system outside itself.</li>
+          </ul></div>
+          <div class="dive-col gap"><h4>Behind</h4><ul>
+            <li>Blind has 9M+ verified users and per-company private forums; that density is what makes "what's it really like at company X" answerable. Salt & Pepper's 12+-years gate keeps quality high but caps the community small by design.</li>
+          </ul></div>
+        </div>
+        <div class="rec"><b>Priority</b>This is a cold-start problem, not a feature gap — the discussion/karma/anonymity mechanics already match Blind's. Growth here is a seeding problem, not a build problem.</div>
+      </div>
+    </section>
+
+    <section id="greymatters">
+      <div class="dive">
+        <div class="dive-head">
+          <div><h3>GreyMatters</h3><div class="dive-vs">vs <b>Medium</b></div></div>
+          <span class="verdict behind">Narrower by design, thinner in practice</span>
+        </div>
+        <div class="dive-cols">
+          <div class="dive-col strength"><h4>Ahead</h4><ul>
+            <li>Author gate (12+ years experience) means every post comes from someone with standing — Medium's Partner Program pays by engagement, which rewards volume and headline-writing over expertise.</li>
+          </ul></div>
+          <div class="dive-col gap"><h4>Behind</h4><ul>
+            <li>No algorithmic distribution or off-platform reach — Medium's discovery engine and SEO domain authority took a decade to build; GreyMatters posts are currently found, not surfaced.</li>
+            <li>No reader-funded monetization beyond one-off tips — Medium's Partner Program gives authors a recurring reason to keep publishing.</li>
+          </ul></div>
+        </div>
+        <div class="rec"><b>Priority</b>Distribution, not features — cross-posting hooks (into the activity feed, into ExpertEdge candidate profiles as "authored by") would do more for reach than any new CMS capability.</div>
+      </div>
+    </section>
+
+    <section id="mentor">
+      <div class="dive">
+        <div class="dive-head">
+          <div><h3>Mentor sessions</h3><div class="dive-vs">vs <b>Topmate</b></div></div>
+          <span class="verdict behind">Booking works; the monetization surface is thin</span>
+        </div>
+        <div class="dive-cols">
+          <div class="dive-col strength"><h4>Ahead</h4><ul>
+            <li>Mentor eligibility is tied to the same Verified Expert / Greyin Score system used everywhere else — a Topmate profile can be created by anyone with a link and a price.</li>
+          </ul></div>
+          <div class="dive-col gap"><h4>Behind</h4><ul>
+            <li>Topmate covers 1:1s, webinars, cohorts, digital products, packages, and paid DMs from one profile with built-in Zoom, recording/replay resale, and instant payouts. Greyin currently ships discrete-slot booking + calendar + payment — the single most feature-rich comparison in this whole audit, and the widest gap.</li>
+          </ul></div>
+        </div>
+        <div class="rec"><b>Priority</b>Highest-leverage gap in the audit: mentors who'd otherwise monetize through Greyin's built-in trust signal have every reason to just run a Topmate link instead until the monetization surface (recordings, packages, group sessions) grows.</div>
+      </div>
+    </section>
+
+    <section id="priorities">
+      <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title">Priority opportunities</h2></div>
+      <p class="sec-dek">Ranked by user value × current competitive gap — where closing distance would move the needle most, not just what's easiest to build.</p>
+      <div class="prio">
+        <div class="prio-row"><div class="prio-rank">01</div><div class="prio-main"><div class="t">Broaden mentor monetization beyond discrete booking</div><div class="d">Cohorts, recordings/replay resale, packages — the single widest feature gap found, against Topmate.</div></div><div class="prio-score"><div class="v gap">High</div><div class="l">value × gap</div></div></div>
+        <div class="prio-row"><div class="prio-rank">02</div><div class="prio-main"><div class="t">Embeddable StackEdge track-record badge</div><div class="d">Let the verified-outcome differentiator travel outside the app, the way GitHub's contribution graph does.</div></div><div class="prio-score"><div class="v gap">High</div><div class="l">value × gap</div></div></div>
+        <div class="prio-row"><div class="prio-rank">03</div><div class="prio-main"><div class="t">Harder-edged "top tier" vetting badge for FreeAgent</div><div class="d">A visible layer above Verified Expert that reads as screened, closer to Toptal's admission bar.</div></div><div class="prio-score"><div class="v mid">Medium</div><div class="l">value × gap</div></div></div>
+        <div class="prio-row"><div class="prio-rank">04</div><div class="prio-main"><div class="t">Cross-post hooks from GreyMatters into other pillars</div><div class="d">Surface authored posts on ExpertEdge candidate profiles and the activity feed to compensate for no algorithmic reach.</div></div><div class="prio-score"><div class="v mid">Medium</div><div class="l">value × gap</div></div></div>
+        <div class="prio-row"><div class="prio-rank">05</div><div class="prio-main"><div class="t">Salary/company-review volume seeding</div><div class="d">Data-depth gap vs Glassdoor/Blind closes with volume, not new mechanics — the privacy-preserving design already works.</div></div><div class="prio-score"><div class="v">Structural</div><div class="l">not a build gap</div></div></div>
+      </div>
+    </section>
+
+    <section id="forecast">
+      <div class="sec-head"><span class="sec-num">05</span><h2 class="sec-title">Engagement forecast</h2></div>
+      <div class="callout">
+        <span class="tag">Read this first</span><br>
+        Greyin has no production usage history yet — every account on the platform so far is a Playwright e2e test user. What follows is a <b>planning scenario</b>, not a measurement: it applies public retention and activation benchmarks for the closest comparable categories (two-sided marketplaces for FreeAgent/StackEdge, B2B SaaS for the activation funnel) to Greyin's current, shipped feature set. Treat the numbers as directional ranges to plan against, not a forecast pulled from analytics.
+      </div>
+
+      <h3 style="font-size:16px;margin-bottom:4px;">Base-case activation funnel</h3>
+      <p style="font-size:13px;color:var(--ink-soft);margin-top:4px;">Modeled on a 38% median B2B SaaS activation rate and 33.7% Day-1 / 2–6% Day-30 marketplace-app return rates, applied to Greyin's deliberate-action core loop (apply, endorse, book, post).</p>
+      <div class="funnel">
+        <div class="funnel-row"><div class="funnel-label">Signup</div><div class="funnel-track"><div class="funnel-fill base" style="width:100%"></div></div><div class="funnel-range">100%</div></div>
+        <div class="funnel-row"><div class="funnel-label">Profile complete</div><div class="funnel-track"><div class="funnel-fill base" style="width:62%"></div></div><div class="funnel-range"><b>55–68%</b></div></div>
+        <div class="funnel-row"><div class="funnel-label">First value action</div><div class="funnel-track"><div class="funnel-fill base" style="width:36%"></div></div><div class="funnel-range"><b>30–42%</b></div></div>
+        <div class="funnel-row"><div class="funnel-label">Day-7 return</div><div class="funnel-track"><div class="funnel-fill base" style="width:22%"></div></div><div class="funnel-range"><b>18–26%</b></div></div>
+        <div class="funnel-row"><div class="funnel-label">Day-30 return</div><div class="funnel-track"><div class="funnel-fill base" style="width:8%"></div></div><div class="funnel-range"><b>5–11%</b></div></div>
+      </div>
+
+      <div class="scenario-row">
+        <div class="scenario">
+          <div class="sn">Conservative</div><h4>Single-pillar behavior</h4>
+          <dl>
+            <dt>Cross-pillar re-engagement</dt><dd>Minimal — users treat Greyin as whichever single app they signed up for</dd>
+            <dt>Day-30 return</dt><dd class="mono">~2–4%</dd>
+            <dt>Employer paid conversion</dt><dd class="mono">~3–6%</dd>
+          </dl>
+        </div>
+        <div class="scenario base">
+          <div class="sn">Base case</div><h4>Notifications do their job</h4>
+          <dl>
+            <dt>Cross-pillar re-engagement</dt><dd>Activity feed + notifications pull some users back via a different pillar's trigger</dd>
+            <dt>Day-30 return</dt><dd class="mono">~5–11%</dd>
+            <dt>Employer paid conversion</dt><dd class="mono">~6–10%</dd>
+          </dl>
+        </div>
+        <div class="scenario">
+          <div class="sn">Optimistic</div><h4>The unified score compounds</h4>
+          <dl>
+            <dt>Cross-pillar re-engagement</dt><dd>Greyin Score + recommendations + worked-together give users a reason to keep every pillar current</dd>
+            <dt>Day-30 return</dt><dd class="mono">~12–18%</dd>
+            <dt>Employer paid conversion</dt><dd class="mono">~10–15%</dd>
+          </dl>
+        </div>
+      </div>
+
+      <p style="font-size:12.5px;color:var(--ink-faint);margin-top:14px;">The gap between Conservative and Optimistic is almost entirely a bet on whether the cross-pillar mechanics (activity feed, notifications, recommendations, worked-together) actually pull a user from one pillar into another — the single-purpose comparables in this audit have no equivalent to test that lift against.</p>
+
+      <div class="lever-grid">
+        <div class="lever-box have">
+          <h4>Levers already shipped</h4>
+          <ul>
+            <li>Cross-pillar activity feed &amp; follow graph</li>
+            <li>Notification triggers on application status, ask closure, pending recommendations</li>
+            <li>Recommendation + endorsement loops that require the recipient to come back and act</li>
+            <li>Mentor session reminders tied to a real booking</li>
+            <li>Cross-pillar natural-language search surfacing people across all six pillars</li>
+          </ul>
+        </div>
+        <div class="lever-box next">
+          <h4>Levers worth adding next</h4>
+          <ul>
+            <li>A periodic digest (weekly email) summarizing cross-pillar activity — the Day-30 gap in every comparable benchmark is where digest/email re-engagement earns its keep</li>
+            <li>Salary-trend alerts ("your role's range moved") as a low-effort return trigger</li>
+            <li>Mentor monetization breadth (§ Priority 01) doubles as a retention lever for mentors, not just mentees</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer id="sources">
+      <div>Competitor feature claims verified via web search, August 2026. Greyin feature claims sourced from <span class="mono">docs/greyin-requirements-traceability.xlsx</span> and <span class="mono">deployment/migrations/001–061</span>.</div>
+      <div class="src-list">
+        <div>Topmate — <a href="https://topmate.io/features">topmate.io/features</a></div>
+        <div>Wellfound — <a href="https://jobright.ai/blog/wellfound-review-2026-features-walkthrough-and-alternatives/">jobright.ai review, 2026</a></div>
+        <div>Blind — <a href="https://www.teamblind.com/company/Blind/salaries/united-states">teamblind.com</a></div>
+        <div>Upwork fee structure — <a href="https://www.upwork.com/resources/upwork-vs-fiverr">upwork.com</a></div>
+        <div>Fiverr / Toptal commission — <a href="https://bestjobsearchapps.com/articles/en/freelancing-platforms-comparison-2026-upwork-fiverr-freelancercom-jobbers-toptal-99designs">bestjobsearchapps.com, 2026</a></div>
+        <div>Marketplace app retention (D1/D30) — <a href="https://uxcam.com/blog/mobile-app-retention-benchmarks/">uxcam.com, 2026</a>; <a href="https://enable3.io/blog/app-retention-benchmarks-2025">enable3.io</a></div>
+        <div>B2B SaaS activation benchmark — <a href="https://getperspective.ai/blog/2026-customer-onboarding-benchmark-activation-rates-by-industry">getperspective.ai, 2026</a></div>
+      </div>
+    </footer>
+  </main>
+</div>

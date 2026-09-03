@@ -1,0 +1,93 @@
+import Link from 'next/link'
+import { redirect, notFound } from 'next/navigation'
+import { ArrowLeft, UserCheck, Sparkles } from 'lucide-react'
+import { SiteHeader } from '@/components/SiteHeader'
+import { createClient } from '@/lib/supabase/server'
+import { matchCandidatesForRole } from '@/lib/match-candidates'
+
+export default async function RoleCandidatesPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect(`/login?next=/employer/roles/${id}/candidates`)
+
+  // RLS's own "Employer manages own future roles" policy (087) is what
+  // actually prevents reading someone else's role here -- this select
+  // simply comes back empty for a non-owner, same as any other
+  // owner-scoped page on the platform.
+  const { data: role } = await supabase
+    .from('future_roles')
+    .select('id, title, description, skills, function_area, seniority_level, status')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (!role) notFound()
+
+  const { data: subs } = await supabase
+    .from('future_role_subscriptions')
+    .select('user_id, created_at')
+    .eq('future_role_id', id)
+    .order('created_at', { ascending: false })
+
+  const subscriberIds = (subs || []).map((s) => s.user_id)
+  const { data: subscriberProfiles } = subscriberIds.length
+    ? await supabase.from('profiles').select('id, full_name, location').in('id', subscriberIds)
+    : { data: [] }
+
+  const aiMatches = await matchCandidatesForRole(
+    { title: role.title, description: role.description, skills: role.skills, function_area: role.function_area, seniority_level: role.seniority_level },
+    subscriberIds
+  )
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <SiteHeader />
+      <div className="max-w-3xl mx-auto px-4 py-10">
+        <Link href="/employer/roles" className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-amber-700 mb-6">
+          <ArrowLeft className="h-4 w-4" /> Back to Your Future Roles
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">{role.title}</h1>
+        <p className="text-gray-500 mb-8">Candidates for this role — never shown together on a public page, only here.</p>
+
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <UserCheck className="h-5 w-5 text-amber-700" />
+            Subscribed ({subscriberProfiles?.length ?? 0})
+          </h2>
+          {subscriberProfiles && subscriberProfiles.length > 0 ? (
+            <div className="divide-y">
+              {subscriberProfiles.map((p) => (
+                <div key={p.id} className="py-3">
+                  <p className="font-medium text-gray-900">{p.full_name ?? 'Unnamed member'}</p>
+                  {p.location && <p className="text-xs text-gray-500">{p.location}</p>}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No one has subscribed to this role yet.</p>
+          )}
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="font-bold text-gray-900 mb-1 flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-amber-700" />
+            AI-surfaced ({aiMatches.length})
+          </h2>
+          <p className="text-xs text-gray-500 mb-4">Matched on stated future interests — they never subscribed to this specific role.</p>
+          {aiMatches.length > 0 ? (
+            <div className="divide-y">
+              {aiMatches.map((m) => (
+                <div key={m.user_id} className="py-3">
+                  <p className="font-medium text-gray-900">{m.full_name ?? 'Unnamed member'}</p>
+                  <p className="text-xs text-gray-500">{m.reason}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No AI matches yet — this needs an admin to enable matching, or no profile currently fits.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

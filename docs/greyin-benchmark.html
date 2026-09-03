@@ -1,0 +1,401 @@
+<title>Greyin Feature Benchmark</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #F4F5F7;
+    --surface: #FFFFFF;
+    --surface-2: #ECEEF1;
+    --text: #1B2028;
+    --text-muted: #5B6472;
+    --text-faint: #8A93A0;
+    --border: #DFE3E8;
+    --accent: #3A5B8C;
+    --accent-soft: #E7EDF5;
+    --accent-text: #2C4568;
+    --reuse-bg: #E7F3EB;
+    --reuse-text: #2E6B41;
+    --partial-bg: #FBF1DF;
+    --partial-text: #8A5F16;
+    --new-bg: #EDEAFB;
+    --new-text: #5B3FA0;
+    --code-bg: #ECEEF1;
+    --shadow: 0 1px 2px rgba(20,23,28,0.04), 0 4px 16px rgba(20,23,28,0.05);
+    --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+    --font-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171C;
+      --surface: #1B1F26;
+      --surface-2: #232833;
+      --text: #E7E9EC;
+      --text-muted: #9AA3AF;
+      --text-faint: #6C7684;
+      --border: #2B303A;
+      --accent: #7CA0D4;
+      --accent-soft: #223349;
+      --accent-text: #9DBBE6;
+      --reuse-bg: #1D3324;
+      --reuse-text: #8FD1A2;
+      --partial-bg: #382E1B;
+      --partial-text: #E3C078;
+      --new-bg: #2B2440;
+      --new-text: #C4B5E8;
+      --code-bg: #232833;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171C;
+    --surface: #1B1F26;
+    --surface-2: #232833;
+    --text: #E7E9EC;
+    --text-muted: #9AA3AF;
+    --text-faint: #6C7684;
+    --border: #2B303A;
+    --accent: #7CA0D4;
+    --accent-soft: #223349;
+    --accent-text: #9DBBE6;
+    --reuse-bg: #1D3324;
+    --reuse-text: #8FD1A2;
+    --partial-bg: #382E1B;
+    --partial-text: #E3C078;
+    --new-bg: #2B2440;
+    --new-text: #C4B5E8;
+    --code-bg: #232833;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--accent-soft); }
+
+  .wrap { max-width: 940px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+
+  header.page-head { margin-bottom: 3rem; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+    margin-bottom: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .eyebrow::before { content: ""; width: 1.6rem; height: 1px; background: var(--accent); display: inline-block; }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    line-height: 1.1;
+    margin: 0 0 0.9rem;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .dek { color: var(--text-muted); font-size: 1.05rem; max-width: 66ch; margin: 0; }
+  .meta-row {
+    display: flex; gap: 1.5rem; margin-top: 1.5rem;
+    font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-faint); flex-wrap: wrap;
+  }
+
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 1.6rem 1.8rem; box-shadow: var(--shadow); margin-bottom: 3.5rem;
+  }
+  .summary-card p { margin: 0 0 0.7rem; }
+  .summary-card p:last-child { margin-bottom: 0; }
+  .summary-card strong { color: var(--text); }
+
+  section.part { margin-bottom: 4rem; }
+  .part-head {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+    border-bottom: 1px solid var(--border); padding-bottom: 0.9rem; margin-bottom: 1.8rem;
+  }
+  .part-head h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; margin: 0; }
+  .part-head .count { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-faint); white-space: nowrap; }
+
+  /* Benchmark table */
+  .bench-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+  table.bench { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.88rem; min-width: 720px; }
+  table.bench th, table.bench td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  table.bench thead th {
+    font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--text-faint); background: var(--surface-2); white-space: nowrap;
+  }
+  table.bench tbody tr:last-child td { border-bottom: none; }
+  table.bench td.platform { font-weight: 600; white-space: nowrap; }
+  table.bench td.greyin { background: var(--accent-soft); }
+
+  .pos-chip {
+    display: inline-block; font-family: var(--font-mono); font-size: 0.65rem; font-weight: 500;
+    letter-spacing: 0.03em; text-transform: uppercase; padding: 0.15rem 0.5rem; border-radius: 999px;
+    margin-bottom: 0.3rem;
+  }
+  .pos-chip.have { background: var(--reuse-bg); color: var(--reuse-text); }
+  .pos-chip.partial { background: var(--partial-bg); color: var(--partial-text); }
+  .pos-chip.gap { background: var(--new-bg); color: var(--new-text); }
+
+  h3.group-title {
+    font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--text-muted); margin: 2.2rem 0 1rem;
+  }
+  h3.group-title:first-child { margin-top: 0; }
+
+  .rec {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.2rem 1.4rem; margin-bottom: 0.9rem;
+  }
+  .rec-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.8rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+  .rec-title { font-weight: 600; font-size: 1rem; }
+  .chip {
+    font-family: var(--font-mono); font-size: 0.68rem; font-weight: 500; letter-spacing: 0.03em;
+    text-transform: uppercase; padding: 0.22rem 0.55rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+  }
+  .chip.reuse { background: var(--reuse-bg); color: var(--reuse-text); }
+  .chip.partial { background: var(--partial-bg); color: var(--partial-text); }
+  .chip.new { background: var(--new-bg); color: var(--new-text); }
+
+  .rec p { margin: 0.4rem 0; color: var(--text-muted); font-size: 0.94rem; }
+  .rec p.inspired { font-size: 0.82rem; color: var(--text-faint); font-style: italic; }
+  .rec p.reuse-note {
+    background: var(--surface-2); border-radius: 8px; padding: 0.55rem 0.8rem; margin-top: 0.6rem;
+    color: var(--text); font-size: 0.86rem; font-style: normal;
+  }
+  .rec p.reuse-note::before { content: "Builds on \2014 "; font-weight: 600; color: var(--accent-text); }
+
+  code, .path {
+    font-family: var(--font-mono); font-size: 0.85em; background: var(--surface-2);
+    padding: 0.1em 0.4em; border-radius: 4px; color: var(--text);
+  }
+
+  .shortlist {
+    background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 14px;
+    padding: 1.6rem 1.8rem; margin-top: 2rem;
+  }
+  .shortlist h3 { font-family: var(--font-display); font-size: 1.15rem; font-weight: 500; margin: 0 0 1rem; color: var(--accent-text); }
+  .shortlist ol { margin: 0; padding-left: 1.3rem; }
+  .shortlist li { margin-bottom: 0.5rem; font-size: 0.95rem; }
+  .shortlist li:last-child { margin-bottom: 0; }
+
+  footer.note { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--text-faint); font-size: 0.82rem; }
+  footer.note a { color: var(--accent-text); }
+
+  @media (max-width: 560px) {
+    .wrap { padding: 2.5rem 1.1rem 4rem; }
+    .part-head { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="page-head">
+    <div class="eyebrow">Strategy review · greyin platform</div>
+    <h1>What LinkedIn, Toptal, and Topmate already figured out</h1>
+    <p class="dek">Greyin's five pillars benchmarked against six platforms that solve adjacent problems — professional networking, job search, salary transparency, freelance marketplaces, curated expert vetting, and paid 1:1 mentorship — with recommendations scoped against what's already built, not a wishlist.</p>
+    <div class="meta-row">
+      <span>22 Aug 2026</span>
+      <span>6 platforms benchmarked</span>
+      <span>5 pillars + hub</span>
+    </div>
+  </header>
+
+  <div class="summary-card">
+    <p><strong>Where Greyin already leads:</strong> nothing benchmarked here has an equivalent to the Greyin Score — a single, cross-platform, peer-and-outcome-derived trust number spanning four independent products. LinkedIn's endorsements are self-selected and unverified; Toptal's vetting is a one-time gate, not a running score; nobody else has it continuously updating from real delivered work.</p>
+    <p><strong>Where the gaps are:</strong> peer-to-peer trust signals (endorsements, written recommendations), salary transparency, company reviews, and turning the passive "mentor" flag into an actual bookable, paid product — Topmate's entire business model sitting one inch away from a badge Greyin already has.</p>
+    <p><strong>How to read the "builds on" note</strong> under each recommendation: every one is scoped against infrastructure that already exists in this codebase (the follow graph, the escrow/payout rails, the LLM provider plumbing, the GreyMatters CMS) — none of these are green-field builds.</p>
+  </div>
+
+  <section class="part">
+    <div class="part-head">
+      <h2>Benchmark</h2>
+      <span class="count">6 platforms &middot; signature feature vs. Greyin's position</span>
+    </div>
+
+    <div class="bench-scroll">
+      <table class="bench">
+        <thead>
+          <tr><th>Platform</th><th>Signature feature</th><th>Greyin's position</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="platform">LinkedIn</td>
+            <td>Peer endorsements, written recommendations, alumni/company-network discovery, conversational AI search</td>
+            <td class="greyin">
+              <span class="pos-chip partial">Partial</span><br>
+              Karma (Salt &amp; Pepper) and the new cross-pillar follow graph exist; no skill-level endorsement or written-recommendation primitive yet.
+            </td>
+          </tr>
+          <tr>
+            <td class="platform">Indeed</td>
+            <td>Massive job/résumé database, ATS, sponsored listings, AI screening at scale</td>
+            <td class="greyin">
+              <span class="pos-chip have">Have (smaller scale)</span><br>
+              Job posting, applications, resume parsing, and job alerts all exist — deliberately narrower (Verified Expert gate) rather than volume-first by design.
+            </td>
+          </tr>
+          <tr>
+            <td class="platform">Glassdoor</td>
+            <td>Anonymous company reviews, salary transparency by role/experience</td>
+            <td class="greyin">
+              <span class="pos-chip gap">Gap</span><br>
+              <code>jobs.salary_min/max/disclosed</code> exists per-listing; no aggregate benchmarking and no company review system at all.
+            </td>
+          </tr>
+          <tr>
+            <td class="platform">Upwork</td>
+            <td>Escrow/milestone payments, AI job-to-freelancer matching, hourly time tracking</td>
+            <td class="greyin">
+              <span class="pos-chip have">Have (fixed-price only)</span><br>
+              FreeAgent already has order/escrow/payout flow and AI delivery-quality scoring; no hourly contract type or time tracking.
+            </td>
+          </tr>
+          <tr>
+            <td class="platform">Toptal</td>
+            <td>Top-3% human vetting, advisor-matched (not self-serve browse), risk-free trial + replacement guarantee</td>
+            <td class="greyin">
+              <span class="pos-chip have">Have, structurally similar</span><br>
+              Verified Expert gate + StackEdge's human-reviewed outcomes is the same trust posture; ExpertEdge's "Fractional Leadership" tier is already sales-led/matched, not self-serve.
+            </td>
+          </tr>
+          <tr>
+            <td class="platform">Topmate</td>
+            <td>Bookable, paid 1:1 sessions/mentorship from one profile link, instant payout</td>
+            <td class="greyin">
+              <span class="pos-chip gap">Gap</span><br>
+              Salt &amp; Pepper's <code>is_mentor</code> flag is a passive badge with zero booking or payment behind it — the single largest "almost-there" gap on this list.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="part">
+    <div class="part-head">
+      <h2>Recommendations</h2>
+      <span class="count">ranked by leverage &middot; existing-infra reuse first</span>
+    </div>
+
+    <h3 class="group-title">Highest leverage — turns an existing flag into a real product</h3>
+
+    <div class="rec">
+      <div class="rec-head">
+        <span class="rec-title">Bookable, paid mentor sessions</span>
+        <span class="chip reuse">Reuses payment + messaging rails</span>
+      </div>
+      <p class="inspired">Inspired by Topmate</p>
+      <p><code>profiles.is_mentor</code> exists today purely as a directory badge — there's no way to actually book or pay a mentor for time. Add a mentor availability/rate table and a session-booking flow that reuses FreeAgent's already-working Razorpay escrow (a session is functionally a zero-delivery-days "gig") and the shared <code>direct_messages</code>/notifications tables for scheduling coordination.</p>
+      <p class="reuse-note">FreeAgent's <code>gig_orders</code> escrow + payout flow, the shared <code>conversations</code> table, the existing notifications pipeline.</p>
+    </div>
+
+    <h3 class="group-title">Peer trust signals — the follow graph makes these newly cheap to build</h3>
+
+    <div class="rec">
+      <div class="rec-head">
+        <span class="rec-title">Skill endorsements</span>
+        <span class="chip reuse">One new table + the follow graph</span>
+      </div>
+      <p class="inspired">Inspired by LinkedIn</p>
+      <p>A follower can endorse a specific skill on someone's profile — lightweight, one click, no free text. This is the platform's own "not a self-reported resume" thesis made literal: skills become peer-attested instead of self-listed, and endorsement counts can feed skill-level detail into the Greyin Score rather than only a single aggregate number.</p>
+      <p class="reuse-note"><code>user_follows</code> (053_activity_feed.sql) as the eligibility gate — only people who follow you, or worked with you on a shared StackEdge project/FreeAgent order, can endorse.</p>
+    </div>
+
+    <div class="rec">
+      <div class="rec-head">
+        <span class="rec-title">Written recommendations</span>
+        <span class="chip reuse">Same follow-graph pattern, richer content</span>
+      </div>
+      <p class="inspired">Inspired by LinkedIn</p>
+      <p>A short, structured testimonial from someone who actually worked with you — displayed on your profile alongside the Greyin Score. Given the platform's own positioning ("senior talent keeps getting filtered out by keyword-matching software"), a real qualitative peer testimonial is exactly the kind of signal an ATS bot can't fake and a recruiter can't ignore.</p>
+      <p class="reuse-note">Same eligibility model as endorsements above; the existing AI quality-sweep infrastructure (<code>llm_providers</code>/<code>llm_feature_flags</code>) could optionally flag spammy/low-effort recommendations the same way it already screens posts and delivery quality.</p>
+    </div>
+
+    <h3 class="group-title">Trust &amp; transparency — genuinely new data Greyin is uniquely positioned to have</h3>
+
+    <div class="rec">
+      <div class="rec-head">
+        <span class="rec-title">Salary benchmarking by role and experience</span>
+        <span class="chip partial">Schema already has the raw data</span>
+      </div>
+      <p class="inspired">Inspired by Glassdoor</p>
+      <p><code>jobs.salary_min/salary_max/salary_disclosed</code> already exists per listing but is never aggregated. A "median senior Staff Engineer salary across the ecosystem" report, computed only from Verified Expert postings, would be real, sourced data most job boards can't claim — self-reported salary data is Glassdoor's actual weak point, and Greyin's data isn't self-reported.</p>
+      <p class="reuse-note">A read-only aggregate view over <code>jobs</code>, same convention as <code>platform_search_index</code>/<code>activity_feed</code> — no new write path needed.</p>
+    </div>
+
+    <div class="rec">
+      <div class="rec-head">
+        <span class="rec-title">Verified-reviewer company reviews</span>
+        <span class="chip new">New table, narrow scope</span>
+      </div>
+      <p class="inspired">Inspired by Glassdoor</p>
+      <p>Glassdoor's biggest known weakness is anonymous-anyone reviews with no proof the reviewer ever worked there. Scope this narrower and more defensibly: only a candidate who actually applied (or was hired) via ExpertEdge can review that company — smaller volume than Glassdoor, but every review is provably real, which is a stronger trust claim than Glassdoor can make.</p>
+      <p class="reuse-note"><code>applications</code> table as the eligibility check; <code>companies/[id]</code> page already exists as the natural display surface.</p>
+    </div>
+
+    <h3 class="group-title">Discovery — extending infrastructure that's already wired up</h3>
+
+    <div class="rec">
+      <div class="rec-head">
+        <span class="rec-title">Natural-language search across the ecosystem</span>
+        <span class="chip reuse">LLM plumbing already exists platform-wide</span>
+      </div>
+      <p class="inspired">Inspired by LinkedIn's conversational search, Upwork's AI job matching</p>
+      <p>Ecosystem Search today is keyword/ILIKE matching over <code>platform_search_index</code>. Every app already has a working connection to an LLM provider (the same <code>llm_providers</code>/<code>llm_feature_flags</code> infrastructure powering AI quality scoring) — routing a search query through it first to extract structured filters ("senior React freelancers, available this month, 4+ verified outcomes") before hitting the existing view is additive, not a new integration.</p>
+      <p class="reuse-note"><code>llm_providers</code> (048_ai_quality_scores.sql) — no new AI vendor integration needed, just a new prompt against infrastructure already in production.</p>
+    </div>
+
+    <div class="rec">
+      <div class="rec-head">
+        <span class="rec-title">"Worked together" / shared-project discovery</span>
+        <span class="chip reuse">Data already exists, just not surfaced</span>
+      </div>
+      <p class="inspired">Inspired by LinkedIn's alumni tool</p>
+      <p>StackEdge's <code>project_applications</code> and FreeAgent's <code>gig_orders</code> already record exactly who worked with whom. Surfacing "people you've worked with" as a follow-suggestion source on the People/Members pages turns data that already exists into a real network-growth loop, the same way LinkedIn's alumni tool turns a shared employer into a connection prompt.</p>
+      <p class="reuse-note">Existing <code>project_applications</code>/<code>gig_orders</code> tables; the new <code>user_follows</code> table as the destination.</p>
+    </div>
+
+    <h3 class="group-title">Lower priority — real gaps, but narrower audience or bigger lift</h3>
+
+    <div class="rec">
+      <div class="rec-head">
+        <span class="rec-title">Hourly contracts with time tracking</span>
+        <span class="chip new">Genuinely new contract type</span>
+      </div>
+      <p class="inspired">Inspired by Upwork's Work Diary</p>
+      <p>FreeAgent's <code>gigs</code> schema (<code>price_min/max</code>, <code>delivery_days</code>) is fixed-price/package-shaped by design, not hourly. Worth flagging as a deliberate scope choice rather than an oversight — only worth building if there's actual demand for hourly engagements, since it's a genuinely new contract type and payment model, not an extension of the existing one.</p>
+    </div>
+
+    <div class="rec">
+      <div class="rec-head">
+        <span class="rec-title">Referral bonus tracking</span>
+        <span class="chip partial">Extends an existing bridge</span>
+      </div>
+      <p class="inspired">Inspired by LinkedIn/Indeed referral programs</p>
+      <p>The peer referral bridge (<code>create_job_referral_notification</code>, migration 040) already notifies a referred candidate — there's no tracking of outcomes for the <em>referrer</em> (did they get hired? does the referrer earn anything?). Worth a look once the endorsement/recommendation features above are in, since all three deepen the same "your network is your credential" loop.</p>
+    </div>
+  </section>
+
+  <div class="shortlist">
+    <h3>If building one thing next</h3>
+    <ol>
+      <li>Bookable mentor sessions — the single biggest gap-to-existing-asset ratio on this list; the badge already exists, the payment rails already exist, only the booking layer is missing</li>
+      <li>Skill endorsements — cheapest to build now that the follow graph exists, and directly reinforces the platform's own "not a self-reported resume" positioning</li>
+      <li>Salary benchmarking — a read-only aggregate over data already being collected, zero new write path</li>
+    </ol>
+  </div>
+
+  <footer class="note">
+    Feature claims for LinkedIn, Indeed, Glassdoor, Upwork, Toptal, and Topmate are sourced from public reporting current as of August 2026 (search results cited on request) and reflect each platform's own marketing/product-update pages, not first-hand use. Greyin's current-state claims are read directly from the live schema and codebase. Nothing here was implemented — this is a planning input, not a build plan.
+  </footer>
+
+</div>

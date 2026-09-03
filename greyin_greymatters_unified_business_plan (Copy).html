@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: A4;
+        margin: 16mm 14mm 16mm 14mm;
+        background-color: #f8fafc;
+        @bottom-right {
+            content: "Page " counter(page) " of " counter(pages);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 8pt;
+            color: #64748b;
+        }
+        @bottom-left {
+            content: "CONFIDENTIAL - GREYIN & GREYMATTERS UNIFIED STRATEGY";
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 8pt;
+            color: #64748b;
+        }
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        color: #1e293b;
+        margin: 0;
+        padding: 0;
+        font-size: 9.5pt;
+        line-height: 1.48;
+    }
+
+    /* Cover / Header Banner */
+    .header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        color: #ffffff;
+        padding: 22px 18px;
+        border-radius: 8px;
+        margin-bottom: 18px;
+    }
+
+    .header-banner h1 {
+        font-size: 19pt;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+        letter-spacing: -0.5px;
+        color: #ffffff;
+    }
+
+    .header-banner p {
+        font-size: 10.5pt;
+        margin: 0;
+        color: #93c5fd;
+    }
+
+    .metadata-grid {
+        display: table;
+        width: 100%;
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .metadata-cell {
+        display: table-cell;
+        font-size: 8pt;
+        color: #cbd5e1;
+    }
+
+    /* Typography & Section Styling */
+    h2 {
+        font-size: 13pt;
+        color: #0f172a;
+        margin-top: 18px;
+        margin-bottom: 8px;
+        padding-bottom: 4px;
+        border-bottom: 2px solid #2563eb;
+        page-break-after: avoid;
+    }
+
+    h3 {
+        font-size: 10.5pt;
+        color: #1e3a8a;
+        margin-top: 12px;
+        margin-bottom: 5px;
+        page-break-after: avoid;
+    }
+
+    p {
+        margin-top: 0;
+        margin-bottom: 8px;
+        text-align: justify;
+    }
+
+    ul, ol {
+        margin-top: 0;
+        margin-bottom: 8px;
+        padding-left: 18px;
+    }
+
+    li {
+        margin-bottom: 3px;
+    }
+
+    /* Callout & Pillar Boxes */
+    .callout {
+        background-color: #ffffff;
+        border-left: 4px solid #2563eb;
+        padding: 10px 14px;
+        margin: 10px 0;
+        border-radius: 0 6px 6px 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .pillar-grid {
+        display: table;
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .pillar-col {
+        display: table-cell;
+        width: 50%;
+        padding-right: 6px;
+        vertical-align: top;
+    }
+
+    .pillar-col:last-child {
+        padding-right: 0;
+        padding-left: 6px;
+    }
+
+    .pillar-box {
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0 14px 0;
+        font-size: 8.5pt;
+        background-color: #ffffff;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    th {
+        background-color: #0f172a;
+        color: #ffffff;
+        font-weight: 600;
+        text-align: left;
+        padding: 7px 9px;
+    }
+
+    td {
+        padding: 7px 9px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+        background-color: #f8fafc;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-size: 7pt;
+        font-weight: 600;
+    }
+
+    .badge-blue { background-color: #dbeafe; color: #1e40af; }
+    .badge-green { background-color: #dcfce7; color: #166534; }
+    .badge-amber { background-color: #fef3c7; color: #92400e; }
+    .badge-purple { background-color: #f3e8ff; color: #6b21a8; }
+
+    .code-block {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 7.5pt;
+        background-color: #1e293b;
+        color: #f8fafc;
+        padding: 8px;
+        border-radius: 6px;
+        margin: 8px 0;
+        white-space: pre-wrap;
+    }
+</style>
+</head>
+<body>
+
+    <div class="header-banner">
+        <h1>GREYIN ECOSYSTEM & GREYMATTERS BLOG</h1>
+        <p>Unified Strategic Business Plan: Platform, Lounge, Freelancing & Content Engine</p>
+        <div class="metadata-grid">
+            <div class="metadata-cell"><strong>Brand Architecture:</strong> Hybrid (Greyin + GreyMatters)</div>
+            <div class="metadata-cell"><strong>Core Target:</strong> 12+ Yrs Senior Domain Talent & Enterprise Buyers</div>
+            <div class="metadata-cell"><strong>Date:</strong> August 2026 &middot; Rev. Aug 9 (implementation-aligned)</div>
+        </div>
+    </div>
+
+    <div class="callout">
+        <strong>Hybrid Brand Positioning:</strong> <strong>Greyin</strong> serves as the clean, modern enterprise portal (Greyin.io), while <strong>"GreyMatters"</strong> serves as the flagship thought-leadership publication and narrative campaign ("Because Grey Matters"). This dual structure pairs high-converting B2B software aesthetics with deep candidate advocacy and domain authority.
+    </div>
+
+    <div class="callout">
+        <strong>Implementation Status (updated Aug 17, 2026):</strong> Five pillars are now live in production (greyin.net, greymatters.greyin.net, saltnpepper.greyin.net, freeagent.greyin.net, prolab.greyin.net — Prolab launched after this document's prior revision), covered by an automated end-to-end test suite, and cross-checked against a competitive benchmark of comparable platforms. All five share one login via cross-pillar SSO. A course-correction pass ("the Verified Expert revamp") restored the age-blind 12+-years gate to Greyin B2B and FreeAgent (both had drifted to being ungated), replaced the plan's original 10%-placement-fee idea with an enterprise subscription gate on candidate search (self-serve + sales-led tiers), added a peer referral bridge, and added advisory member voting on the eligibility threshold. See <em>Section 4</em> below for the as-built technical architecture, and the companion document <code>IMPLEMENTATION_VS_REQUIREMENTS.md</code> (§6) for full detail on the revamp.
+    </div>
+
+    <h2>1. Four-Pillar Architecture</h2>
+
+    <div class="pillar-grid">
+        <div class="pillar-col">
+            <div class="pillar-box">
+                <h3>1. GREYIN (Enterprise B2B Portal)</h3>
+                <p>The monetization frontend for enterprise clients, OEMs, and hiring partners. Offers age-blind candidate search, fractional leadership placement, and corporate outplacement tools.</p>
+            </div>
+            <div class="pillar-box">
+                <h3>2. GREYMATTERS (Thought Leadership Blog)</h3>
+                <p>The content engine anchored around the mission slogan <em>"Because Grey Matters."</em> Publishes deep domain teardowns, system design blueprints, and career transition guides to drive organic SEO and candidate signups.</p>
+            </div>
+        </div>
+        <div class="pillar-col">
+            <div class="pillar-box">
+                <h3>3. SALT & PEPPER (Community Lounge)</h3>
+                <p>Private, age-verified peer community for senior pros (12+ Yrs). Features unfiltered architecture reviews, "The Lab" project showcase, and peer referral networks free from recruiters.</p>
+            </div>
+            <div class="pillar-box">
+                <h3>4. FREEAGENT (0%-Commission Freelancing)</h3>
+                <p>Zero-fee gig engine empowering community members to consult, contract, or review peer projects with 100% earnings retention and zero platform middleman fees.</p>
+            </div>
+        </div>
+    </div>
+
+    <h2>2. Unified Business & Revenue Matrix</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Pillar / Asset</th>
+                <th>Audience / Focus</th>
+                <th>Offering & Strategic Role</th>
+                <th>Monetization Mechanism</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>GreyMatters Blog</strong></td>
+                <td>Domain Pros & Engineering VPs</td>
+                <td>Deep-dive technical essays, SDV/AI architecture teardowns</td>
+                <td><span class="badge badge-purple">Inbound Engine</span> (SEO & Lead Gen)</td>
+            </tr>
+            <tr>
+                <td><strong>Salt & Pepper</strong></td>
+                <td>Senior Talent (12+ Yrs)</td>
+                <td>Peer lounge, code/design reviews, MVP showcases</td>
+                <td><span class="badge badge-green">Free / Included</span> (Daily Retention)</td>
+            </tr>
+            <tr>
+                <td><strong>FreeAgent Engine</strong></td>
+                <td>Community Builders</td>
+                <td>Direct P2P contracting, micro-consulting</td>
+                <td><span class="badge badge-green">0% Commission</span> (Community First)*</td>
+            </tr>
+            <tr>
+                <td><strong>Greyin Placements</strong></td>
+                <td>Enterprise Clients / OEMs</td>
+                <td>Fractional C-suite, principal architects, domain leads</td>
+                <td><span class="badge badge-blue">10% Client Fee</span> (Paid by Hiring Co)**</td>
+            </tr>
+            <tr>
+                <td><strong>Enterprise Outplacement</strong></td>
+                <td>Corporate HR Leads</td>
+                <td>Offboarding packages for senior departing staff</td>
+                <td><span class="badge badge-amber">$2,500+ / Package</span> (B2B Contract)**</td>
+            </tr>
+        </tbody>
+    </table>
+    <p style="font-size: 8pt; color: #64748b;">
+        * Escrow, checkout, order lifecycle, and freelancer earnings tracking are live; freelancer withdrawal is currently a request/ledger flow (an admin marks each request paid once a manual transfer completes) pending a live payout-rail integration (e.g. RazorpayX Payouts), which needs a separate contract and KYC step not yet in place.<br>
+        ** The underlying job/company/candidate primitives are live; the 10% fee and $2,500+ package pricing are not yet enforced by software — today these are sales-and-invoicing-driven engagements layered on top of the platform, not a metered/billed product feature.
+    </p>
+
+    <h2>3. Content Strategy: The "GreyMatters" Editorial Engine</h2>
+
+    <p>The <strong>GreyMatters</strong> blog functions as the primary organic top-of-funnel (TOFU) acquisition engine for both senior talent and hiring executives:</p>
+    <ul>
+        <li><strong>Architecture Teardowns:</strong> High-level system design breakdowns (e.g., <em>"AUTOSAR Zonal Architecture vs. Centralized Compute," "Local LLM Deployments on On-Prem Hardware"</em>).</li>
+        <li><strong>Career & Seniority Insights:</strong> Thought pieces on ageism in tech, transitioning from embedded hardware to AI/ML, and navigating fractional leadership roles after 15+ years.</li>
+        <li><strong>Community Spotlights:</strong> Highlighting projects and MVPs built by members inside <em>Salt & Pepper Lounge</em>, driving traffic directly to the <em>FreeAgent</em> freelance engine.</li>
+    </ul>
+
+    <h2>4. Technical Infrastructure (As Built: Self-Hosted Supabase + Next.js)</h2>
+
+    <p>The original plan called for a self-hosted NocoBase 2.0 instance. In implementation this was superseded by self-hosted <strong>Supabase</strong> (PostgreSQL, GoTrue auth, PostgREST, Kong API gateway, and S3-compatible Storage) behind four independent <strong>Next.js 14</strong> App Router frontends — one per pillar — sharing a single Postgres database. The change was made for better authentication primitives (email-OTP verified signup, password reset), row-level-security-enforced data access in place of application-level permission checks, and object storage for user-uploaded images, none of which NocoBase 2.0 offered out of the box. Data sovereignty is preserved: everything still runs self-hosted on the same infrastructure, behind Docker Swarm and Traefik with automatic Let's Encrypt TLS.</p>
+
+    <div class="code-block">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    SUPABASE BACKEND MATRIX (AS BUILT)                       │
+│                                                                             │
+│   profiles (12+ Yrs role-gated) ──► posts (GreyMatters Editorial Engine)   │
+│         │                                                                   │
+│         ├──► discussions / builder_projects (Salt & Pepper Lounge)        │
+│         │                                                                   │
+│         ├──► gigs / gig_orders / payout_requests (FreeAgent, 0% commission)│
+│         │                                                                   │
+│         ├──► jobs / applications / companies (Greyin Hiring & Placements) │
+│         │                                                                   │
+│         └──► notifications (cross-pillar, trigger-fed from every table    │
+│               above — new application, order update, comment, reply,      │
+│               payout status)                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+    </div>
+
+    <h3>What's live today:</h3>
+    <ol>
+        <li><strong>Editorial engine:</strong> the <code>posts</code> table plus an in-app author dashboard (write, edit, publish, cover-image upload) — not a Markdown-collection admin UI, a purpose-built CMS behind each author's own login, gated by role the same way every other pillar-specific action is.</li>
+        <li><strong>Public delivery:</strong> published posts, categories, and search are server-rendered Next.js pages, not an embedded NocoBase view — same SEO-friendly outcome, different rendering path.</li>
+        <li><strong>Lead-capture routing:</strong> newsletter signup and category/search-driven discovery are live on GreyMatters; cross-pillar routing (a GreyMatters reader landing in Salt & Pepper or a Greyin consultation) is manual/link-based today rather than a shared-identity handoff — see the Section 4 note below.</li>
+        <li><strong>Payments:</strong> Razorpay integration for FreeAgent checkout, currently running in test mode pending a deliberate switch to live keys.</li>
+        <li><strong>Notifications:</strong> a cross-pillar in-app notification system, fed by Postgres triggers on the events users actually care about (new application, application status change, order status change, new order message, new comment, new discussion reply, payout status change) — this wasn't in the original plan at all, added because the underlying event data already existed in every pillar's tables and surfacing it in-app closes a real engagement gap.</li>
+    </ol>
+
+    <p style="font-size: 8.5pt; color: #64748b;"><strong>Known architectural gap:</strong> each of the four Next.js apps currently has its own independent user base (a Salt & Pepper member and a FreeAgent freelancer with the same person behind them are two unrelated accounts today), even though they share one Supabase project. Building true cross-pillar identity — a single login carrying a member from GreyMatters readership into Salt & Pepper membership into a Greyin placement, which is the flywheel this plan describes — is the highest-leverage engineering gap against the strategy as written. See <code>COMPETITIVE_BENCHMARK.md</code>, "Cross-cutting gaps," item 1.</p>
+
+    <h2>5. Flywheel Dynamics & Growth Engine</h2>
+    <ol>
+        <li><strong>Read (GreyMatters):</strong> Practitioners and hiring VPs read authoritative, deep-domain technical articles on the GreyMatters blog.</li>
+        <li><strong>Engage (Salt & Pepper):</strong> Senior talent joins the gated lounge to discuss articles, showcase MVPs, and collaborate.</li>
+        <li><strong>Build & Earn (FreeAgent):</strong> Members offer micro-consulting and accept peer gigs at 0% platform commission.</li>
+        <li><strong>Hire (Greyin):</strong> Enterprise buyers hire verified senior talent for fractional or advisory roles, generating platform revenue.</li>
+    </ol>
+
+</body>
+</html>

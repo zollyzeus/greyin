@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: A4;
+        margin: 18mm 15mm 18mm 15mm;
+        background-color: #f8fafc;
+        @bottom-right {
+            content: "Page " counter(page) " of " counter(pages);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 8pt;
+            color: #64748b;
+        }
+        @bottom-left {
+            content: "CONFIDENTIAL - VETERANNET BUSINESS PLAN";
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 8pt;
+            color: #64748b;
+        }
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        color: #1e293b;
+        margin: 0;
+        padding: 0;
+        font-size: 10pt;
+        line-height: 1.5;
+    }
+
+    /* Cover / Top Banner */
+    .header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        color: #ffffff;
+        padding: 24px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+
+    .header-banner h1 {
+        font-size: 20pt;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        letter-spacing: -0.5px;
+        color: #ffffff;
+    }
+
+    .header-banner p {
+        font-size: 11pt;
+        margin: 0;
+        color: #93c5fd;
+    }
+
+    .metadata-grid {
+        display: table;
+        width: 100%;
+        margin-top: 15px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .metadata-cell {
+        display: table-cell;
+        font-size: 8.5pt;
+        color: #cbd5e1;
+    }
+
+    /* Typography & Section Styling */
+    h2 {
+        font-size: 14pt;
+        color: #0f172a;
+        margin-top: 22px;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #3b82f6;
+        page-break-after: avoid;
+    }
+
+    h3 {
+        font-size: 11.5pt;
+        color: #1e3a8a;
+        margin-top: 14px;
+        margin-bottom: 6px;
+        page-break-after: avoid;
+    }
+
+    p {
+        margin-top: 0;
+        margin-bottom: 10px;
+        text-align: justify;
+    }
+
+    ul, ol {
+        margin-top: 0;
+        margin-bottom: 10px;
+        padding-left: 18px;
+    }
+
+    li {
+        margin-bottom: 4px;
+    }
+
+    /* Callout & Highlight Boxes */
+    .callout {
+        background-color: #ffffff;
+        border-left: 4px solid #2563eb;
+        padding: 12px 15px;
+        margin: 12px 0;
+        border-radius: 0 6px 6px 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .tech-stack-box {
+        background-color: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 6px;
+        padding: 12px 15px;
+        margin: 12px 0;
+    }
+
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0 16px 0;
+        font-size: 9pt;
+        background-color: #ffffff;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    th {
+        background-color: #1e293b;
+        color: #ffffff;
+        font-weight: 600;
+        text-align: left;
+        padding: 8px 10px;
+    }
+
+    td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+        background-color: #f8fafc;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 8pt;
+        font-weight: 600;
+    }
+
+    .badge-blue { background-color: #dbeafe; color: #1e40af; }
+    .badge-green { background-color: #dcfce7; color: #166534; }
+    .badge-amber { background-color: #fef3c7; color: #92400e; }
+
+    .page-break {
+        page-break-before: always;
+    }
+</style>
+</head>
+<body>
+
+    <div class="header-banner">
+        <h1>VeteranNet / NextStep Executive</h1>
+        <p>Comprehensive Business Plan & Technical Requirements Specification</p>
+        <div class="metadata-grid">
+            <div class="metadata-cell"><strong>Document Type:</strong> Product Specification & Strategy</div>
+            <div class="metadata-cell"><strong>Target Audience:</strong> Mid-to-Senior Professionals (12+ Yrs Exp)</div>
+            <div class="metadata-cell"><strong>Date:</strong> August 2026</div>
+        </div>
+    </div>
+
+    <div class="callout">
+        <strong>Executive Summary:</strong>
+        A self-hosted, privacy-first peer networking and fractional advisory platform built to solve systemic age-related displacement (ATS auto-rejections, redundancy, and corporate restructuring) for professionals with 12+ years of experience.
+    </div>
+
+    <div class="callout">
+        <strong>Implementation Status (updated Aug 18, 2026):</strong> This is the earliest concept document (VeteranNet/NextStep Executive); the platform that shipped is Greyin, now five pillars (greyin.net, greymatters.greyin.net, saltnpepper.greyin.net, freeagent.greyin.net, prolab.greyin.net) sharing one login via cross-pillar SSO. The core thesis here — the age-blind, 12+-years gate — had drifted out of Greyin B2B's implementation and was restored in an August 2026 corrective pass (see <code>IMPLEMENTATION_VS_REQUIREMENTS.md</code> §6), which also added enterprise-subscription monetization and a peer referral bridge, both direct descendants of this document's "Peer Referral Bridge" (FR-03) idea below. The "Domain-to-AI Upskilling Hub" (FR-04) has been formally cut — GreyMatters covers that ground as editorial content instead. A later addition, the cross-domain "pivoter" track (support for switching fields, not just staying put), extends this document's core displacement thesis to skill obsolescence, not just age — with peer mentor-matching as its own concrete answer to "how do you actually make the switch."
+    </div>
+
+    <h2>1. Recommended Tech Stack (100% Free & Open-Source)</h2>
+
+    <p>To meet your requirement of a <strong>free, open-source, and self-hosted</strong> stack capable of complex relational data (users, fractional projects, peer endorsements, feeds, and referrals), we recommend an integrated low-code microservice architecture:</p>
+
+    <div class="tech-stack-box">
+        <h3>Primary Framework: NocoBase (or Baserow) + PostgreSQL</h3>
+        <ul>
+            <li><strong>Core Platform — NocoBase (Self-Hosted via Docker):</strong> Unlike basic form-builders, NocoBase is a extensible open-source no-code/low-code web application platform. It natively supports granular Role-Based Access Control (RBAC), multi-table relations, visual page layout creation, and flexible workflow automation.</li>
+            <li><strong>Database — PostgreSQL:</strong> Enterprise-grade open-source relational database storing encrypted user profiles, project listings, and peer referral graphs.</li>
+            <li><strong>Self-Hosted Auth & Identity — Authentik / Keycloak:</strong> Provides secure passwordless login, OIDC/OAuth2, and strict verification workflows without vendor lock-in.</li>
+            <li><strong>Deployment Target:</strong> Local Docker Compose / On-Premises Server or low-cost Linux VPS ($5–$10/mo).</li>
+        </ul>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Tool Recommendation</th>
+                <th>License</th>
+                <th>Role in Architecture</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Backend & UI Builder</strong></td>
+                <td>NocoBase / Baserow</td>
+                <td>Apache 2.0 / MIT</td>
+                <td>Visual database schema, custom UI pages, and admin engine.</td>
+            </tr>
+            <tr>
+                <td><strong>Database Engine</strong></td>
+                <td>PostgreSQL 16</td>
+                <td>PostgreSQL License</td>
+                <td>Relational storage for profiles, skills, and engagement data.</td>
+            </tr>
+            <tr>
+                <td><strong>Search Engine</strong></td>
+                <td>Meilisearch</td>
+                <td>MIT</td>
+                <td>Fast, age-blind talent search and vector/keyword matching.</td>
+            </tr>
+            <tr>
+                <td><strong>Container Host</strong></td>
+                <td>Docker Compose</td>
+                <td>Apache 2.0</td>
+                <td>One-click local self-hosting and zero-downtime maintenance.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>2. Business Plan Strategy</h2>
+
+    <h3>2.1 Market Positioning & Legal Compliance</h3>
+    <p>To avoid app-store policy violations and public accommodation civil rights issues regarding age-gating, the platform uses an <strong>Experience-Based Threshold</strong> instead of biological age:</p>
+    <ul>
+        <li><strong>Qualification Rule:</strong> Gate entry to individuals with <strong>12+ years of verified professional experience</strong> or senior/executive titles (Lead, Staff, Manager, Director, Architect, VP).</li>
+        <li><strong>Positioning:</strong> "The Executive Advisory & Peer Referral Network for Senior Domain Experts."</li>
+    </ul>
+
+    <h3>2.2 Monetization Architecture</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Revenue Stream</th>
+                <th>Model</th>
+                <th>Target Rate / Pricing</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Peer Network Access</strong></td>
+                <td>Freemium / Premium Tier</td>
+                <td>Free core feed; $29/mo for direct referral routing & advisory tools.</td>
+            </tr>
+            <tr>
+                <td><strong>Fractional Marketplace</strong></td>
+                <td>Take-Fee / Commission</td>
+                <td>10% fee on fractional C-suite/Architect consulting contracts.</td>
+            </tr>
+            <tr>
+                <td><strong>Enterprise Outplacement</strong></td>
+                <td>B2B SaaS License</td>
+                <td>Corporate licenses purchased by companies undergoing downsizing.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. Product Requirements Document (PRD)</h2>
+
+    <h3>3.1 Functional Requirements Matrix</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Module ID</th>
+                <th>Feature Name</th>
+                <th>Description & Business Logic</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="badge badge-blue">FR-01</span></td>
+                <td><strong>Age-Blind Talent Card</strong></td>
+                <td>Profiles showcase verified domain achievements, skills, and project history. Graduation years, birthdates, and photo requirements are completely omitted to neutralize ATS bias.</td>
+                <td>High</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-blue">FR-02</span></td>
+                <td><strong>Peer Referral Bridge</strong></td>
+                <td>Gated introduction engine allowing senior members to directly refer peers into active openings at their current/former firms, bypassing cold ATS applications.</td>
+                <td>High</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-green">FR-03</span></td>
+                <td><strong>Fractional & Advisory Engine</strong></td>
+                <td>Marketplace listing short-term interim roles, advisory board posts, and part-time domain consultant requests from startups and SMBs.</td>
+                <td>Medium</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-amber">FR-04</span></td>
+                <td><strong>Domain-to-AI Upskilling Hub</strong></td>
+                <td>Curated repository and discussion threads focused on leveraging modern generative AI tools to amplify 15+ years of domain expertise.</td>
+                <td>Medium</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>3.2 Technical & Security Architecture Requirements</h3>
+    <ul>
+        <li><strong>Data Isolation & Self-Hosting:</strong> All data stored in locally hosted Docker volumes with automated encrypted pg_dump backups.</li>
+        <li><strong>Granular Role-Based Access Control (RBAC):</strong>
+            <ul>
+                <li><em>Unverified Applicant:</em> Access restricted to onboarding form and identity upload.</li>
+                <li><em>Verified Veteran Member:</em> Full access to search talent, post articles, send referral requests, and bid on fractional work.</li>
+                <li><em>Corporate Client / Recruiter:</em> Access restricted to viewing anonymous capability cards and posting fractional roles.</li>
+            </ul>
+        </li>
+        <li><strong>Compliance:</strong> Fully compliant with GDPR and local data protection standards by enabling complete profile deletion and zero tracking telemetry.</li>
+    </ul>
+
+    <h2>4. Implementation & Deployment Roadmap</h2>
+    <ol>
+        <li><strong>Phase 1: Environment Setup (Week 1)</strong> — Spin up Docker environment running NocoBase + PostgreSQL + Authentik on local infrastructure.</li>
+        <li><strong>Phase 2: Schema & RBAC Design (Weeks 2–3)</strong> — Configure collections for Profiles, Experience Logs, Referral Requests, and Fractional Opportunities.</li>
+        <li><strong>Phase 3: Page Creation & Workflows (Weeks 4–5)</strong> — Build visual views (Talent Directory, Opportunity Board, Peer Discussion Feed).</li>
+        <li><strong>Phase 4: Testing & Pilot Launch (Week 6)</strong> — Onboard an initial cohort of 50 senior professionals for peer verification testing.</li>
+    </ol>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+version: '3.8'
+
+# ============================================================
+# Greyin Platform - Isolated E2E Frontend Apps
+# ============================================================
+#
+# Companion to docker-compose.e2e.yml. NEXT_PUBLIC_* vars are
+# baked in at Docker *build* time (Next.js inlines them into the
+# client bundle), not runtime — this is exactly the class of bug
+# that broke deepedge's client-side Supabase calls earlier this
+# project (see next.config.js / build history), so this file
+# uses `build.args`, not `environment`, for every NEXT_PUBLIC_*
+# value. Runtime-only server config (SMTP, Razorpay secret keys)
+# goes under `environment` as usual.
+#
+# Each app gets a fixed host port (3100-3103) and
+# NEXT_PUBLIC_COOKIE_DOMAIN=localhost — cookies scope by
+# hostname, not port, so a session on :3100 is still visible on
+# :3103, which is what the cross-platform SSO spec needs and
+# would not get from four different local hostnames.
+# ============================================================
+
+services:
+  e2e_deepedge_web:
+    image: deepedge:e2e
+    build:
+      context: ../apps/deepedge
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: http://localhost:${E2E_KONG_PORT:-8180}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY}
+        NEXT_PUBLIC_SITE_URL: http://localhost:${E2E_DEEPEDGE_PORT:-3100}
+    environment:
+      - NEXT_PUBLIC_COOKIE_DOMAIN=localhost
+      - SUPABASE_INTERNAL_URL=http://kong:8000
+    ports:
+      - "127.0.0.1:${E2E_DEEPEDGE_PORT:-3100}:3000"
+
+  e2e_greymatters_web:
+    image: greymatters-blog:e2e
+    build:
+      context: ../apps/greymatters-blog
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: http://localhost:${E2E_KONG_PORT:-8180}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY}
+        NEXT_PUBLIC_SITE_URL: http://localhost:${E2E_GREYMATTERS_PORT:-3101}
+    environment:
+      - NEXT_PUBLIC_COOKIE_DOMAIN=localhost
+      - SUPABASE_INTERNAL_URL=http://kong:8000
+      - RAZORPAY_KEY_ID=${RAZORPAY_TEST_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_TEST_KEY_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_ADMIN_EMAIL=${SMTP_ADMIN_EMAIL}
+      - SMTP_SENDER_NAME=GreyMatters (e2e)
+    ports:
+      - "127.0.0.1:${E2E_GREYMATTERS_PORT:-3101}:3001"
+
+  e2e_flexpro_web:
+    image: flexpro:e2e
+    build:
+      context: ..
+      dockerfile: apps/flexpro/Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: http://localhost:${E2E_KONG_PORT:-8180}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY}
+        NEXT_PUBLIC_SITE_URL: http://localhost:${E2E_FLEXPRO_PORT:-3102}
+    environment:
+      - NEXT_PUBLIC_COOKIE_DOMAIN=localhost
+      - SUPABASE_INTERNAL_URL=http://kong:8000
+      - NEXT_PUBLIC_RAZORPAY_KEY_ID=${RAZORPAY_TEST_KEY_ID}
+      - RAZORPAY_KEY_ID=${RAZORPAY_TEST_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_TEST_KEY_SECRET}
+      - RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_ADMIN_EMAIL=${SMTP_ADMIN_EMAIL}
+      - SMTP_SENDER_NAME=FlexPro (e2e)
+    ports:
+      - "127.0.0.1:${E2E_FLEXPRO_PORT:-3102}:3002"
+
+  e2e_saltnpepper_web:
+    image: saltnpepper-community:e2e
+    build:
+      context: ../apps/saltnpepper-community
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: http://localhost:${E2E_KONG_PORT:-8180}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY}
+        NEXT_PUBLIC_SITE_URL: http://localhost:${E2E_SALTNPEPPER_PORT:-3103}
+    environment:
+      - NEXT_PUBLIC_COOKIE_DOMAIN=localhost
+      - SUPABASE_INTERNAL_URL=http://kong:8000
+    ports:
+      - "127.0.0.1:${E2E_SALTNPEPPER_PORT:-3103}:3003"
+
+  e2e_stackworks_web:
+    image: stackworks:e2e
+    build:
+      context: ../apps/stackworks
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: http://localhost:${E2E_KONG_PORT:-8180}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY}
+        NEXT_PUBLIC_SITE_URL: http://localhost:${E2E_STACKWORKS_PORT:-3104}
+    environment:
+      - NEXT_PUBLIC_COOKIE_DOMAIN=localhost
+      - SUPABASE_INTERNAL_URL=http://kong:8000
+      - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+    ports:
+      - "127.0.0.1:${E2E_STACKWORKS_PORT:-3104}:3004"

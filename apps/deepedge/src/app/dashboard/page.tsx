@@ -1,0 +1,348 @@
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
+import { Briefcase, Users, FileText, Settings, LogOut, Bell, MessageCircle, BellPlus, BadgeCheck, ArrowUpRight, Vote, Rss } from 'lucide-react'
+
+export default async function DashboardPage() {
+  const supabase = await createClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+
+  if (error || !user) {
+    redirect('/login?next=/dashboard')
+  }
+
+  // Fetch user profile
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+
+  // Employers get the dedicated, fuller dashboard at /employer/dashboard.
+  if (profile?.role === 'employer') {
+    redirect('/employer/dashboard')
+  }
+
+  const { count: unreadCount } = await supabase
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('read', false)
+
+  const { data: scoreRow } = await supabase
+    .from('greyin_scores')
+    .select('greyin_score, is_verified_expert')
+    .eq('user_id', user.id)
+    .maybeSingle()
+  const isVerifiedExpert = !!scoreRow?.is_verified_expert
+
+  // Salary trend watches (063) get their lazy sweep here -- this page
+  // load is as good a trigger as any, same "do this user's overdue
+  // work while they're here" shape as finalize_completed_mentor_sessions.
+  await supabase.rpc('sweep_salary_trend_alerts')
+
+  // In-app weekly digest (competitive audit, Aug 2026): the retention
+  // lever without a real email send, given the shared SMTP provider's
+  // known rate-limit issue. notifications is one shared table written
+  // to by every pillar (017/051), so this already reflects cross-pillar
+  // activity, not just DeepEdge's own.
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const { data: weekNotifications } = await supabase
+    .from('notifications')
+    .select('type')
+    .eq('user_id', user.id)
+    .gte('created_at', weekAgo)
+  const digestCounts = (weekNotifications || []).reduce<Record<string, number>>((acc, n) => {
+    acc[n.type] = (acc[n.type] || 0) + 1
+    return acc
+  }, {})
+  const digestTotal = weekNotifications?.length || 0
+
+  // Gap-audit item #10 ("your activity" dashboard cards) -- this page's own
+  // Quick Stats section already existed but had hardcoded 0s for every tile.
+  // Applications is real and cheap to wire (applications.candidate_id ->
+  // candidates.id -> user_id); Saved Jobs and Profile Views stay static since
+  // neither has a backing feature (no saved-jobs table, no per-candidate
+  // profile-view counter) -- left as-is rather than inventing tracking out of
+  // scope for this pass, not silently left as if already real.
+  const { data: candidateRow } = await supabase.from('candidates').select('id').eq('user_id', user.id).maybeSingle()
+  const { count: applicationCount } = candidateRow
+    ? await supabase.from('applications').select('id', { count: 'exact', head: true }).eq('candidate_id', candidateRow.id)
+    : { count: 0 }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation */}
+      <nav className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <a href="https://greyin.net" className="text-2xl font-bold text-blue-600">
+                DeepEdge
+              </a>
+              <span className="ml-4 text-gray-500">Dashboard</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/feed" className="relative text-gray-600 hover:text-gray-900" title="Feed">
+                <Rss className="h-5 w-5" />
+              </Link>
+              <Link href="/notifications" className="relative text-gray-600 hover:text-gray-900" title="Notifications">
+                <Bell className="h-5 w-5" />
+                {!!unreadCount && (
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </Link>
+              <span className="text-gray-700">{profile?.full_name || user.email}</span>
+              <form action="/auth/logout" method="post">
+                <button className="text-gray-600 hover:text-gray-900">
+                  <LogOut className="h-5 w-5" />
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome back, {profile?.full_name || 'User'}!
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Explore job opportunities and track your applications
+          </p>
+        </div>
+
+        {/* Verified Expert status */}
+        {isVerifiedExpert ? (
+          <div className="mb-8 flex items-center gap-2 rounded-lg bg-indigo-50 border border-indigo-200 px-4 py-3 text-sm font-semibold text-indigo-700">
+            <BadgeCheck className="h-5 w-5 shrink-0" />
+            Verified Expert{scoreRow?.greyin_score != null ? ` · Greyin Score ${scoreRow.greyin_score}` : ''} — you can apply to jobs and appear in employer candidate search.
+          </div>
+        ) : (
+          <div className="mb-8 rounded-lg bg-amber-50 border border-amber-200 px-6 py-5">
+            <p className="text-sm font-semibold text-amber-900">
+              Applying to jobs requires Verified Expert status
+            </p>
+            <p className="text-sm text-amber-800 mt-1">
+              You need senior-level experience, or a Greyin Score of 75+{scoreRow?.greyin_score != null ? ` (yours is currently ${scoreRow.greyin_score})` : ''}, to submit applications and appear in employer candidate search. Build your score by being active on:
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <a href="https://stackworks.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-teal-700 hover:text-teal-800">
+                StackWorks <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+              <a href="https://flexpro.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-orange-700 hover:text-orange-800">
+                FlexPro <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+              <a href="https://saltnpepper.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-purple-700 hover:text-purple-800">
+                Salt &amp; Pepper <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* This week's digest -- in-app only, see comment above on why */}
+        <div className="mb-8 bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">This week across Greyin</h2>
+          {digestTotal > 0 ? (
+            <>
+              <p className="text-sm text-gray-500 mb-3">{digestTotal} update{digestTotal === 1 ? '' : 's'} in the last 7 days</p>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(digestCounts).map(([type, count]) => (
+                  <span key={type} className="text-xs font-medium bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
+                    {count}&times; {type.replace(/_/g, ' ')}
+                  </span>
+                ))}
+              </div>
+              <Link href="/notifications" className="inline-block mt-3 text-sm font-medium text-blue-600 hover:text-blue-700">
+                View all &rarr;
+              </Link>
+            </>
+          ) : (
+            <p className="text-sm text-gray-500">Nothing new this week yet.</p>
+          )}
+        </div>
+
+        {/* Pivoter nudge */}
+        {profile?.is_pivoter && (
+          <div className="mb-8 rounded-lg bg-orange-50 border border-orange-200 px-6 py-5">
+            <p className="text-sm font-semibold text-orange-900">
+              Pivoting from {profile.pivot_from_domain || 'your current domain'} to {profile.pivot_to_domain || 'a new one'}
+            </p>
+            <p className="text-sm text-orange-800 mt-1">
+              You'll only show up in job applications for roles explicitly &quot;open to career changers,&quot; not the
+              general Verified Expert search. Build a track record in the new domain, or find someone who's
+              already made a similar jump:
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <a href="https://stackworks.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-teal-700 hover:text-teal-800">
+                Build on StackWorks <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+              <a href="https://saltnpepper.greyin.net/mentors" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-purple-700 hover:text-purple-800">
+                Find a mentor <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* Re-entry nudge -- unlike the pivoter banner above, this candidate
+            shows up everywhere normally; the tag is additive context, not a
+            restricted path, so the copy stays encouraging rather than
+            explaining a limitation. */}
+        {profile?.is_reentry && (
+          <div className="mb-8 rounded-lg bg-blue-50 border border-blue-200 px-6 py-5">
+            <p className="text-sm font-semibold text-blue-900">
+              Your profile notes your return to work
+            </p>
+            <p className="text-sm text-blue-800 mt-1">
+              This helps employers read a gap in your timeline in context instead of as a red flag — you show
+              up in candidate search and job applications exactly as any other Verified Expert. Want peer
+              support from someone who's done the same?
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <a href="https://saltnpepper.greyin.net/mentors" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-purple-700 hover:text-purple-800">
+                Find a mentor <ArrowUpRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Applications</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">{applicationCount || 0}</p>
+              </div>
+              <Briefcase className="h-12 w-12 text-blue-500" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Saved Jobs</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
+              </div>
+              <FileText className="h-12 w-12 text-green-500" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-500 text-sm">Profile Views</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
+              </div>
+              <Users className="h-12 w-12 text-purple-500" />
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">Quick Actions</h2>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Link
+                href="/jobs"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+              >
+                <Briefcase className="h-10 w-10 text-blue-600 mr-4" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Browse Jobs</h3>
+                  <p className="text-sm text-gray-600">Find your next opportunity</p>
+                </div>
+              </Link>
+
+              <Link
+                href="/dashboard/applications"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+              >
+                <FileText className="h-10 w-10 text-green-600 mr-4" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">My Applications</h3>
+                  <p className="text-sm text-gray-600">Track your application status</p>
+                </div>
+              </Link>
+
+              <Link
+                href="/profile"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+              >
+                <Users className="h-10 w-10 text-purple-600 mr-4" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Edit Profile</h3>
+                  <p className="text-sm text-gray-600">Update your profile and resume</p>
+                </div>
+              </Link>
+
+              <Link
+                href="/companies"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+              >
+                <Settings className="h-10 w-10 text-gray-600 mr-4" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Browse Companies</h3>
+                  <p className="text-sm text-gray-600">Explore companies that are hiring</p>
+                </div>
+              </Link>
+
+              <Link
+                href="/messages"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+              >
+                <MessageCircle className="h-10 w-10 text-blue-600 mr-4" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Messages</h3>
+                  <p className="text-sm text-gray-600">Conversations with employers</p>
+                </div>
+              </Link>
+
+              <Link
+                href="/dashboard/alerts"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+              >
+                <BellPlus className="h-10 w-10 text-blue-600 mr-4" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Job Alerts</h3>
+                  <p className="text-sm text-gray-600">Get notified about matching jobs</p>
+                </div>
+              </Link>
+
+              <Link
+                href="/governance/threshold"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+              >
+                <Vote className="h-10 w-10 text-indigo-600 mr-4" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Have a Say</h3>
+                  <p className="text-sm text-gray-600">Vote on the eligibility bar</p>
+                </div>
+              </Link>
+
+              {profile?.role === 'admin' && (
+                <Link
+                  href="/admin"
+                  className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+                >
+                  <Settings className="h-10 w-10 text-red-600 mr-4" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Admin</h3>
+                    <p className="text-sm text-gray-600">Moderate listings and view users</p>
+                  </div>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

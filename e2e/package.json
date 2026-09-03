@@ -1,0 +1,19 @@
+{
+  "name": "greyin-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:deepedge": "playwright test --project=deepedge",
+    "test:greymatters": "playwright test --project=greymatters",
+    "test:flexpro": "playwright test --project=flexpro",
+    "test:saltnpepper": "playwright test --project=saltnpepper",
+    "test:stackworks": "playwright test --project=stackworks",
+    "test:cross-platform": "playwright test --project=cross-platform",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "dotenv": "^16.4.5"
+  }
+}

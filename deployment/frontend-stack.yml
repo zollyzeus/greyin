@@ -1,0 +1,312 @@
+version: '3.8'
+
+services:
+  # ============================================================
+  # DEEPEDGE (apps/deepedge codebase) - B2B Hiring Marketplace
+  # ============================================================
+  # Rebranded from ExpertEdge 2026-09-01 (brand + domain only, at the
+  # time -- deepedge.greyin.net). Fully renamed 2026-09-03 (App 3, the
+  # last of the internal-identifiers rename) -- folder, image, compose
+  # service key, and Traefik router/service IDs (including the extra
+  # `expertedge` layer, one rename older than the `greyin_web`/
+  # `greyin-b2b` layer above it) all now say deepedge, reversing the
+  # original decision to leave them on the old codenames.
+  deepedge_web:
+    image: deepedge:latest
+    build:
+      context: ../apps/deepedge
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - NEXT_PUBLIC_SITE_URL=https://${DEEPEDGE_DOMAIN}
+      # Runtime-only (never NEXT_PUBLIC_*): used by
+      # api/subscriptions/checkout/verify and api/webhooks/razorpay-subscriptions
+      # to bypass company_subscriptions' RLS, since neither Razorpay's
+      # server-to-server webhook nor the financial-state-change verify step
+      # should rely on RLS ownership as the authorization boundary -- the
+      # HMAC signature check in those routes is the real gate.
+      - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+      - NEXT_PUBLIC_RAZORPAY_KEY_ID=${NEXT_PUBLIC_RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_ADMIN_EMAIL=${SMTP_ADMIN_EMAIL}
+      # App-specific override, same pattern as GreyMatters below -- without
+      # this, DeepEdge's own transactional emails (referral invites) send
+      # as the generic shared ${SMTP_SENDER_NAME} ("Greyin Platform")
+      # instead of this app's own brand, the same class of leftover-brand
+      # bug the code fallback in lib/email.ts was fixed for -- env always
+      # wins over a code fallback, so fixing only the code was a no-op
+      # without this too.
+      - SMTP_SENDER_NAME=DeepEdge
+    networks:
+      - edjitsu-network
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.deepedge.rule=Host(`${DEEPEDGE_DOMAIN}`)"
+        - "traefik.http.routers.deepedge.entrypoints=websecure"
+        - "traefik.http.routers.deepedge.tls.certresolver=letsencrypt"
+        - "traefik.http.services.deepedge.loadbalancer.server.port=3000"
+        - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # ============================================================
+  # GREYIN HUB - Ecosystem homepage + /pivoting + /reentry + /dashboard
+  # ============================================================
+  greyin_hub_web:
+    image: greyin-hub:latest
+    build:
+      context: ../apps/greyin-hub
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - NEXT_PUBLIC_SITE_URL=https://${MAIN_DOMAIN}
+      # Runtime-only (never NEXT_PUBLIC_*): the homepage's own per-pillar
+      # activity counts (discussions, verified outcomes) read tables whose
+      # SELECT RLS requires auth.role()='authenticated' with no public
+      # branch at all -- an anonymous visitor's own anon-key query
+      # silently returns 0 rows regardless of real data, the exact
+      # audience this stat display exists to impress. lib/supabase/service.ts
+      # bypasses that for just these two read-only aggregate counts.
+      - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+    networks:
+      - edjitsu-network
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.greyinhub.rule=Host(`${MAIN_DOMAIN}`)"
+        - "traefik.http.routers.greyinhub.entrypoints=websecure"
+        - "traefik.http.routers.greyinhub.tls.certresolver=letsencrypt"
+        - "traefik.http.services.greyinhub.loadbalancer.server.port=3005"
+        - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # ============================================================
+  # GREYMATTERS - Blog Platform
+  # ============================================================
+  greymatters_web:
+    image: greymatters-blog:latest
+    build:
+      context: ../apps/greymatters-blog
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+      - NEXT_PUBLIC_SITE_URL=https://${BLOG_DOMAIN}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_ADMIN_EMAIL=${SMTP_ADMIN_EMAIL}
+      - SMTP_SENDER_NAME=GreyMatters
+    networks:
+      - edjitsu-network
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.greymatters.rule=Host(`${BLOG_DOMAIN}`)"
+        - "traefik.http.routers.greymatters.entrypoints=websecure"
+        - "traefik.http.routers.greymatters.tls.certresolver=letsencrypt"
+        - "traefik.http.services.greymatters.loadbalancer.server.port=3001"
+        - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # ============================================================
+  # FLEXPRO (apps/flexpro codebase) - Freelance Marketplace
+  # ============================================================
+  # Rebranded from FreeAgent 2026-09-01 (brand + domain -- flexpro.greyin.net;
+  # the old name collided with an existing UK accounting SaaS company).
+  # Internal identifiers (folder, image, compose service key, Traefik
+  # router/service IDs) fully renamed to match on 2026-09-02, reversing
+  # the original "brand + domain only" decision at explicit user request.
+  flexpro_web:
+    image: flexpro:latest
+    build:
+      context: ../apps/flexpro
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - NEXT_PUBLIC_SITE_URL=https://${FLEXPRO_DOMAIN}
+      # Runtime-only (never NEXT_PUBLIC_*): used solely by
+      # api/webhooks/razorpay to bypass gig_orders' RLS, since Razorpay's
+      # server-to-server webhook calls carry no user session for RLS to
+      # match against. The HMAC signature check in that route is the real
+      # authorization gate.
+      - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+      - NEXT_PUBLIC_RAZORPAY_KEY_ID=${NEXT_PUBLIC_RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_ADMIN_EMAIL=${SMTP_ADMIN_EMAIL}
+      # App-specific override -- found alongside the same missing override
+      # on DeepEdge above: without this, FlexPro's own emails send as the
+      # generic shared ${SMTP_SENDER_NAME} ("Greyin Platform"), not the
+      # "FlexPro Marketplace" its own lib/email.ts code fallback expects
+      # (env always wins over a code fallback).
+      - SMTP_SENDER_NAME=FlexPro Marketplace
+      - RAZORPAYX_KEY_ID=${RAZORPAYX_KEY_ID}
+      - RAZORPAYX_KEY_SECRET=${RAZORPAYX_KEY_SECRET}
+      - RAZORPAYX_ACCOUNT_NUMBER=${RAZORPAYX_ACCOUNT_NUMBER}
+    networks:
+      - edjitsu-network
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.flexpro.rule=Host(`${FLEXPRO_DOMAIN}`)"
+        - "traefik.http.routers.flexpro.entrypoints=websecure"
+        - "traefik.http.routers.flexpro.tls.certresolver=letsencrypt"
+        - "traefik.http.services.flexpro.loadbalancer.server.port=3002"
+        - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # ============================================================
+  # SALT & PEPPER - Community Forum
+  # ============================================================
+  saltnpepper_web:
+    image: saltnpepper-community:latest
+    build:
+      context: ../apps/saltnpepper-community
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+      - NEXT_PUBLIC_SITE_URL=https://${COMMUNITY_DOMAIN}
+    networks:
+      - edjitsu-network
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.saltnpepper.rule=Host(`${COMMUNITY_DOMAIN}`)"
+        - "traefik.http.routers.saltnpepper.entrypoints=websecure"
+        - "traefik.http.routers.saltnpepper.tls.certresolver=letsencrypt"
+        - "traefik.http.services.saltnpepper.loadbalancer.server.port=3003"
+        - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # ============================================================
+  # STACKWORKS (apps/stackworks codebase) - Builder/Supporter Project Marketplace
+  # ============================================================
+  # Rebranded from StackEdge 2026-09-01 (brand + domain only, at the
+  # time -- stackworks.greyin.net). Fully renamed 2026-09-03 (App 2 of
+  # the internal-identifiers rename, after FlexPro) -- folder, image,
+  # compose service key, and Traefik router/service IDs all now say
+  # stackworks, reversing the original decision to leave them on the
+  # old codename.
+  stackworks_web:
+    image: stackworks:latest
+    build:
+      context: ../apps/stackworks
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - NEXT_PUBLIC_SITE_URL=https://${STACKWORKS_DOMAIN}
+      # Runtime-only (never NEXT_PUBLIC_*): used by lib/llm/client.ts and
+      # the submit-outcome route to read llm_providers (holds API keys,
+      # admin-only under RLS) and write ai_* fields on a row the
+      # submitter doesn't own. Same trust model as flexpro's razorpay
+      # webhook -- RLS-bypassing, gated by route-level auth checks
+      # instead.
+      - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+    networks:
+      - edjitsu-network
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.stackworks.rule=Host(`${STACKWORKS_DOMAIN}`)"
+        - "traefik.http.routers.stackworks.entrypoints=websecure"
+        - "traefik.http.routers.stackworks.tls.certresolver=letsencrypt"
+        - "traefik.http.services.stackworks.loadbalancer.server.port=3004"
+        - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+  # ============================================================
+  # LONGLIST (apps/longlist codebase) - Future Roles Pillar
+  # ============================================================
+  # 7th app, added 2026-08-31. Companies post roles they expect to open
+  # 3-12 months out, anonymized to members; members subscribe as
+  # future-interested or get AI-surfaced via stated future interests.
+  # Shares the same Supabase instance and companies table as every
+  # other pillar -- no new backend service, just this container.
+  longlist_web:
+    image: longlist:latest
+    build:
+      context: ../apps/longlist
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - NEXT_PUBLIC_SITE_URL=https://${LONGLIST_DOMAIN}
+      # Runtime-only (never NEXT_PUBLIC_*): lib/llm/client.ts (candidate
+      # matching) and lib/match-candidates.ts's platform_people_index
+      # read need to see every stated future-interest, not just the
+      # viewer's own -- same RLS-bypassing, route-gated trust model as
+      # stackworks's verification engine.
+      - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+    networks:
+      - edjitsu-network
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.longlist.rule=Host(`${LONGLIST_DOMAIN}`)"
+        - "traefik.http.routers.longlist.entrypoints=websecure"
+        - "traefik.http.routers.longlist.tls.certresolver=letsencrypt"
+        - "traefik.http.services.longlist.loadbalancer.server.port=3006"
+        - "traefik.docker.network=${TRAEFIK_NETWORK}"
+
+networks:
+  edjitsu-network:
+    external: true
+    name: ${TRAEFIK_NETWORK}
