@@ -46,18 +46,18 @@ export default async function PeerProjectsAdminPage() {
   })
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/admin" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4">
+        <Link href="/admin" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4 dark:text-gray-400 dark:hover:text-gray-300">
           <ArrowLeft className="h-4 w-4" /> Back to admin
         </Link>
         <div className="flex items-center gap-2 mb-1">
-          <Briefcase className="h-6 w-6 text-indigo-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Peer-Confirmed Projects</h1>
+          <Briefcase className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Peer-Confirmed Projects</h1>
         </div>
-        <p className="text-sm text-gray-500 mb-6">
+        <p className="text-sm text-gray-500 mb-6 dark:text-gray-400">
           Most recent 50 projects, flagged ones first. Deleting a project removes its members and ratings with it.
         </p>
 
@@ -66,23 +66,23 @@ export default async function PeerProjectsAdminPage() {
             {sorted.map((p: any) => {
               const flagged = flaggedProjectIds.has(p.id)
               return (
-                <div key={p.id} className={`bg-white rounded-lg shadow-sm border p-4 flex items-center justify-between ${flagged ? 'border-amber-300' : 'border-gray-200'}`}>
+                <div key={p.id} className={`bg-white rounded-lg shadow-sm border p-4 flex items-center justify-between ${flagged ? 'border-amber-300 dark:border-amber-800' : 'border-gray-200 dark:border-gray-800'}`}>
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-gray-900 dark:text-gray-50">
                       {p.title}
                       {flagged && (
-                        <span className="ml-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                        <span className="ml-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5 dark:text-amber-400 dark:bg-amber-950/40 dark:border-amber-900">
                           ⚠ Possible reciprocal rating
                         </span>
                       )}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {p.company} · added by {p.profiles?.full_name || 'Unknown'} · {new Date(p.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <form action="/api/admin/peer-projects/delete" method="POST">
                     <input type="hidden" name="project_id" value={p.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 flex-shrink-0 ml-4">
+                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 flex-shrink-0 ml-4 dark:text-red-400 dark:hover:text-red-300">
                       Delete
                     </button>
                   </form>
@@ -91,7 +91,7 @@ export default async function PeerProjectsAdminPage() {
             })}
           </div>
         ) : (
-          <p className="text-gray-500 text-sm">No peer-confirmed projects yet.</p>
+          <p className="text-gray-500 text-sm dark:text-gray-400">No peer-confirmed projects yet.</p>
         )}
       </div>
     </main>

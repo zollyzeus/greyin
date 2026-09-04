@@ -8,20 +8,28 @@ export interface ActivityEvent {
   occurred_at: string
 }
 
+// Found stale (2026-09-04): 'expertedge' was the pre-rename key
+// (fixed 2026-09-03 in the DB view itself, migration 106) -- this map
+// was never updated in that pass, so every DeepEdge activity square
+// silently rendered colorless (fell through to the "no activity" gray)
+// even though the count was correct. 'longlist' was missing outright --
+// the view had no Longlist source at all until 108_pillar_activity_longlist.sql.
 const PILLAR_COLORS: Record<string, string> = {
-  expertedge: '#4F46E5',
+  deepedge: '#4F46E5',
   greymatters: '#0284C7',
   saltnpepper: '#9333EA',
   flexpro: '#EA580C',
   stackworks: '#0D9488',
+  longlist: '#A16207',
 }
 
 const PILLAR_LABELS: Record<string, string> = {
-  expertedge: 'DeepEdge',
+  deepedge: 'DeepEdge',
   greymatters: 'GreyMatters',
   saltnpepper: 'Salt & Pepper',
   flexpro: 'FlexPro',
   stackworks: 'StackWorks',
+  longlist: 'Longlist',
 }
 
 function toDayKey(iso: string): string {
@@ -102,10 +110,10 @@ export function ActivityHeatmap({ activity, joinDate }: { activity: ActivityEven
 
   return (
     <div>
-      <p className="text-sm text-gray-600 mb-3">
+      <p className="text-sm text-gray-600 mb-3 dark:text-gray-400">
         {totalEvents} activit{totalEvents === 1 ? 'y' : 'ies'} between{' '}
-        <span className="font-medium text-gray-900">{rangeStart.toLocaleDateString()}</span> and{' '}
-        <span className="font-medium text-gray-900">{rangeEnd.toLocaleDateString()}</span>
+        <span className="font-medium text-gray-900 dark:text-gray-50">{rangeStart.toLocaleDateString()}</span> and{' '}
+        <span className="font-medium text-gray-900 dark:text-gray-50">{rangeEnd.toLocaleDateString()}</span>
       </p>
 
       <div className="overflow-x-auto pb-2">
@@ -154,7 +162,7 @@ export function ActivityHeatmap({ activity, joinDate }: { activity: ActivityEven
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4 mt-4 mb-6 text-xs text-gray-500">
+      <div className="flex flex-wrap gap-4 mt-4 mb-6 text-xs text-gray-500 dark:text-gray-400">
         {Object.entries(PILLAR_LABELS).map(([key, label]) => (
           <span key={key} className="inline-flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: PILLAR_COLORS[key] }} />
@@ -193,7 +201,7 @@ export function ActivityHeatmap({ activity, joinDate }: { activity: ActivityEven
           }}
         />
       </div>
-      <div className="flex justify-between text-xs text-gray-400 mt-1">
+      <div className="flex justify-between text-xs text-gray-400 mt-1 dark:text-gray-500">
         <span>{new Date(joinKey).toLocaleDateString()} (joined)</span>
         <span>{new Date(todayKey).toLocaleDateString()} (today)</span>
       </div>

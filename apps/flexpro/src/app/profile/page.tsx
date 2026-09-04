@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { User, Mail, Phone, MapPin, Package, Save, Star, BadgeCheck } from 'lucide-react'
 import Link from 'next/link'
 import { EcosystemWidget } from '@/components/EcosystemWidget'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -22,6 +23,15 @@ export default async function ProfilePage() {
     .from('pillar_memberships')
     .select('pillar')
     .eq('user_id', user.id)
+
+  // 'skills' isn't its own profiles column -- it's the same platform-wide
+  // profile_skills table skill_endorsements/skill_ratings already read
+  // (114, integrity audit follow-up).
+  const { data: skillRows } = await supabase
+    .from('profile_skills')
+    .select('skill')
+    .eq('user_id', user.id)
+  const skills = (skillRows || []).map((r) => r.skill)
 
   // Cross-app trust signals -- profiles already carries this app's own
   // seller_rating/total_reviews (via profile.*); the other two need
@@ -64,15 +74,15 @@ export default async function ProfilePage() {
     : null
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
+            <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
               ← Back to Dashboard
             </Link>
             <h1 className="text-xl font-semibold">Seller Profile</h1>
-            <div className="w-32"></div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -81,7 +91,7 @@ export default async function ProfilePage() {
         <EcosystemWidget activePillars={(memberships || []).map((m) => m.pillar)} />
 
         {(verifiedCount > 0 || (profile?.total_reviews ?? 0) > 0 || (reputationRow?.score ?? 0) > 0 || deliveryQualityCount > 0) && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <BadgeCheck className="w-5 h-5" />
@@ -96,35 +106,35 @@ export default async function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
               {verifiedCount > 0 && (
                 <div>
-                  <p className="text-gray-500">StackWorks</p>
-                  <p className="font-semibold text-gray-900">{verifiedCount} verified outcome{verifiedCount === 1 ? '' : 's'} · avg {verifiedAvg}/100</p>
+                  <p className="text-gray-500 dark:text-gray-400">StackWorks</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-50">{verifiedCount} verified outcome{verifiedCount === 1 ? '' : 's'} · avg {verifiedAvg}/100</p>
                 </div>
               )}
               {(profile?.total_reviews ?? 0) > 0 && (
                 <div>
-                  <p className="text-gray-500">FlexPro</p>
-                  <p className="font-semibold text-gray-900">★ {profile.seller_rating?.toFixed(1)} ({profile.total_reviews} reviews)</p>
+                  <p className="text-gray-500 dark:text-gray-400">FlexPro</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-50">★ {profile.seller_rating?.toFixed(1)} ({profile.total_reviews} reviews)</p>
                 </div>
               )}
               {(reputationRow?.score ?? 0) > 0 && (
                 <div>
-                  <p className="text-gray-500">Salt &amp; Pepper</p>
-                  <p className="font-semibold text-gray-900">{reputationRow!.score} reputation</p>
+                  <p className="text-gray-500 dark:text-gray-400">Salt &amp; Pepper</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-50">{reputationRow!.score} reputation</p>
                 </div>
               )}
             </div>
 
             {deliveryQualityCount > 0 && (
-              <div className="mt-4 pt-4 border-t border-gray-100 text-sm">
-                <p className="text-gray-500">AI delivery quality (this platform, informational only)</p>
-                <p className="font-semibold text-gray-900">{deliveryQualityCount} scored deliver{deliveryQualityCount === 1 ? 'y' : 'ies'} · avg {deliveryQualityAvg}/100</p>
+              <div className="mt-4 pt-4 border-t border-gray-100 text-sm dark:border-gray-800">
+                <p className="text-gray-500 dark:text-gray-400">AI delivery quality (this platform, informational only)</p>
+                <p className="font-semibold text-gray-900 dark:text-gray-50">{deliveryQualityCount} scored deliver{deliveryQualityCount === 1 ? 'y' : 'ies'} · avg {deliveryQualityAvg}/100</p>
               </div>
             )}
 
             {greyinScoreRow?.greyin_score != null && (
-              <details className="mt-4 pt-4 border-t border-gray-100">
-                <summary className="text-xs font-medium text-indigo-600 cursor-pointer select-none">How is this calculated?</summary>
-                <div className="mt-3 space-y-1.5 text-xs text-gray-600">
+              <details className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <summary className="text-xs font-medium text-indigo-600 cursor-pointer select-none dark:text-indigo-400">How is this calculated?</summary>
+                <div className="mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-400">
                   <p>Each platform&apos;s raw average is shrunk toward the platform-wide mean based on how much evidence you have there, so one lucky 100 doesn&apos;t outrank someone with ten solid 80s:</p>
                   <ul className="pl-4 list-disc space-y-1">
                     {greyinScoreRow.stackworks_score != null && (
@@ -142,7 +152,7 @@ export default async function ProfilePage() {
                   </ul>
                   <p>Platform composite (headcount-weighted across whichever of the above you have): {greyinScoreRow.platform_composite}/100</p>
                   <p>Career experience: {Math.min(greyinScoreRow.years_experience ?? 0, 20)} of 20 capped years counted</p>
-                  <p className="font-medium text-gray-900">Greyin Score = 85% platform composite + 15% experience = {greyinScoreRow.greyin_score}</p>
+                  <p className="font-medium text-gray-900 dark:text-gray-50">Greyin Score = 85% platform composite + 15% experience = {greyinScoreRow.greyin_score}</p>
                 </div>
               </details>
             )}
@@ -151,52 +161,52 @@ export default async function ProfilePage() {
 
         <form action="/api/profile/update" method="POST" className="space-y-6">
           {/* Profile Information */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <User className="w-5 h-5" />
               Basic Information
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Display Name
                 </label>
                 <input
                   type="text"
                   name="full_name"
                   defaultValue={profile?.full_name || ''}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Email
                 </label>
                 <input
                   type="email"
                   value={user.email}
                   disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-400"
                 />
-                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Email cannot be changed</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Phone Number
                 </label>
                 <input
                   type="tel"
                   name="phone"
                   defaultValue={profile?.phone || ''}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Location
                 </label>
                 <input
@@ -204,21 +214,21 @@ export default async function ProfilePage() {
                   name="location"
                   defaultValue={profile?.location || ''}
                   placeholder="City, Country"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
             </div>
           </div>
 
           {/* Professional Information */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Package className="w-5 h-5" />
               Professional Information
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Professional Title
                 </label>
                 <input
@@ -226,12 +236,12 @@ export default async function ProfilePage() {
                   name="title"
                   defaultValue={profile?.title || ''}
                   placeholder="e.g., Graphic Designer, Web Developer"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   About Me
                 </label>
                 <textarea
@@ -239,26 +249,26 @@ export default async function ProfilePage() {
                   defaultValue={profile?.bio || ''}
                   rows={4}
                   placeholder="Describe your expertise and services..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Skills
                 </label>
                 <input
                   type="text"
                   name="skills"
-                  defaultValue={profile?.skills?.join(', ') || ''}
+                  defaultValue={skills.join(', ')}
                   placeholder="e.g., Logo Design, Branding, UI/UX"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
-                <p className="text-xs text-gray-500 mt-1">Separate skills with commas</p>
+                <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Separate skills with commas</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Languages
                 </label>
                 <input
@@ -266,31 +276,9 @@ export default async function ProfilePage() {
                   name="languages"
                   defaultValue={profile?.languages?.join(', ') || ''}
                   placeholder="e.g., English, Hindi, Spanish"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
-                <p className="text-xs text-gray-500 mt-1">Separate languages with commas</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Information */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Payment Information</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Razorpay Account ID
-                </label>
-                <input
-                  type="text"
-                  name="razorpay_account_id"
-                  defaultValue={profile?.razorpay_account_id || ''}
-                  placeholder="acc_xxxxxxxxxxxxx"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Required to receive payments for your gigs
-                </p>
+                <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Separate languages with commas</p>
               </div>
             </div>
           </div>

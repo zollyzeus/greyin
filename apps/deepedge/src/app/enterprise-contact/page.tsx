@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ArrowLeft, CheckCircle } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const SERVICE_COPY: Record<string, { heading: string; blurb: string; backHref: string; backLabel: string }> = {
   subscription: {
@@ -54,40 +55,41 @@ export default async function EnterpriseContactPage({
   const { data: company } = await supabase.from('companies').select('id, name').eq('user_id', user.id).maybeSingle()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <Link href={copy.backHref} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href={copy.backHref} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
             <ArrowLeft className="w-4 h-4" />
             <span>{copy.backLabel}</span>
           </Link>
+          <ThemeToggle />
         </div>
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-12">
         {success ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Request received</h1>
-            <p className="text-gray-600">Our team will reach out to {profile?.email || user.email} shortly to discuss terms and get you set up.</p>
+          <div className="bg-white rounded-lg shadow p-8 text-center dark:bg-gray-900">
+            <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4 dark:text-green-400" />
+            <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-gray-50">Request received</h1>
+            <p className="text-gray-600 dark:text-gray-400">Our team will reach out to {profile?.email || user.email} shortly to discuss terms and get you set up.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow p-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{copy.heading}</h1>
-            <p className="text-gray-600 mb-6">{copy.blurb}</p>
+          <div className="bg-white rounded-lg shadow p-8 dark:bg-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-gray-50">{copy.heading}</h1>
+            <p className="text-gray-600 mb-6 dark:text-gray-400">{copy.blurb}</p>
 
             {error && (
-              <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
                 {decodeURIComponent(error)}
               </div>
             )}
 
             <form action="/api/enterprise-leads/create" method="POST" className="space-y-4">
               <div>
-                <label htmlFor="service_type" className="block text-sm font-medium text-gray-700">What are you interested in?</label>
+                <label htmlFor="service_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">What are you interested in?</label>
                 <select
                   id="service_type" name="service_type" defaultValue={service}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 >
                   <option value="subscription">Candidate search subscription</option>
                   <option value="fractional_leadership">Fractional leadership placement</option>
@@ -96,31 +98,31 @@ export default async function EnterpriseContactPage({
                 </select>
               </div>
               <div>
-                <label htmlFor="company_name" className="block text-sm font-medium text-gray-700">Company name</label>
+                <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company name</label>
                 <input
                   id="company_name" name="company_name" type="text" required defaultValue={company?.name || ''}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
               <div>
-                <label htmlFor="contact_name" className="block text-sm font-medium text-gray-700">Your name</label>
+                <label htmlFor="contact_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Your name</label>
                 <input
                   id="contact_name" name="contact_name" type="text" required defaultValue={profile?.full_name || ''}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
               <div>
-                <label htmlFor="contact_email" className="block text-sm font-medium text-gray-700">Work email</label>
+                <label htmlFor="contact_email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Work email</label>
                 <input
                   id="contact_email" name="contact_email" type="email" required defaultValue={profile?.email || user.email || ''}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
               <div>
-                <label htmlFor="team_size" className="block text-sm font-medium text-gray-700">Team / headcount size</label>
+                <label htmlFor="team_size" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Team / headcount size</label>
                 <select
                   id="team_size" name="team_size" defaultValue=""
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 >
                   <option value="">Prefer not to say</option>
                   <option value="1-5">1-5</option>
@@ -130,10 +132,10 @@ export default async function EnterpriseContactPage({
                 </select>
               </div>
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700">Tell us more</label>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tell us more</label>
                 <textarea
                   id="message" name="message" rows={3}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
               <button type="submit" className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700">

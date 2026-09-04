@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getUserIdByEmail, getCandidateIdByUserId, grantActiveSubscriptionTier } from '../../utils/admin'
+import { getUserIdByEmail, grantActiveSubscriptionTier } from '../../utils/admin'
 
 const SUPABASE_URL = process.env.SUPABASE_URL!
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -19,12 +19,17 @@ function restHeaders() {
 // precedent as every other subscription-grant helper here) so the test
 // only needs two page loads to prove both the "still within allowance"
 // and "allowance exhausted" paths.
+//
+// URL id is the person's own profiles.id/user_id, not candidates.id
+// (candidates/[id]/page.tsx's own banner comment) -- this test was
+// navigating with candidates.id, which never matched, so the page always
+// 404'd before either assertion below ever ran. Fixed to use
+// candidateUserId directly.
 test('viewing a candidate profile is capped by the employer\'s tier credit allowance, and blocked once exhausted', async ({ browser, cleanup }) => {
   const candidateCtx = await browser.newContext()
   const candidatePage = await candidateCtx.newPage()
   const candidate = await signUpDeepEdge(candidatePage, 'candidate', cleanup)
   const candidateUserId = await getUserIdByEmail(candidate.email)
-  const candidateId = await getCandidateIdByUserId(candidateUserId)
   await candidateCtx.close()
 
   const employerCtx = await browser.newContext()
@@ -53,12 +58,12 @@ test('viewing a candidate profile is capped by the employer\'s tier credit allow
   await login(employerPage, employer, '/employer/dashboard')
 
   // 50th credit -- should succeed, real profile detail renders.
-  await employerPage.goto(`/candidates/${candidateId}`)
+  await employerPage.goto(`/candidates/${candidateUserId}`)
   await expect(employerPage.getByText(`${candidate.firstName} ${candidate.lastName}`)).toBeVisible()
   await expect(employerPage.getByText('Verified Expert')).toBeVisible()
 
   // 51st credit -- allowance exhausted, upgrade screen instead of the profile.
-  await employerPage.goto(`/candidates/${candidateId}`)
+  await employerPage.goto(`/candidates/${candidateUserId}`)
   await expect(employerPage.getByText(/Out of profile views for this month/i)).toBeVisible()
   await expect(employerPage.getByText(`${candidate.firstName} ${candidate.lastName}`)).not.toBeVisible()
 

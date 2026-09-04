@@ -10,6 +10,12 @@ import { PILLARS } from './EcosystemWidget'
 // moved here, sharing the pillar links' own row (right-aligned, same
 // line) rather than crowding the header alongside Home/Pivoting/
 // Returning to Work.
+// Deliberately theme-invariant (2026-09-04) -- this footer was already a
+// dark surface (bg-gray-900) before light/dark mode existed, and stays
+// that way in both themes rather than flipping to a light footer under
+// light mode; it already carries its own dark-mode-appropriate palette,
+// and a light-mode-only footer would need its own contrast pass for the
+// logo, text, and hover states with no benefit over what's already here.
 export function SiteFooter() {
   return (
     <footer className="bg-gray-900 text-gray-300 py-12">
@@ -27,7 +33,10 @@ export function SiteFooter() {
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-sm">
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             {PILLARS.map((p) => (
-              <a key={p.key} href={p.url} className="hover:text-white transition">{p.label}</a>
+              <a key={p.key} href={p.url} className="flex items-center gap-1.5 hover:text-white transition">
+                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} aria-hidden="true" />
+                {p.label}
+              </a>
             ))}
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-2">

@@ -136,7 +136,7 @@ export default async function GigsPage({
     .order('name')
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
       {/* Hero */}
@@ -148,15 +148,15 @@ export default async function GigsPage({
           {/* id referenced by the Filters sidebar's inputs below via the
               form="" attribute -- keeps the sidebar visually separate
               while still submitting as part of this one GET request. */}
-          <form id="gig-filters" action="/gigs" method="GET" className="bg-white rounded-lg p-4 flex gap-4 max-w-3xl">
+          <form id="gig-filters" action="/gigs" method="GET" className="bg-white rounded-lg p-4 flex gap-4 max-w-3xl dark:bg-gray-900">
             <div className="flex-1 flex items-center gap-3">
-              <Search className="h-5 w-5 text-gray-400" />
+              <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               <input
                 type="text"
                 name="q"
                 defaultValue={q || ''}
                 placeholder="Search for services..."
-                className="flex-1 outline-none text-gray-900 placeholder-gray-500"
+                className="flex-1 outline-none text-gray-900 placeholder-gray-500 dark:text-gray-50 dark:bg-gray-950"
               />
             </div>
             <button type="submit" className="bg-orange-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-orange-700">
@@ -186,16 +186,16 @@ export default async function GigsPage({
         <div className="flex gap-8">
           {/* Filters Sidebar */}
           <aside className="w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
+            <div className="bg-white rounded-lg shadow-md p-6 sticky top-24 dark:bg-gray-900">
               <div className="flex items-center gap-2 mb-6">
-                <Filter className="h-5 w-5 text-gray-600" />
+                <Filter className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                 <h2 className="font-semibold text-lg">Filters</h2>
               </div>
 
               {/* Categories */}
               {categories && categories.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="font-semibold text-sm text-gray-900 mb-3">Category</h3>
+                  <h3 className="font-semibold text-sm text-gray-900 mb-3 dark:text-gray-50">Category</h3>
                   <div className="space-y-2">
                     {categories.map((cat: any) => (
                       <label key={cat.id} className="flex items-center">
@@ -205,9 +205,9 @@ export default async function GigsPage({
                           name="category"
                           value={cat.id}
                           defaultChecked={selectedCategories.includes(cat.id)}
-                          className="rounded text-orange-600 mr-2"
+                          className="rounded text-orange-600 mr-2 dark:text-orange-400 dark:bg-gray-950 dark:text-gray-100"
                         />
-                        <span className="text-sm text-gray-700">{cat.name}</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{cat.name}</span>
                       </label>
                     ))}
                   </div>
@@ -216,7 +216,7 @@ export default async function GigsPage({
 
               {/* Price Range -- real gigs.price_min/price_max columns */}
               <div className="mb-6">
-                <h3 className="font-semibold text-sm text-gray-900 mb-3">Price Range</h3>
+                <h3 className="font-semibold text-sm text-gray-900 mb-3 dark:text-gray-50">Price Range</h3>
                 <div className="space-y-2">
                   {[
                     { value: 'under_1000', label: 'Under ₹1,000' },
@@ -231,9 +231,9 @@ export default async function GigsPage({
                         name="price"
                         value={range.value}
                         defaultChecked={selectedPriceRanges.includes(range.value)}
-                        className="rounded text-orange-600 mr-2"
+                        className="rounded text-orange-600 mr-2 dark:text-orange-400 dark:bg-gray-950 dark:text-gray-100"
                       />
-                      <span className="text-sm text-gray-700">{range.label}</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{range.label}</span>
                     </label>
                   ))}
                 </div>
@@ -241,7 +241,7 @@ export default async function GigsPage({
 
               {/* Delivery Time -- real gigs.delivery_days column */}
               <div className="mb-6">
-                <h3 className="font-semibold text-sm text-gray-900 mb-3">Delivery Time</h3>
+                <h3 className="font-semibold text-sm text-gray-900 mb-3 dark:text-gray-50">Delivery Time</h3>
                 <div className="space-y-2">
                   {[
                     { value: '1', label: '24 hours' },
@@ -256,9 +256,9 @@ export default async function GigsPage({
                         name="delivery"
                         value={time.value}
                         defaultChecked={selectedDelivery.includes(time.value)}
-                        className="rounded text-orange-600 mr-2"
+                        className="rounded text-orange-600 mr-2 dark:text-orange-400 dark:bg-gray-950 dark:text-gray-100"
                       />
-                      <span className="text-sm text-gray-700">{time.label}</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{time.label}</span>
                     </label>
                   ))}
                 </div>
@@ -267,7 +267,7 @@ export default async function GigsPage({
               <button form="gig-filters" type="submit" className="w-full bg-orange-600 text-white rounded-lg py-2 text-sm font-semibold hover:bg-orange-700 mb-2">
                 Apply Filters
               </button>
-              <Link href="/gigs" className="block w-full text-center text-sm text-orange-600 hover:text-orange-700 font-semibold">
+              <Link href="/gigs" className="block w-full text-center text-sm text-orange-600 hover:text-orange-700 font-semibold dark:text-orange-400 dark:hover:text-orange-300">
                 Reset Filters
               </Link>
             </div>
@@ -276,7 +276,7 @@ export default async function GigsPage({
           {/* Gig Listings */}
           <div className="flex-1">
             <div className="mb-6 flex justify-between items-center">
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 {gigs?.length || 0} services available
               </p>
               {/* Server Component -- no client JS here, so this submits via
@@ -285,7 +285,7 @@ export default async function GigsPage({
                 form="gig-filters"
                 name="sort"
                 defaultValue={sort || 'recommended'}
-                className="border border-gray-300 rounded-lg px-4 py-2 text-sm"
+                className="border border-gray-300 rounded-lg px-4 py-2 text-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
               >
                 <option value="recommended">Recommended</option>
                 <option value="best_selling">Best Selling</option>
@@ -296,16 +296,16 @@ export default async function GigsPage({
             </div>
 
             {/* 0% Commission Banner */}
-            <div className="bg-gradient-to-r from-green-50 to-orange-50 border border-green-200 rounded-lg p-6 mb-6">
+            <div className="bg-gradient-to-r from-green-50 to-orange-50 border border-green-200 rounded-lg p-6 mb-6 dark:border-green-900 dark:from-gray-950 dark:to-gray-900">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <DollarSign className="h-8 w-8 text-green-600" />
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center dark:bg-green-950/40">
+                  <DollarSign className="h-8 w-8 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">
+                  <h3 className="text-xl font-bold text-gray-900 mb-1 dark:text-gray-50">
                     0% Platform Fee - Keep 100% of Your Earnings!
                   </h3>
-                  <p className="text-gray-700">
+                  <p className="text-gray-700 dark:text-gray-300">
                     Only ~2% Razorpay processing fee. No hidden charges. Built for verified experts across the Greyin ecosystem.
                   </p>
                 </div>
@@ -318,10 +318,10 @@ export default async function GigsPage({
                   <Link
                     key={gig.id}
                     href={`/gigs/${gig.id}`}
-                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
+                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-900"
                   >
                     {/* Gig Image */}
-                    <div className="h-48 bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center">
+                    <div className="h-48 bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center dark:from-gray-950 dark:to-gray-900">
                       {gig.images && gig.images.length > 0 ? (
                         <img src={gig.images[0]} alt={gig.title} className="w-full h-full object-cover" />
                       ) : (
@@ -336,20 +336,20 @@ export default async function GigsPage({
                           <img src={gig.profiles.avatar_url} alt={gig.profiles.full_name} className="w-8 h-8 rounded-full" />
                         ) : (
                           <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                            <User className="h-5 w-5 text-gray-400" />
+                            <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                           </div>
                         )}
-                        <span className="text-sm font-medium text-gray-700">{gig.profiles?.full_name || 'Anonymous'}</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{gig.profiles?.full_name || 'Anonymous'}</span>
                       </div>
 
                       {/* Title */}
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 h-12">
+                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 h-12 dark:text-gray-50">
                         {gig.title}
                       </h3>
 
                       {/* Category */}
                       {gig.gig_categories && (
-                        <span className="inline-block px-2 py-1 bg-orange-50 text-orange-700 rounded text-xs font-medium mb-3">
+                        <span className="inline-block px-2 py-1 bg-orange-50 text-orange-700 rounded text-xs font-medium mb-3 dark:bg-orange-950/40 dark:text-orange-400">
                           {gig.gig_categories.name}
                         </span>
                       )}
@@ -360,17 +360,17 @@ export default async function GigsPage({
                           <>
                             <Star className="h-4 w-4 text-yellow-400 fill-current" />
                             <span className="text-sm font-semibold">{gig.profiles.seller_rating?.toFixed(1)}</span>
-                            <span className="text-sm text-gray-500">({gig.profiles.total_reviews})</span>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">({gig.profiles.total_reviews})</span>
                           </>
                         ) : (
-                          <span className="text-sm text-gray-400">New seller</span>
+                          <span className="text-sm text-gray-400 dark:text-gray-500">New seller</span>
                         )}
                       </div>
 
                       {/* StackWorks verified track record, if any */}
                       <div className="mb-3">
                         {trackRecordByUser.get(gig.profiles?.id) && (
-                          <div className="flex items-center gap-1 text-xs text-green-700 font-medium">
+                          <div className="flex items-center gap-1 text-xs text-green-700 font-medium dark:text-green-400">
                             <BadgeCheck className="h-3.5 w-3.5" />
                             {trackRecordByUser.get(gig.profiles.id)!.count} verified on StackWorks · avg {trackRecordByUser.get(gig.profiles.id)!.avgScore}/100
                           </div>
@@ -379,13 +379,13 @@ export default async function GigsPage({
 
                       {/* Footer */}
                       <div className="flex items-center justify-between pt-3 border-t">
-                        <div className="flex items-center gap-1 text-gray-600 text-sm">
+                        <div className="flex items-center gap-1 text-gray-600 text-sm dark:text-gray-400">
                           <Clock className="h-4 w-4" />
                           {gig.delivery_days} days delivery
                         </div>
                         <div className="text-right">
-                          <div className="text-sm text-gray-600">Starting at</div>
-                          <div className="text-lg font-bold text-gray-900">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Starting at</div>
+                          <div className="text-lg font-bold text-gray-900 dark:text-gray-50">
                             {/* gigs has price_min/price_max, not price_basic
                                 (that column doesn't exist) -- this was
                                 silently rendering blank for every gig. */}
@@ -397,10 +397,10 @@ export default async function GigsPage({
                   </Link>
                 ))
               ) : (
-                <div className="col-span-3 bg-white rounded-lg shadow-md p-12 text-center">
+                <div className="col-span-3 bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
                   <Briefcase className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No gigs found</h3>
-                  <p className="text-gray-600">Try adjusting your filters or search criteria</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-50">No gigs found</h3>
+                  <p className="text-gray-600 dark:text-gray-400">Try adjusting your filters or search criteria</p>
                 </div>
               )}
             </div>

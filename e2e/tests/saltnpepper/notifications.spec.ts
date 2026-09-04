@@ -27,7 +27,7 @@ test('a discussion author is notified when someone replies', async ({ browser, c
   // The bell badge is rendered on dashboard load, so re-visiting picks up
   // the trigger-inserted notification.
   await authorPage.goto('/dashboard')
-  await expect(authorPage.getByTitle('Notifications')).toContainText('1')
+  await expect(authorPage.getByLabel('Notifications')).toContainText('1')
 
   await authorPage.goto('/notifications')
   await expect(authorPage.getByText('New reply to your discussion')).toBeVisible()
@@ -35,7 +35,7 @@ test('a discussion author is notified when someone replies', async ({ browser, c
 
   // Viewing the page marks it read — the badge should be gone now.
   await authorPage.goto('/dashboard')
-  await expect(authorPage.getByTitle('Notifications').locator('span')).toHaveCount(0)
+  await expect(authorPage.getByLabel('Notifications').locator('span')).toHaveCount(0)
 
   await authorCtx.close()
 })

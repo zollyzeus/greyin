@@ -1,11 +1,12 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getJobIdByTitle, getUserIdByEmail, promoteToAdmin } from '../../utils/admin'
+import { getJobIdByTitle, getUserIdByEmail, promoteToAdmin, grantActiveSubscriptionTier } from '../../utils/admin'
 
 test('an admin can close a job listing', async ({ browser, cleanup }) => {
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(employerPage, employer, '/employer/dashboard')
 
   const jobTitle = `E2E Admin Moderation Role ${Date.now()}`

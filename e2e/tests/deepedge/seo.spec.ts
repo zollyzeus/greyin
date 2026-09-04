@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getJobIdByTitle } from '../../utils/admin'
+import { getJobIdByTitle, grantActiveSubscriptionTier, getUserIdByEmail } from '../../utils/admin'
 
 /**
  * SEO / distribution (competitive audit, Aug 2026): DeepEdge's
@@ -11,6 +11,7 @@ import { getJobIdByTitle } from '../../utils/admin'
  */
 test('sitemap.xml lists a real open job, and its detail page carries JobPosting JSON-LD', async ({ page, cleanup }) => {
   const employer = await signUpDeepEdge(page, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(page, employer, '/employer/dashboard')
 
   const jobTitle = `E2E SEO Test Role ${Date.now()}`

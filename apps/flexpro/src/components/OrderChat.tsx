@@ -95,7 +95,7 @@ export default function OrderChat({ orderId, currentUserId }: OrderChatProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+        <Loader2 className="w-6 h-6 animate-spin text-indigo-600 dark:text-indigo-400" />
       </div>
     )
   }
@@ -103,9 +103,9 @@ export default function OrderChat({ orderId, currentUserId }: OrderChatProps) {
   return (
     <div className="flex flex-col h-[500px]">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 rounded-t-lg">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 rounded-t-lg dark:bg-gray-950">
         {messages.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (
@@ -119,7 +119,7 @@ export default function OrderChat({ orderId, currentUserId }: OrderChatProps) {
               >
                 <div className={`max-w-[70%] ${isOwnMessage ? 'order-2' : 'order-1'}`}>
                   {!isOwnMessage && (
-                    <div className="text-xs text-gray-600 mb-1 px-1">
+                    <div className="text-xs text-gray-600 mb-1 px-1 dark:text-gray-400">
                       {msg.sender?.full_name || 'User'}
                     </div>
                   )}
@@ -127,7 +127,7 @@ export default function OrderChat({ orderId, currentUserId }: OrderChatProps) {
                     className={`rounded-lg px-4 py-2 ${
                       isOwnMessage
                         ? 'bg-indigo-600 text-white'
-                        : 'bg-white text-gray-900 border border-gray-200'
+                        : 'bg-white text-gray-900 border border-gray-200 dark:bg-gray-900 dark:text-gray-50 dark:border-gray-800'
                     }`}
                   >
                     <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
@@ -147,14 +147,14 @@ export default function OrderChat({ orderId, currentUserId }: OrderChatProps) {
       </div>
 
       {/* Message Input */}
-      <form onSubmit={sendMessage} className="border-t bg-white p-4 rounded-b-lg">
+      <form onSubmit={sendMessage} className="border-t bg-white p-4 rounded-b-lg dark:bg-gray-900">
         <div className="flex gap-2">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:border-gray-700"
             disabled={sending}
           />
           <button

@@ -105,7 +105,7 @@ export default async function PeoplePage() {
   })
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
       <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-16">
@@ -122,19 +122,19 @@ export default async function PeoplePage() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {collaboratorProfiles && collaboratorProfiles.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">People you&rsquo;ve worked with</h2>
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8 dark:bg-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-50">People you&rsquo;ve worked with</h2>
             <div className="flex flex-wrap gap-3">
               {collaboratorProfiles.map((person) => (
-                <div key={person.id} className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2">
-                  <User className="h-4 w-4 text-gray-400" />
+                <div key={person.id} className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 dark:border-gray-800">
+                  <User className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                   <a
                     href={`https://deepedge.greyin.net/candidates/${person.id}`}
-                    className="text-sm text-gray-800 hover:text-teal-700 hover:underline"
+                    className="text-sm text-gray-800 hover:text-teal-700 hover:underline dark:text-gray-100 dark:hover:text-teal-300"
                   >
                     {person.full_name || 'A collaborator'}
                   </a>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
                     via {[...(pillarsByCollaborator.get(person.id) || [])].map((p) => PILLAR_LABEL[p] || p).join(' & ')}
                   </span>
                   <FollowButton targetUserId={person.id} isFollowing={false} next="/people" />
@@ -151,15 +151,15 @@ export default async function PeoplePage() {
               const track = trackRecordByUser.get(person.id)
               const greyinScore = scoreByUser.get(person.id)?.greyin_score
               return (
-                <div key={person.id} className="bg-white rounded-lg shadow-md p-6">
+                <div key={person.id} className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-900">
                   <div className="flex items-center justify-between gap-3 mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
-                        <User className="h-6 w-6 text-teal-600" />
+                      <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center dark:bg-teal-950/40">
+                        <User className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{person.full_name || 'StackWorks member'}</h3>
-                        {person.location && <p className="text-sm text-gray-500">{person.location}</p>}
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-50">{person.full_name || 'StackWorks member'}</h3>
+                        {person.location && <p className="text-sm text-gray-500 dark:text-gray-400">{person.location}</p>}
                       </div>
                     </div>
                     {greyinScore != null && (
@@ -170,35 +170,35 @@ export default async function PeoplePage() {
                   </div>
                   <span
                     className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold mb-2 ${
-                      builder ? 'bg-teal-50 text-teal-700' : 'bg-emerald-50 text-emerald-700'
+                      builder ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400' : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
                     }`}
                   >
                     {builder ? <Hammer className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
                     {builder ? 'Builder' : 'Supporter'}
                   </span>
                   {person.is_pivoter && person.pivot_status === 'seeking' && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold mb-2 ml-2 bg-orange-50 text-orange-700">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold mb-2 ml-2 bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400">
                       <Shuffle className="h-3.5 w-3.5" />
                       Pivoting into {person.pivot_to_domain || 'a new domain'}
                     </span>
                   )}
                   {person.is_reentry && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold mb-2 ml-2 bg-blue-50 text-blue-700">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold mb-2 ml-2 bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400">
                       <RotateCcw className="h-3.5 w-3.5" />
                       Returning to work
                     </span>
                   )}
                   {track ? (
-                    <p className="flex items-center gap-1 text-xs font-medium text-green-700 mb-2">
+                    <p className="flex items-center gap-1 text-xs font-medium text-green-700 mb-2 dark:text-green-400">
                       <BadgeCheck className="h-3.5 w-3.5" />
                       {track.count} verified outcome{track.count === 1 ? '' : 's'} · avg {track.avgScore}/100
                     </p>
                   ) : (
-                    <p className="text-xs text-gray-400 mb-2">No verified outcomes yet</p>
+                    <p className="text-xs text-gray-400 mb-2 dark:text-gray-500">No verified outcomes yet</p>
                   )}
-                  {person.bio && <p className="text-sm text-gray-600 line-clamp-3 mb-2">{person.bio}</p>}
+                  {person.bio && <p className="text-sm text-gray-600 line-clamp-3 mb-2 dark:text-gray-400">{person.bio}</p>}
                   {builder && person.years_experience != null && (
-                    <p className="text-xs text-gray-500">{person.years_experience} years of experience</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{person.years_experience} years of experience</p>
                   )}
                   {user && user.id !== person.id && (
                     <FollowButton
@@ -212,10 +212,10 @@ export default async function PeoplePage() {
             })}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
             <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No one here yet</h3>
-            <p className="text-gray-600 mb-6">Be the first to sign up — as whichever one you are.</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-50">No one here yet</h3>
+            <p className="text-gray-600 mb-6 dark:text-gray-400">Be the first to sign up — as whichever one you are.</p>
             <div className="flex gap-4 justify-center flex-wrap">
               <Link
                 href="/signup?track=builder"
@@ -225,7 +225,7 @@ export default async function PeoplePage() {
               </Link>
               <Link
                 href="/signup?track=supporter"
-                className="border border-teal-600 text-teal-700 px-6 py-3 rounded-lg font-semibold hover:bg-teal-50"
+                className="border border-teal-600 text-teal-700 px-6 py-3 rounded-lg font-semibold hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-950/40"
               >
                 Join as a Supporter
               </Link>

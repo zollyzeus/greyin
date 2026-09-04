@@ -28,8 +28,8 @@ export function SkillEndorseButton({
         type="submit"
         className={
           isEndorsed
-            ? 'flex items-center gap-1 text-xs font-medium text-indigo-700 bg-indigo-50 px-2 py-1 rounded-full'
-            : 'flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-indigo-700 hover:bg-indigo-50 px-2 py-1 rounded-full'
+            ? 'flex items-center gap-1 text-xs font-medium text-indigo-700 bg-indigo-50 px-2 py-1 rounded-full dark:text-indigo-400 dark:bg-indigo-950/40'
+            : 'flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-indigo-700 hover:bg-indigo-50 px-2 py-1 rounded-full dark:text-gray-400 dark:hover:text-indigo-300 dark:hover:bg-indigo-950/40'
         }
       >
         <ThumbsUp className="h-3 w-3" />

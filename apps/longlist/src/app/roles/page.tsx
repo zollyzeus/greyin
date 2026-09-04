@@ -27,11 +27,11 @@ export default async function RolesPage() {
   const subscribedIds = new Set((mySubs || []).map((s) => s.future_role_id))
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
       <div className="max-w-4xl mx-auto px-4 py-10">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Future Roles</h1>
-        <p className="text-gray-600 mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-gray-50">Future Roles</h1>
+        <p className="text-gray-600 mb-8 dark:text-gray-400">
           Company identity is withheld on every listing below. Subscribing tells that company you&rsquo;re
           future-interested — nothing more.
         </p>
@@ -41,13 +41,13 @@ export default async function RolesPage() {
             {roles.map((r) => {
               const subscribed = subscribedIds.has(r.id)
               return (
-                <div key={r.id} className="bg-white rounded-xl border border-gray-200 p-6">
+                <div key={r.id} className="bg-white rounded-xl border border-gray-200 p-6 dark:bg-gray-900 dark:border-gray-800">
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div>
-                      <Link href={`/roles/${r.id}`} className="text-lg font-bold text-gray-900 hover:text-amber-700">
+                      <Link href={`/roles/${r.id}`} className="text-lg font-bold text-gray-900 hover:text-amber-700 dark:text-gray-50 dark:hover:text-amber-300">
                         {r.title}
                       </Link>
-                      <div className="flex flex-wrap gap-3 mt-1.5 text-sm text-gray-500">
+                      <div className="flex flex-wrap gap-3 mt-1.5 text-sm text-gray-500 dark:text-gray-400">
                         {r.seniority_level && <span>{r.seniority_level}</span>}
                         {r.function_area && <span>&middot; {r.function_area}</span>}
                         {r.location && (
@@ -55,27 +55,27 @@ export default async function RolesPage() {
                         )}
                       </div>
                     </div>
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-amber-50 text-amber-700 inline-flex items-center gap-1 whitespace-nowrap">
+                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-amber-50 text-amber-700 inline-flex items-center gap-1 whitespace-nowrap dark:bg-amber-950/40 dark:text-amber-400">
                       <Clock className="h-3 w-3" />
                       {TIMEFRAME_LABEL[r.target_timeframe] ?? r.target_timeframe}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-3 line-clamp-2">{r.description}</p>
+                  <p className="text-sm text-gray-600 mt-3 line-clamp-2 dark:text-gray-400">{r.description}</p>
                   {r.skills && r.skills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {r.skills.map((s: string) => (
-                        <span key={s} className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{s}</span>
+                        <span key={s} className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full dark:bg-gray-800 dark:text-gray-300">{s}</span>
                       ))}
                     </div>
                   )}
                   <div className="mt-4 flex items-center justify-between">
-                    <Link href={`/roles/${r.id}`} className="text-sm font-semibold text-amber-700 hover:text-amber-800">View details</Link>
+                    <Link href={`/roles/${r.id}`} className="text-sm font-semibold text-amber-700 hover:text-amber-800 dark:text-amber-400">View details</Link>
                     <form action={`/api/future-roles/${r.id}/${subscribed ? 'unsubscribe' : 'subscribe'}`} method="POST">
                       <button
                         type="submit"
                         className={
                           subscribed
-                            ? 'text-sm px-4 py-2 rounded-lg border border-amber-700 text-amber-700 hover:bg-amber-50 font-semibold'
+                            ? 'text-sm px-4 py-2 rounded-lg border border-amber-700 text-amber-700 hover:bg-amber-50 font-semibold dark:text-amber-400 dark:hover:bg-amber-950/40'
                             : 'text-sm px-4 py-2 rounded-lg bg-amber-700 text-white hover:bg-amber-800 font-semibold'
                         }
                       >
@@ -88,7 +88,7 @@ export default async function RolesPage() {
             })}
           </div>
         ) : (
-          <p className="text-gray-500">No future roles posted yet. Check back soon.</p>
+          <p className="text-gray-500 dark:text-gray-400">No future roles posted yet. Check back soon.</p>
         )}
       </div>
     </div>

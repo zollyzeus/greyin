@@ -1,8 +1,9 @@
 import { createClient } from '@/app/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { User, Mail, Phone, MapPin, PenTool, Save, BadgeCheck } from 'lucide-react'
+import { User, Mail, Phone, MapPin, Save, BadgeCheck } from 'lucide-react'
 import Link from 'next/link'
 import { EcosystemWidget } from '@/app/components/EcosystemWidget'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -65,15 +66,15 @@ export default async function ProfilePage() {
     : null
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
+            <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
               ← Back to Dashboard
             </Link>
             <h1 className="text-xl font-semibold">Author Profile</h1>
-            <div className="w-32"></div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -82,7 +83,7 @@ export default async function ProfilePage() {
         <EcosystemWidget activePillars={(memberships || []).map((m) => m.pillar)} />
 
         {(verifiedCount > 0 || (profile?.total_reviews ?? 0) > 0 || (reputationRow?.score ?? 0) > 0 || postQualityCount > 0) && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <BadgeCheck className="w-5 h-5" />
@@ -97,34 +98,34 @@ export default async function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
               {verifiedCount > 0 && (
                 <div>
-                  <p className="text-gray-500">StackWorks</p>
-                  <p className="font-semibold text-gray-900">{verifiedCount} verified outcome{verifiedCount === 1 ? '' : 's'} · avg {verifiedAvg}/100</p>
+                  <p className="text-gray-500 dark:text-gray-400">StackWorks</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-50">{verifiedCount} verified outcome{verifiedCount === 1 ? '' : 's'} · avg {verifiedAvg}/100</p>
                 </div>
               )}
               {(profile?.total_reviews ?? 0) > 0 && (
                 <div>
-                  <p className="text-gray-500">FlexPro</p>
-                  <p className="font-semibold text-gray-900">★ {profile.seller_rating?.toFixed(1)} ({profile.total_reviews} reviews)</p>
+                  <p className="text-gray-500 dark:text-gray-400">FlexPro</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-50">★ {profile.seller_rating?.toFixed(1)} ({profile.total_reviews} reviews)</p>
                 </div>
               )}
               {(reputationRow?.score ?? 0) > 0 && (
                 <div>
-                  <p className="text-gray-500">Salt &amp; Pepper</p>
-                  <p className="font-semibold text-gray-900">{reputationRow!.score} reputation</p>
+                  <p className="text-gray-500 dark:text-gray-400">Salt &amp; Pepper</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-50">{reputationRow!.score} reputation</p>
                 </div>
               )}
               {postQualityCount > 0 && (
                 <div>
-                  <p className="text-gray-500">GreyMatters</p>
-                  <p className="font-semibold text-gray-900">{postQualityCount} scored post{postQualityCount === 1 ? '' : 's'} · avg {postQualityAvg}/100</p>
+                  <p className="text-gray-500 dark:text-gray-400">GreyMatters</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-50">{postQualityCount} scored post{postQualityCount === 1 ? '' : 's'} · avg {postQualityAvg}/100</p>
                 </div>
               )}
             </div>
 
             {greyinScoreRow?.greyin_score != null && (
-              <details className="mt-4 pt-4 border-t border-gray-100">
-                <summary className="text-xs font-medium text-indigo-600 cursor-pointer select-none">How is this calculated?</summary>
-                <div className="mt-3 space-y-1.5 text-xs text-gray-600">
+              <details className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <summary className="text-xs font-medium text-indigo-600 cursor-pointer select-none dark:text-indigo-400">How is this calculated?</summary>
+                <div className="mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-400">
                   <p>Each platform&apos;s raw average is shrunk toward the platform-wide mean based on how much evidence you have there, so one lucky 100 doesn&apos;t outrank someone with ten solid 80s:</p>
                   <ul className="pl-4 list-disc space-y-1">
                     {greyinScoreRow.stackworks_score != null && (
@@ -142,7 +143,7 @@ export default async function ProfilePage() {
                   </ul>
                   <p>Platform composite (headcount-weighted across whichever of the above you have): {greyinScoreRow.platform_composite}/100</p>
                   <p>Career experience: {Math.min(greyinScoreRow.years_experience ?? 0, 20)} of 20 capped years counted</p>
-                  <p className="font-medium text-gray-900">Greyin Score = 85% platform composite + 15% experience = {greyinScoreRow.greyin_score}</p>
+                  <p className="font-medium text-gray-900 dark:text-gray-50">Greyin Score = 85% platform composite + 15% experience = {greyinScoreRow.greyin_score}</p>
                 </div>
               </details>
             )}
@@ -151,41 +152,41 @@ export default async function ProfilePage() {
 
         <form action="/api/profile/update" method="POST" className="space-y-6">
           {/* Profile Information */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <User className="w-5 h-5" />
               Basic Information
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Display Name
                 </label>
                 <input
                   type="text"
                   name="full_name"
                   defaultValue={profile?.full_name || ''}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">This will be shown on your posts</p>
+                <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">This will be shown on your posts</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Email
                 </label>
                 <input
                   type="email"
                   value={user.email}
                   disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-400"
                 />
-                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Email cannot be changed</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Bio
                 </label>
                 <textarea
@@ -193,12 +194,12 @@ export default async function ProfilePage() {
                   defaultValue={profile?.bio || ''}
                   rows={4}
                   placeholder="Tell your readers about yourself..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Website
                 </label>
                 <input
@@ -206,30 +207,30 @@ export default async function ProfilePage() {
                   name="website"
                   defaultValue={profile?.website || ''}
                   placeholder="https://yourwebsite.com"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Twitter Handle
                 </label>
                 <div className="flex items-center">
-                  <span className="px-3 py-2 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg text-gray-600">
+                  <span className="px-3 py-2 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg text-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400">
                     @
                   </span>
                   <input
                     type="text"
                     name="twitter"
-                    defaultValue={profile?.twitter || ''}
+                    defaultValue={profile?.twitter_handle || ''}
                     placeholder="username"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Location
                 </label>
                 <input
@@ -237,45 +238,8 @@ export default async function ProfilePage() {
                   name="location"
                   defaultValue={profile?.location || ''}
                   placeholder="City, Country"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
-              </div>
-            </div>
-          </div>
-
-          {/* Writing Preferences */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <PenTool className="w-5 h-5" />
-              Writing Preferences
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="email_notifications"
-                    defaultChecked={profile?.email_notifications}
-                    className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">
-                    Email me when someone comments on my posts
-                  </span>
-                </label>
-              </div>
-
-              <div>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="show_email"
-                    defaultChecked={profile?.show_email}
-                    className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">
-                    Show my email address on my public profile
-                  </span>
-                </label>
               </div>
             </div>
           </div>

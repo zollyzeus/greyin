@@ -1,0 +1,38 @@
+-- ============================================================
+-- SEC fix: collaborators view lost security_invoker=true
+-- ============================================================
+--
+-- 067_security_critical_fixes.sql originally set security_invoker=true
+-- on this view so it enforces the QUERYING user's own RLS on the
+-- underlying tables (project_applications/project_asks/gig_orders/
+-- peer_project_members), rather than running with the view owner's
+-- (postgres, effectively RLS-bypassing) privileges.
+--
+-- 089_peer_projects.sql recreated this view with CREATE OR REPLACE VIEW
+-- to add the 'peer' pillar branch, which silently reset it back to the
+-- Postgres default (security_invoker=false) -- CREATE OR REPLACE VIEW
+-- does not preserve reloptions from the version it's replacing. Flagged
+-- during the 2026-08-31 freeagent->flexpro rename (found while checking
+-- view reloptions before an unrelated Tier 3 migration) but never
+-- actually fixed until now.
+--
+-- Impact, confirmed live before this fix: with security_invoker off and
+-- anon holding a SELECT grant (PostgREST's default per-view/table grant,
+-- same as every other view here -- RLS is meant to be the real
+-- enforcement), a plain unauthenticated curl against
+-- /rest/v1/collaborators returned real cross-user, cross-pillar
+-- collaboration pairs platform-wide with zero login required.
+--
+-- Verified before applying: every real app-code query against this view
+-- (greyin-hub/dashboard, stackworks/people, saltnpepper-community/members,
+-- deepedge/candidates/[id], flexpro/sellers/[id] -- the only 5 call
+-- sites in the whole codebase) already filters .eq('user_id', <the
+-- current authenticated viewer's own id>), so in every legitimate row
+-- returned the viewer IS one of the two collaborating parties -- exactly
+-- what each underlying table's own RLS already permits for its
+-- applicant/owner/buyer/seller/peer-member. Enabling security_invoker
+-- closes the anon/cross-user leak without changing behavior for any of
+-- these 5 legitimate call sites.
+-- ============================================================
+
+ALTER VIEW public.collaborators SET (security_invoker = true);

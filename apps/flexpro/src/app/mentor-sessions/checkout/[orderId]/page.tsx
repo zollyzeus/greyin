@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { GraduationCap, ArrowLeft, CreditCard } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 /**
  * Trimmed-down variant of checkout/[id]/page.tsx -- no package-tier
@@ -35,24 +36,25 @@ export default async function MentorSessionCheckoutPage({ params }: { params: { 
   const { data: buyerProfile } = await supabase.from('profiles').select('phone').eq('id', user.id).single()
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <Link href={`/mentor-sessions`} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
+        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href={`/mentor-sessions`} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
             <ArrowLeft className="w-4 h-4" />
             <span>Back to mentor sessions</span>
           </Link>
-        </div>
+            <ThemeToggle />
+          </div>
       </header>
 
       <div className="max-w-md mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
           <div className="flex items-center gap-2 mb-4">
-            <GraduationCap className="w-5 h-5 text-indigo-600" />
-            <h1 className="text-xl font-bold text-gray-900">Confirm booking</h1>
+            <GraduationCap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-50">Confirm booking</h1>
           </div>
-          <p className="text-gray-600 mb-1">{order.gig?.title}</p>
-          <p className="text-2xl font-bold text-indigo-600 mb-6">₹{order.amount.toLocaleString()}</p>
+          <p className="text-gray-600 mb-1 dark:text-gray-400">{order.gig?.title}</p>
+          <p className="text-2xl font-bold text-indigo-600 mb-6 dark:text-indigo-400">₹{order.amount.toLocaleString()}</p>
 
           <button
             id="pay-button"
@@ -62,7 +64,7 @@ export default async function MentorSessionCheckoutPage({ params }: { params: { 
             Pay &amp; confirm
           </button>
 
-          <p className="text-xs text-gray-500 mt-4 text-center">Secure payment powered by Razorpay</p>
+          <p className="text-xs text-gray-500 mt-4 text-center dark:text-gray-400">Secure payment powered by Razorpay</p>
         </div>
       </div>
 

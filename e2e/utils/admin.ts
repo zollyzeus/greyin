@@ -890,3 +890,25 @@ export async function createBackdatedJob(opts: {
   const [job] = await res.json()
   return job.id
 }
+
+/**
+ * Directly flips an llm_feature_flags row rather than driving
+ * /admin/llm's UI -- that panel is already covered by
+ * admin-llm.spec.ts's own test-only flag; a real flag like
+ * longlist_candidate_matching is genuinely OFF by default (a real
+ * product decision, not an oversight -- it surfaces a member's profile
+ * to an employer with no explicit opt-in for that specific role), so a
+ * spec exercising the real matching pipeline must flip it on for its
+ * own duration and always flip it back off in a finally block,
+ * regardless of pass/fail, rather than leaving live behavior changed.
+ */
+export async function setLLMFeatureFlag(featureKey: string, enabled: boolean): Promise<void> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/llm_feature_flags?feature_key=eq.${encodeURIComponent(featureKey)}`, {
+    method: 'PATCH',
+    headers: { ...restHeaders(), Prefer: 'return=minimal' },
+    body: JSON.stringify({ enabled }),
+  })
+  if (!res.ok) {
+    throw new Error(`Failed to set llm_feature_flags.${featureKey}.enabled=${enabled}: ${res.status} ${await res.text()}`)
+  }
+}

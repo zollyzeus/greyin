@@ -4,6 +4,7 @@ import { Briefcase, Search as SearchIcon } from 'lucide-react'
 import { EcosystemSearchResults } from '@/components/EcosystemSearchResults'
 import { PeopleSearchResults, PersonResult } from '@/components/PeopleSearchResults'
 import { parseSearchQuery } from '@/lib/parse-search-query'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function SearchPage({
   searchParams,
@@ -56,30 +57,31 @@ export default async function SearchPage({
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-blue-600" />
+              <Briefcase className="h-8 w-8 text-orange-600 dark:text-orange-400" />
               <span className="ml-2 text-2xl font-bold">FlexPro</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Search the Greyin Ecosystem</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6 dark:text-gray-50">Search the Greyin Ecosystem</h1>
 
         <form className="mb-8 flex gap-3">
-          <div className="flex-1 flex items-center gap-3 bg-white border border-gray-300 rounded-lg px-4">
-            <SearchIcon className="h-5 w-5 text-gray-400" />
+          <div className="flex-1 flex items-center gap-3 bg-white border border-gray-300 rounded-lg px-4 dark:bg-gray-900 dark:border-gray-700">
+            <SearchIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
               name="q"
               defaultValue={query}
               placeholder="Search jobs, gigs, articles, discussions, and projects..."
-              className="flex-1 py-3 outline-none"
+              className="flex-1 py-3 outline-none dark:bg-gray-950 dark:text-gray-100"
             />
           </div>
           <button type="submit" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
@@ -88,7 +90,7 @@ export default async function SearchPage({
         </form>
 
         {query && (!results || results.length === 0) && people.length === 0 && (
-          <p className="text-gray-500 text-sm">No results for &ldquo;{query}&rdquo;.</p>
+          <p className="text-gray-500 text-sm dark:text-gray-400">No results for &ldquo;{query}&rdquo;.</p>
         )}
 
         <PeopleSearchResults results={people} />

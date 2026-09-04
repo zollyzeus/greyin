@@ -26,7 +26,7 @@ const SOURCE_COLORS: Record<string, string> = {
  */
 export function SalaryTrendChart({ rows }: { rows: TrendRow[] }) {
   if (rows.length === 0) {
-    return <p className="text-gray-500 text-sm">Not enough data yet for this filter (at least 3 people/postings are needed per group).</p>
+    return <p className="text-gray-500 text-sm dark:text-gray-400">Not enough data yet for this filter (at least 3 people/postings are needed per group).</p>
   }
 
   const midpoints = rows.map((r) => (r.avg_salary_low + r.avg_salary_high) / 2)

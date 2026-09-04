@@ -6,6 +6,7 @@ import { Users, Menu, X, ChevronDown, Home, MessageSquareHeart, Building2, BookO
 import { PILLARS } from './EcosystemWidget'
 import { createClient } from '@/lib/supabase/client'
 import { NotificationBell } from './NotificationBell'
+import { ThemeToggle } from './ThemeToggle'
 
 const NAV_LINKS = [
   { href: '/discussions', label: 'Discussions' },
@@ -56,51 +57,51 @@ export function SiteHeader() {
   }, [])
 
   return (
-    <header className="bg-white border-b">
+    <header className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <a href="https://greyin.net" className="flex items-center min-w-0">
-            <Users className="h-8 w-8 text-purple-600 flex-shrink-0" />
-            <span className="ml-2 text-2xl font-bold truncate">Salt &amp; Pepper</span>
+            <Users className="h-8 w-8 text-purple-600 dark:text-purple-500 flex-shrink-0" />
+            <span className="ml-2 text-2xl font-bold text-gray-900 dark:text-gray-50 truncate">Salt &amp; Pepper</span>
           </a>
 
           <nav className="hidden md:flex items-center gap-6 flex-shrink-0">
-            <a href="https://greyin.net" className="flex items-center gap-1 text-gray-700 hover:text-purple-600" title="Back to the Greyin ecosystem hub">
+            <a href="https://greyin.net" className="flex items-center gap-1 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400" title="Back to the Greyin ecosystem hub">
               <Home className="h-4 w-4" />
               Home
             </a>
             <div className="relative group">
-              <button className="text-gray-700 hover:text-purple-600 transition flex items-center gap-1">
+              <button className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1">
                 Explore
                 <ChevronDown className="h-4 w-4" />
               </button>
-              <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
+              <div className="absolute left-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
                 {NAV_LINKS.map((link) => (
-                  <Link key={link.href} href={link.href} className="block px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-purple-600 transition">
+                  <Link key={link.href} href={link.href} className="block px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-purple-600 dark:hover:text-purple-400 transition">
                     {link.label}
                   </Link>
                 ))}
-                <a href="https://greyin.net/feedback?app=saltnpepper" className="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-gray-50 hover:text-purple-600 transition border-t border-gray-100" title="Send feedback to the Greyin team">
+                <a href="https://greyin.net/feedback?app=saltnpepper" className="flex items-center gap-2 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-purple-600 dark:hover:text-purple-400 transition border-t border-gray-100 dark:border-gray-800" title="Send feedback to the Greyin team">
                   <MessageSquareHeart className="h-4 w-4" />
                   Feedback
                 </a>
               </div>
             </div>
             <div className="relative group">
-              <button className="text-gray-700 hover:text-purple-600 transition flex items-center gap-1">
+              <button className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition flex items-center gap-1">
                 More Platforms
                 <ChevronDown className="h-4 w-4" />
               </button>
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
                 {OTHER_PILLARS.map((p) => {
                   const Icon = PILLAR_ICONS[p.key]
                   return (
-                    <a key={p.key} href={p.url} className="block px-4 py-3 hover:bg-gray-50 transition border-b border-gray-100 last:border-b-0">
-                      <div className="font-semibold text-gray-900 flex items-center gap-2">
+                    <a key={p.key} href={p.url} className="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition border-b border-gray-100 dark:border-gray-800 last:border-b-0">
+                      <div className="font-semibold text-gray-900 dark:text-gray-50 flex items-center gap-2">
                         <Icon className="h-4 w-4 flex-shrink-0" style={{ color: p.color }} aria-hidden="true" />
                         {p.label}
                       </div>
-                      <div className="text-sm text-gray-600">{p.description}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">{p.description}</div>
                     </a>
                   )
                 })}
@@ -109,43 +110,47 @@ export function SiteHeader() {
             {isLoggedIn === true ? (
               <>
                 <NotificationBell />
-                <Link href="/dashboard" className="text-gray-700 hover:text-purple-600">Dashboard</Link>
+                <Link href="/dashboard" className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400">Dashboard</Link>
                 <form action="/auth/logout" method="POST">
                   <button type="submit" className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 whitespace-nowrap">Sign Out</button>
                 </form>
               </>
             ) : isLoggedIn === false ? (
               <>
-                <Link href="/login" className="text-gray-700 hover:text-purple-600">Sign In</Link>
+                <Link href="/login" className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400">Sign In</Link>
                 <Link href="/signup" className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 whitespace-nowrap">
                   Join Community
                 </Link>
               </>
             ) : null}
+            <ThemeToggle />
           </nav>
 
-          <button
-            type="button"
-            className="md:hidden p-2 -mr-2 text-gray-700 flex-shrink-0"
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-          >
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          <div className="flex items-center gap-1 md:hidden flex-shrink-0">
+            <ThemeToggle />
+            <button
+              type="button"
+              className="p-2 -mr-2 text-gray-700 dark:text-gray-300"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileOpen}
+            >
+              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
       {mobileOpen && (
-        <nav className="md:hidden border-t bg-white px-4 py-4 space-y-1">
-          <a href="https://greyin.net" className="flex items-center gap-2 py-2.5 text-gray-700 hover:text-purple-600" onClick={() => setMobileOpen(false)}>
+        <nav className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-4 space-y-1">
+          <a href="https://greyin.net" className="flex items-center gap-2 py-2.5 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400" onClick={() => setMobileOpen(false)}>
             <Home className="h-4 w-4" />
             Home
           </a>
 
           <button
             type="button"
-            className="w-full flex items-center justify-between py-2.5 text-gray-700"
+            className="w-full flex items-center justify-between py-2.5 text-gray-700 dark:text-gray-300"
             onClick={() => setExploreOpen((v) => !v)}
             aria-expanded={exploreOpen}
           >
@@ -155,11 +160,11 @@ export function SiteHeader() {
           {exploreOpen && (
             <div className="pl-3 space-y-1 pb-1">
               {NAV_LINKS.map((link) => (
-                <Link key={link.href} href={link.href} className="block py-2 text-sm text-gray-600 hover:text-purple-600" onClick={() => setMobileOpen(false)}>
+                <Link key={link.href} href={link.href} className="block py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400" onClick={() => setMobileOpen(false)}>
                   {link.label}
                 </Link>
               ))}
-              <a href="https://greyin.net/feedback?app=saltnpepper" className="flex items-center gap-2 py-2 text-sm text-gray-600 hover:text-purple-600" onClick={() => setMobileOpen(false)}>
+              <a href="https://greyin.net/feedback?app=saltnpepper" className="flex items-center gap-2 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400" onClick={() => setMobileOpen(false)}>
                 <MessageSquareHeart className="h-4 w-4" />
                 Feedback
               </a>
@@ -168,7 +173,7 @@ export function SiteHeader() {
 
           <button
             type="button"
-            className="w-full flex items-center justify-between py-2.5 text-gray-700"
+            className="w-full flex items-center justify-between py-2.5 text-gray-700 dark:text-gray-300"
             onClick={() => setPlatformsOpen((v) => !v)}
             aria-expanded={platformsOpen}
           >
@@ -180,7 +185,7 @@ export function SiteHeader() {
               {OTHER_PILLARS.map((p) => {
                 const Icon = PILLAR_ICONS[p.key]
                 return (
-                  <a key={p.key} href={p.url} className="flex items-center gap-2 py-2 text-sm text-gray-600">
+                  <a key={p.key} href={p.url} className="flex items-center gap-2 py-2 text-sm text-gray-600 dark:text-gray-400">
                     <Icon className="h-4 w-4 flex-shrink-0" style={{ color: p.color }} aria-hidden="true" />
                     {p.label}
                   </a>
@@ -189,13 +194,13 @@ export function SiteHeader() {
             </div>
           )}
 
-          <div className="pt-3 border-t border-gray-200 flex flex-col gap-2">
+          <div className="pt-3 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-2">
             {isLoggedIn === true ? (
               <>
                 <div className="flex justify-center">
                   <NotificationBell />
                 </div>
-                <Link href="/dashboard" className="text-center py-2.5 text-gray-700 border border-gray-300 rounded-lg" onClick={() => setMobileOpen(false)}>
+                <Link href="/dashboard" className="text-center py-2.5 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Dashboard
                 </Link>
                 <form action="/auth/logout" method="POST">
@@ -206,7 +211,7 @@ export function SiteHeader() {
               </>
             ) : isLoggedIn === false ? (
               <>
-                <Link href="/login" className="text-center py-2.5 text-gray-700 border border-gray-300 rounded-lg" onClick={() => setMobileOpen(false)}>
+                <Link href="/login" className="text-center py-2.5 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Sign In
                 </Link>
                 <Link href="/signup" className="text-center py-2.5 bg-purple-600 text-white rounded-lg" onClick={() => setMobileOpen(false)}>

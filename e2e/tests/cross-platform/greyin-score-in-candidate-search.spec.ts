@@ -69,7 +69,13 @@ test('a candidate with real StackWorks evidence shows a Greyin Score in the empl
   await grantActiveSubscription(employerId)
 
   await employerPage.goto('/candidates')
-  const candidateCard = employerPage.locator('div.bg-white.rounded-lg.shadow-md', { hasText: `${candidate.firstName} ${candidate.lastName}` })
+  // Each result renders as a single anchor (candidates/page.tsx:199,
+  // `<Link className="block bg-white rounded-lg shadow-md ...">`), not a
+  // div wrapping a link -- a div.bg-white.rounded-lg.shadow-md CSS
+  // selector never matches it and silently returns zero elements. Scope
+  // by accessible role/name instead, matching how the rest of this suite
+  // locates cards (e.g. peer-projects.spec.ts's role+regex buttons).
+  const candidateCard = employerPage.getByRole('link', { name: new RegExp(`${candidate.firstName} ${candidate.lastName}`) })
   await expect(candidateCard.getByText(/Verified Expert · Greyin Score \d+/)).toBeVisible()
 
   await builderCtx.close()

@@ -92,7 +92,7 @@ export function TipButton({
   }
 
   if (done) {
-    return <p className="text-sm text-green-700 font-medium">Thank you for supporting {authorName}! 💙</p>
+    return <p className="text-sm text-green-700 font-medium dark:text-green-400">Thank you for supporting {authorName}! 💙</p>
   }
 
   return (
@@ -100,7 +100,7 @@ export function TipButton({
       <select
         value={amount}
         onChange={(e) => setAmount(Number(e.target.value))}
-        className="text-sm border border-gray-300 rounded-lg px-2 py-1.5"
+        className="text-sm border border-gray-300 rounded-lg px-2 py-1.5 dark:border-gray-700"
       >
         <option value={50}>₹50</option>
         <option value={100}>₹100</option>

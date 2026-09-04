@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/app/lib/supabase/server'
 import { BookOpen, ArrowLeft, User } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function CategoryPostsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -35,26 +36,27 @@ export default async function CategoryPostsPage({ params }: { params: Promise<{ 
   const posts = (rawPosts || []).map((p) => ({ ...p, profiles: authorsById.get(p.author_id) || null }))
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <BookOpen className="h-8 w-8 text-blue-600" />
+              <BookOpen className="h-8 w-8 text-sky-600 dark:text-sky-400" />
               <span className="ml-2 text-2xl font-bold">GreyMatters</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/categories" className="flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/categories" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           All categories
         </Link>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">{category.name}</h1>
-        {category.description && <p className="text-gray-600 mb-6">{category.description}</p>}
+        <h1 className="text-3xl font-bold text-gray-900 mb-1 dark:text-gray-50">{category.name}</h1>
+        {category.description && <p className="text-gray-600 mb-6 dark:text-gray-400">{category.description}</p>}
 
         {posts && posts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -62,15 +64,15 @@ export default async function CategoryPostsPage({ params }: { params: Promise<{ 
               <Link
                 key={post.id}
                 href={`/posts/${post.slug}`}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-900"
               >
                 {post.cover_image_url && (
                   <img src={post.cover_image_url} alt={post.title} className="w-full h-40 object-cover" />
                 )}
                 <div className="p-6">
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{post.title}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">{post.excerpt}</p>
-                  <p className="text-xs text-gray-400 flex items-center gap-1">
+                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 dark:text-gray-50">{post.title}</h3>
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-3 dark:text-gray-400">{post.excerpt}</p>
+                  <p className="text-xs text-gray-400 flex items-center gap-1 dark:text-gray-500">
                     <User className="h-3 w-3" />
                     {post.profiles?.full_name || 'GreyMatters'}
                   </p>
@@ -79,8 +81,8 @@ export default async function CategoryPostsPage({ params }: { params: Promise<{ 
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <p className="text-gray-600">No articles in this category yet</p>
+          <div className="bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
+            <p className="text-gray-600 dark:text-gray-400">No articles in this category yet</p>
           </div>
         )}
       </div>

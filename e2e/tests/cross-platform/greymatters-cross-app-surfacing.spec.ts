@@ -46,7 +46,11 @@ test('a published GreyMatters post shows up in deepedge\'s Ecosystem Search and 
 
   await page.goto(`${greyinB2BBase}/search?q=${encodeURIComponent(title)}`)
   await expect(page.getByText(title)).toBeVisible()
-  await expect(page.getByText(/GreyMatters/)).toBeVisible()
+  // Plain /GreyMatters/ also matches the shared footer's own link to
+  // greymatters.greyin.net (strict-mode violation) -- the result card's
+  // pillar tag renders as "GreyMatters · post", so anchor on that suffix
+  // to scope the match to the actual search result.
+  await expect(page.getByText(/GreyMatters · post/)).toBeVisible()
 
   // Same SSO cookie (shared .greyin.net domain) carries straight into the
   // hub -- no separate hub login needed, matching every other

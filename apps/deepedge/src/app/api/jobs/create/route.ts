@@ -31,6 +31,28 @@ export async function POST(request: Request) {
     )
   }
 
+  // FR-EE-16 (109_grandfather_job_post_credits.sql): job_post was
+  // schema-ready since 096 but never actually enforced here -- job
+  // posting had been completely free. Every company that existed
+  // before this shipped was grandfathered onto a free 'basic' tier in
+  // that migration so nobody already posting is locked out; a company
+  // created after this deploy has no subscription at all until it
+  // genuinely subscribes via /subscribe, same as consume_credit's
+  // existing profile_view gate on candidates/[id].
+  const { data: canPost } = await supabase.rpc('consume_credit', {
+    p_user_id: user.id,
+    p_product: 'deepedge_hiring',
+    p_credit_type: 'job_post',
+  })
+  if (!canPost) {
+    return NextResponse.redirect(
+      absoluteUrl(
+        '/employer/post-job?error=' +
+          encodeURIComponent("You've used all your job posting credits for this month, or don't have an active plan. Upgrade to post more.")
+      )
+    )
+  }
+
   const title = formData.get('title') as string
   const skillsRaw = formData.get('skills_required') as string
   const skills = skillsRaw ? skillsRaw.split(',').map((s) => s.trim()).filter(Boolean) : []

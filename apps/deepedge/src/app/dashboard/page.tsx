@@ -1,7 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { Briefcase, Users, FileText, Settings, LogOut, Bell, MessageCircle, BellPlus, BadgeCheck, ArrowUpRight, Vote, Rss } from 'lucide-react'
+import { Briefcase, Building2, Users, FileText, Settings, LogOut, MessageCircle, BellPlus, BadgeCheck, ArrowUpRight, Vote, Rss } from 'lucide-react'
+import { NotificationBell } from '@/components/NotificationBell'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { EcosystemWidget } from '@/components/EcosystemWidget'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -23,11 +26,10 @@ export default async function DashboardPage() {
     redirect('/employer/dashboard')
   }
 
-  const { count: unreadCount } = await supabase
-    .from('notifications')
-    .select('id', { count: 'exact', head: true })
+  const { data: memberships } = await supabase
+    .from('pillar_memberships')
+    .select('pillar')
     .eq('user_id', user.id)
-    .eq('read', false)
 
   const { data: scoreRow } = await supabase
     .from('greyin_scores')
@@ -71,32 +73,28 @@ export default async function DashboardPage() {
     : { count: 0 }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200">
+      <nav className="bg-white border-b border-gray-200 dark:bg-gray-950 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <a href="https://greyin.net" className="text-2xl font-bold text-blue-600">
+              <a href="https://greyin.net" className="flex items-center gap-2 text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                <Building2 className="w-6 h-6" />
                 DeepEdge
               </a>
-              <span className="ml-4 text-gray-500">Dashboard</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/feed" className="relative text-gray-600 hover:text-gray-900" title="Feed">
+              <Link href="/feed" className="relative text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" title="Feed">
                 <Rss className="h-5 w-5" />
               </Link>
-              <Link href="/notifications" className="relative text-gray-600 hover:text-gray-900" title="Notifications">
-                <Bell className="h-5 w-5" />
-                {!!unreadCount && (
-                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
+              <NotificationBell />
+              <Link href="/profile" className="relative text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" title="Profile">
+                <Settings className="h-5 w-5" />
               </Link>
-              <span className="text-gray-700">{profile?.full_name || user.email}</span>
+              <ThemeToggle />
               <form action="/auth/logout" method="post">
-                <button className="text-gray-600 hover:text-gray-900">
+                <button className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
                   <LogOut className="h-5 w-5" />
                 </button>
               </form>
@@ -108,36 +106,36 @@ export default async function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">
             Welcome back, {profile?.full_name || 'User'}!
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 mt-2 dark:text-gray-400">
             Explore job opportunities and track your applications
           </p>
         </div>
 
         {/* Verified Expert status */}
         {isVerifiedExpert ? (
-          <div className="mb-8 flex items-center gap-2 rounded-lg bg-indigo-50 border border-indigo-200 px-4 py-3 text-sm font-semibold text-indigo-700">
+          <div className="mb-8 flex items-center gap-2 rounded-lg bg-indigo-50 border border-indigo-200 px-4 py-3 text-sm font-semibold text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-900 dark:text-indigo-400">
             <BadgeCheck className="h-5 w-5 shrink-0" />
             Verified Expert{scoreRow?.greyin_score != null ? ` · Greyin Score ${scoreRow.greyin_score}` : ''} — you can apply to jobs and appear in employer candidate search.
           </div>
         ) : (
-          <div className="mb-8 rounded-lg bg-amber-50 border border-amber-200 px-6 py-5">
+          <div className="mb-8 rounded-lg bg-amber-50 border border-amber-200 px-6 py-5 dark:bg-amber-950/40 dark:border-amber-900">
             <p className="text-sm font-semibold text-amber-900">
               Applying to jobs requires Verified Expert status
             </p>
-            <p className="text-sm text-amber-800 mt-1">
+            <p className="text-sm text-amber-800 mt-1 dark:text-amber-400">
               You need senior-level experience, or a Greyin Score of 75+{scoreRow?.greyin_score != null ? ` (yours is currently ${scoreRow.greyin_score})` : ''}, to submit applications and appear in employer candidate search. Build your score by being active on:
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
-              <a href="https://stackworks.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-teal-700 hover:text-teal-800">
+              <a href="https://stackworks.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-teal-700 hover:text-teal-800 dark:text-teal-400">
                 StackWorks <ArrowUpRight className="h-3.5 w-3.5" />
               </a>
-              <a href="https://flexpro.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-orange-700 hover:text-orange-800">
+              <a href="https://flexpro.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-orange-700 hover:text-orange-800 dark:text-orange-400">
                 FlexPro <ArrowUpRight className="h-3.5 w-3.5" />
               </a>
-              <a href="https://saltnpepper.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-purple-700 hover:text-purple-800">
+              <a href="https://saltnpepper.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-purple-700 hover:text-purple-800 dark:text-purple-400">
                 Salt &amp; Pepper <ArrowUpRight className="h-3.5 w-3.5" />
               </a>
             </div>
@@ -145,43 +143,43 @@ export default async function DashboardPage() {
         )}
 
         {/* This week's digest -- in-app only, see comment above on why */}
-        <div className="mb-8 bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">This week across Greyin</h2>
+        <div className="mb-8 bg-white rounded-lg shadow p-6 dark:bg-gray-900">
+          <h2 className="text-lg font-semibold text-gray-900 mb-1 dark:text-gray-50">This week across Greyin</h2>
           {digestTotal > 0 ? (
             <>
-              <p className="text-sm text-gray-500 mb-3">{digestTotal} update{digestTotal === 1 ? '' : 's'} in the last 7 days</p>
+              <p className="text-sm text-gray-500 mb-3 dark:text-gray-400">{digestTotal} update{digestTotal === 1 ? '' : 's'} in the last 7 days</p>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(digestCounts).map(([type, count]) => (
-                  <span key={type} className="text-xs font-medium bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
+                  <span key={type} className="text-xs font-medium bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full dark:bg-blue-950/40 dark:text-blue-400">
                     {count}&times; {type.replace(/_/g, ' ')}
                   </span>
                 ))}
               </div>
-              <Link href="/notifications" className="inline-block mt-3 text-sm font-medium text-blue-600 hover:text-blue-700">
+              <Link href="/notifications" className="inline-block mt-3 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                 View all &rarr;
               </Link>
             </>
           ) : (
-            <p className="text-sm text-gray-500">Nothing new this week yet.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Nothing new this week yet.</p>
           )}
         </div>
 
         {/* Pivoter nudge */}
         {profile?.is_pivoter && (
-          <div className="mb-8 rounded-lg bg-orange-50 border border-orange-200 px-6 py-5">
+          <div className="mb-8 rounded-lg bg-orange-50 border border-orange-200 px-6 py-5 dark:bg-orange-950/40 dark:border-orange-900">
             <p className="text-sm font-semibold text-orange-900">
               Pivoting from {profile.pivot_from_domain || 'your current domain'} to {profile.pivot_to_domain || 'a new one'}
             </p>
-            <p className="text-sm text-orange-800 mt-1">
+            <p className="text-sm text-orange-800 mt-1 dark:text-orange-400">
               You'll only show up in job applications for roles explicitly &quot;open to career changers,&quot; not the
               general Verified Expert search. Build a track record in the new domain, or find someone who's
               already made a similar jump:
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
-              <a href="https://stackworks.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-teal-700 hover:text-teal-800">
+              <a href="https://stackworks.greyin.net" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-teal-700 hover:text-teal-800 dark:text-teal-400">
                 Build on StackWorks <ArrowUpRight className="h-3.5 w-3.5" />
               </a>
-              <a href="https://saltnpepper.greyin.net/mentors" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-purple-700 hover:text-purple-800">
+              <a href="https://saltnpepper.greyin.net/mentors" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-purple-700 hover:text-purple-800 dark:text-purple-400">
                 Find a mentor <ArrowUpRight className="h-3.5 w-3.5" />
               </a>
             </div>
@@ -193,17 +191,17 @@ export default async function DashboardPage() {
             restricted path, so the copy stays encouraging rather than
             explaining a limitation. */}
         {profile?.is_reentry && (
-          <div className="mb-8 rounded-lg bg-blue-50 border border-blue-200 px-6 py-5">
+          <div className="mb-8 rounded-lg bg-blue-50 border border-blue-200 px-6 py-5 dark:bg-blue-950/40 dark:border-blue-900">
             <p className="text-sm font-semibold text-blue-900">
               Your profile notes your return to work
             </p>
-            <p className="text-sm text-blue-800 mt-1">
+            <p className="text-sm text-blue-800 mt-1 dark:text-blue-400">
               This helps employers read a gap in your timeline in context instead of as a red flag — you show
               up in candidate search and job applications exactly as any other Verified Expert. Want peer
               support from someone who's done the same?
             </p>
             <div className="mt-3 flex flex-wrap gap-3">
-              <a href="https://saltnpepper.greyin.net/mentors" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-purple-700 hover:text-purple-800">
+              <a href="https://saltnpepper.greyin.net/mentors" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-medium text-purple-700 hover:text-purple-800 dark:text-purple-400">
                 Find a mentor <ArrowUpRight className="h-3.5 w-3.5" />
               </a>
             </div>
@@ -212,135 +210,138 @@ export default async function DashboardPage() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Applications</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{applicationCount || 0}</p>
+                <p className="text-gray-500 text-sm dark:text-gray-400">Applications</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2 dark:text-gray-50">{applicationCount || 0}</p>
               </div>
-              <Briefcase className="h-12 w-12 text-blue-500" />
+              <Briefcase className="h-12 w-12 text-blue-500 dark:text-blue-400" />
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Saved Jobs</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
+                <p className="text-gray-500 text-sm dark:text-gray-400">Saved Jobs</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2 dark:text-gray-50">0</p>
               </div>
-              <FileText className="h-12 w-12 text-green-500" />
+              <FileText className="h-12 w-12 text-green-500 dark:text-green-400" />
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Profile Views</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
+                <p className="text-gray-500 text-sm dark:text-gray-400">Profile Views</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2 dark:text-gray-50">0</p>
               </div>
-              <Users className="h-12 w-12 text-purple-500" />
+              <Users className="h-12 w-12 text-purple-500 dark:text-purple-400" />
             </div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Quick Actions</h2>
+        <div className="bg-white rounded-lg shadow dark:bg-gray-900">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-50">Quick Actions</h2>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Link
                 href="/jobs"
-                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition dark:border-gray-800"
               >
-                <Briefcase className="h-10 w-10 text-blue-600 mr-4" />
+                <Briefcase className="h-10 w-10 text-blue-600 mr-4 dark:text-blue-400" />
                 <div>
-                  <h3 className="font-semibold text-gray-900">Browse Jobs</h3>
-                  <p className="text-sm text-gray-600">Find your next opportunity</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-50">Browse Jobs</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Find your next opportunity</p>
                 </div>
               </Link>
 
               <Link
                 href="/dashboard/applications"
-                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition dark:border-gray-800"
               >
-                <FileText className="h-10 w-10 text-green-600 mr-4" />
+                <FileText className="h-10 w-10 text-green-600 mr-4 dark:text-green-400" />
                 <div>
-                  <h3 className="font-semibold text-gray-900">My Applications</h3>
-                  <p className="text-sm text-gray-600">Track your application status</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-50">My Applications</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Track your application status</p>
                 </div>
               </Link>
 
               <Link
                 href="/profile"
-                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition dark:border-gray-800"
               >
-                <Users className="h-10 w-10 text-purple-600 mr-4" />
+                <Users className="h-10 w-10 text-purple-600 mr-4 dark:text-purple-400" />
                 <div>
-                  <h3 className="font-semibold text-gray-900">Edit Profile</h3>
-                  <p className="text-sm text-gray-600">Update your profile and resume</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-50">Edit Profile</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Update your profile and resume</p>
                 </div>
               </Link>
 
               <Link
                 href="/companies"
-                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition dark:border-gray-800"
               >
-                <Settings className="h-10 w-10 text-gray-600 mr-4" />
+                <Settings className="h-10 w-10 text-gray-600 mr-4 dark:text-gray-400" />
                 <div>
-                  <h3 className="font-semibold text-gray-900">Browse Companies</h3>
-                  <p className="text-sm text-gray-600">Explore companies that are hiring</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-50">Browse Companies</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Explore companies that are hiring</p>
                 </div>
               </Link>
 
               <Link
                 href="/messages"
-                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition dark:border-gray-800"
               >
-                <MessageCircle className="h-10 w-10 text-blue-600 mr-4" />
+                <MessageCircle className="h-10 w-10 text-blue-600 mr-4 dark:text-blue-400" />
                 <div>
-                  <h3 className="font-semibold text-gray-900">Messages</h3>
-                  <p className="text-sm text-gray-600">Conversations with employers</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-50">Messages</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Conversations with employers</p>
                 </div>
               </Link>
 
               <Link
                 href="/dashboard/alerts"
-                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition dark:border-gray-800"
               >
-                <BellPlus className="h-10 w-10 text-blue-600 mr-4" />
+                <BellPlus className="h-10 w-10 text-blue-600 mr-4 dark:text-blue-400" />
                 <div>
-                  <h3 className="font-semibold text-gray-900">Job Alerts</h3>
-                  <p className="text-sm text-gray-600">Get notified about matching jobs</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-50">Job Alerts</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Get notified about matching jobs</p>
                 </div>
               </Link>
 
               <Link
                 href="/governance/threshold"
-                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+                className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition dark:border-gray-800"
               >
-                <Vote className="h-10 w-10 text-indigo-600 mr-4" />
+                <Vote className="h-10 w-10 text-indigo-600 mr-4 dark:text-indigo-400" />
                 <div>
-                  <h3 className="font-semibold text-gray-900">Have a Say</h3>
-                  <p className="text-sm text-gray-600">Vote on the eligibility bar</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-50">Have a Say</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Vote on the eligibility bar</p>
                 </div>
               </Link>
 
               {profile?.role === 'admin' && (
                 <Link
                   href="/admin"
-                  className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition"
+                  className="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition dark:border-gray-800"
                 >
-                  <Settings className="h-10 w-10 text-red-600 mr-4" />
+                  <Settings className="h-10 w-10 text-red-600 mr-4 dark:text-red-400" />
                   <div>
-                    <h3 className="font-semibold text-gray-900">Admin</h3>
-                    <p className="text-sm text-gray-600">Moderate listings and view users</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-50">Admin</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Moderate listings and view users</p>
                   </div>
                 </Link>
               )}
             </div>
           </div>
+        </div>
+        <div className="mt-8">
+          <EcosystemWidget activePillars={(memberships || []).map((m) => m.pillar)} />
         </div>
       </div>
     </div>

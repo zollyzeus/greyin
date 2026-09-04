@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { EcosystemWidget } from '@/components/EcosystemWidget'
 import { ResumeSkillsUploader } from '@/components/ResumeSkillsUploader'
 import { EmploymentHistoryEditor } from '@/components/EmploymentHistoryEditor'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -123,15 +124,15 @@ export default async function ProfilePage() {
     : { data: [] }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
+            <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
               ← Back to Dashboard
             </Link>
             <h1 className="text-xl font-semibold">My Profile</h1>
-            <div className="w-32"></div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -140,7 +141,7 @@ export default async function ProfilePage() {
         <EcosystemWidget activePillars={(memberships || []).map((m) => m.pillar)} />
 
         {(verifiedCount > 0 || (profile?.total_reviews ?? 0) > 0 || (reputationRow?.score ?? 0) > 0) && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <BadgeCheck className="w-5 h-5" />
@@ -155,28 +156,28 @@ export default async function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
               {verifiedCount > 0 && (
                 <div>
-                  <p className="text-gray-500">StackWorks</p>
-                  <p className="font-semibold text-gray-900">{verifiedCount} verified outcome{verifiedCount === 1 ? '' : 's'} · avg {verifiedAvg}/100</p>
+                  <p className="text-gray-500 dark:text-gray-400">StackWorks</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-50">{verifiedCount} verified outcome{verifiedCount === 1 ? '' : 's'} · avg {verifiedAvg}/100</p>
                 </div>
               )}
               {(profile?.total_reviews ?? 0) > 0 && (
                 <div>
-                  <p className="text-gray-500">FlexPro</p>
-                  <p className="font-semibold text-gray-900">★ {profile.seller_rating?.toFixed(1)} ({profile.total_reviews} reviews)</p>
+                  <p className="text-gray-500 dark:text-gray-400">FlexPro</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-50">★ {profile.seller_rating?.toFixed(1)} ({profile.total_reviews} reviews)</p>
                 </div>
               )}
               {(reputationRow?.score ?? 0) > 0 && (
                 <div>
-                  <p className="text-gray-500">Salt &amp; Pepper</p>
-                  <p className="font-semibold text-gray-900">{reputationRow!.score} reputation</p>
+                  <p className="text-gray-500 dark:text-gray-400">Salt &amp; Pepper</p>
+                  <p className="font-semibold text-gray-900 dark:text-gray-50">{reputationRow!.score} reputation</p>
                 </div>
               )}
             </div>
 
             {greyinScoreRow?.greyin_score != null && (
-              <details className="mt-4 pt-4 border-t border-gray-100">
-                <summary className="text-xs font-medium text-indigo-600 cursor-pointer select-none">How is this calculated?</summary>
-                <div className="mt-3 space-y-1.5 text-xs text-gray-600">
+              <details className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <summary className="text-xs font-medium text-indigo-600 cursor-pointer select-none dark:text-indigo-400">How is this calculated?</summary>
+                <div className="mt-3 space-y-1.5 text-xs text-gray-600 dark:text-gray-400">
                   <p>Each platform&apos;s raw average is shrunk toward the platform-wide mean based on how much evidence you have there, so one lucky 100 doesn&apos;t outrank someone with ten solid 80s:</p>
                   <ul className="pl-4 list-disc space-y-1">
                     {greyinScoreRow.stackworks_score != null && (
@@ -194,7 +195,7 @@ export default async function ProfilePage() {
                   </ul>
                   <p>Platform composite (headcount-weighted across whichever of the above you have): {greyinScoreRow.platform_composite}/100</p>
                   <p>Career experience: {Math.min(greyinScoreRow.years_experience ?? 0, 20)} of 20 capped years counted</p>
-                  <p className="font-medium text-gray-900">Greyin Score = 85% platform composite + 15% experience = {greyinScoreRow.greyin_score}</p>
+                  <p className="font-medium text-gray-900 dark:text-gray-50">Greyin Score = 85% platform composite + 15% experience = {greyinScoreRow.greyin_score}</p>
                 </div>
               </details>
             )}
@@ -204,14 +205,14 @@ export default async function ProfilePage() {
         {/* Career Pivot -- only settable once you're already a Verified
             Expert, so this stays "senior, changing lanes" rather than a
             backdoor around the gate. */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-1 flex items-center gap-2">
             <Shuffle className="w-5 h-5" />
             Career Pivot
           </h2>
           {greyinScoreRow?.is_verified_expert ? (
             <>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 mb-4 dark:text-gray-400">
                 Pivoting? Tag yourself as a pivoter to unlock jobs explicitly open to career changers,
                 a spot on StackWorks&apos;s People directory, and mentor-matching on Salt &amp; Pepper.
               </p>
@@ -221,49 +222,49 @@ export default async function ProfilePage() {
                     type="checkbox"
                     name="is_pivoter"
                     defaultChecked={profile?.is_pivoter || false}
-                    className="h-4 w-4 text-indigo-600 rounded"
+                    className="h-4 w-4 text-indigo-600 rounded dark:text-indigo-400 dark:bg-gray-950 dark:text-gray-100"
                   />
-                  <span className="text-sm font-medium text-gray-700">I&apos;m pivoting to a new domain</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">I&apos;m pivoting to a new domain</span>
                 </label>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">From</label>
                     <input
                       type="text"
                       name="pivot_from_domain"
                       defaultValue={profile?.pivot_from_domain || ''}
                       placeholder="e.g., Finance"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">To</label>
                     <input
                       type="text"
                       name="pivot_to_domain"
                       defaultValue={profile?.pivot_to_domain || ''}
                       placeholder="e.g., Software Engineering"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Note</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Note</label>
                   <textarea
                     name="pivot_note"
                     defaultValue={profile?.pivot_note || ''}
                     rows={2}
                     placeholder="Why the switch, what you bring with you..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Status</label>
                   <div className="flex gap-4">
-                    <label className="flex items-center gap-2 text-sm text-gray-700">
+                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                       <input
                         type="radio"
                         name="pivot_status"
@@ -272,7 +273,7 @@ export default async function ProfilePage() {
                       />
                       Seeking — looking for the new domain
                     </label>
-                    <label className="flex items-center gap-2 text-sm text-gray-700">
+                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                       <input
                         type="radio"
                         name="pivot_status"
@@ -294,7 +295,7 @@ export default async function ProfilePage() {
               </form>
             </>
           ) : (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Verified Expert status is required to tag yourself as a career pivoter — build it on StackWorks,
               FlexPro, or Salt &amp; Pepper, or add your years of experience above.
             </p>
@@ -308,14 +309,14 @@ export default async function ProfilePage() {
             context wherever the candidate already shows up (candidate
             search, employer applications review), it doesn't change who
             can apply where. */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-1 flex items-center gap-2">
             <RotateCcw className="w-5 h-5" />
             Career Re-entry
           </h2>
           {greyinScoreRow?.is_verified_expert ? (
             <>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 mb-4 dark:text-gray-400">
                 Returning to work after a gap? Tag it so employers see the context up front instead of
                 a blank spot in your timeline — you&apos;ll still show up in normal candidate search and
                 job applications exactly as before.
@@ -326,17 +327,17 @@ export default async function ProfilePage() {
                     type="checkbox"
                     name="is_reentry"
                     defaultChecked={profile?.is_reentry || false}
-                    className="h-4 w-4 text-indigo-600 rounded"
+                    className="h-4 w-4 text-indigo-600 rounded dark:text-indigo-400 dark:bg-gray-950 dark:text-gray-100"
                   />
-                  <span className="text-sm font-medium text-gray-700">I&apos;m returning to work after a gap</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">I&apos;m returning to work after a gap</span>
                 </label>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Reason</label>
                   <select
                     name="reentry_reason"
                     defaultValue={profile?.reentry_reason || ''}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   >
                     <option value="">Prefer not to say</option>
                     <option value="caregiving">Caregiving</option>
@@ -349,13 +350,13 @@ export default async function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Note</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Note</label>
                   <textarea
                     name="reentry_note"
                     defaultValue={profile?.reentry_note || ''}
                     rows={2}
                     placeholder="Anything you'd like employers to know..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
 
@@ -369,7 +370,7 @@ export default async function ProfilePage() {
               </form>
             </>
           ) : (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Verified Expert status is required to tag a career re-entry — build it on StackWorks,
               FlexPro, or Salt &amp; Pepper, or add your years of experience above.
             </p>
@@ -380,14 +381,14 @@ export default async function ProfilePage() {
             a lifelong domain expert who never personally pivoted is often
             exactly the right person to mentor someone entering their
             field, so this isn't limited to completed pivoters. */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-1 flex items-center gap-2">
             <GraduationCap className="w-5 h-5" />
             Mentor Availability
           </h2>
           {greyinScoreRow?.is_verified_expert ? (
             <>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 mb-4 dark:text-gray-400">
                 Willing to talk to someone pivoting into your domain — whether or not you pivoted
                 yourself? List yourself on Salt &amp; Pepper&apos;s mentor directory.
               </p>
@@ -397,30 +398,30 @@ export default async function ProfilePage() {
                     type="checkbox"
                     name="is_mentor"
                     defaultChecked={profile?.is_mentor || false}
-                    className="h-4 w-4 text-indigo-600 rounded"
+                    className="h-4 w-4 text-indigo-600 rounded dark:text-indigo-400 dark:bg-gray-950 dark:text-gray-100"
                   />
-                  <span className="text-sm font-medium text-gray-700">List me as a mentor</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">List me as a mentor</span>
                 </label>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Domain</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Domain</label>
                   <input
                     type="text"
                     name="mentor_domain"
                     defaultValue={profile?.mentor_domain || profile?.pivot_to_domain || ''}
                     placeholder="e.g., Software Engineering"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Note</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Note</label>
                   <textarea
                     name="mentor_note"
                     defaultValue={profile?.mentor_note || ''}
                     rows={2}
                     placeholder="What you can help with..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
 
@@ -432,15 +433,15 @@ export default async function ProfilePage() {
                   Save Mentor Availability
                 </button>
               </form>
-              <p className="text-sm text-gray-500 mt-4">
+              <p className="text-sm text-gray-500 mt-4 dark:text-gray-400">
                 Want to offer bookable, paid or free 1:1 sessions? Set up session times on{' '}
-                <a href="https://flexpro.greyin.net/mentor-sessions/manage" className="text-indigo-600 hover:underline">
+                <a href="https://flexpro.greyin.net/mentor-sessions/manage" className="text-indigo-600 hover:underline dark:text-indigo-400">
                   FlexPro
                 </a>.
               </p>
             </>
           ) : (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Verified Expert status is required to list yourself as a mentor.
             </p>
           )}
@@ -448,52 +449,52 @@ export default async function ProfilePage() {
 
         <form action="/api/profile/update" method="POST" className="space-y-6">
           {/* Profile Information */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <User className="w-5 h-5" />
               Basic Information
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Full Name
                 </label>
                 <input
                   type="text"
                   name="full_name"
                   defaultValue={profile?.full_name || ''}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Email
                 </label>
                 <input
                   type="email"
                   value={user.email}
                   disabled
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-400"
                 />
-                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Email cannot be changed</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Phone Number
                 </label>
                 <input
                   type="tel"
                   name="phone"
                   defaultValue={profile?.phone || ''}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                   Location
                 </label>
                 <input
@@ -501,7 +502,7 @@ export default async function ProfilePage() {
                   name="location"
                   defaultValue={profile?.location || ''}
                   placeholder="City, Country"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
             </div>
@@ -509,44 +510,44 @@ export default async function ProfilePage() {
 
           {/* Company Information (if employer) */}
           {company && (
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Building2 className="w-5 h-5" />
                 Company Information
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                     Company Name
                   </label>
                   <input
                     type="text"
                     name="company_name"
                     defaultValue={company.name || ''}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                     Industry
                   </label>
                   <input
                     type="text"
                     name="industry"
                     defaultValue={company.industry || ''}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                     Company Size
                   </label>
                   <select
                     name="company_size"
                     defaultValue={company.company_size || ''}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   >
                     <option value="">Select size</option>
                     <option value="1-10">1-10 employees</option>
@@ -558,14 +559,14 @@ export default async function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                     Description
                   </label>
                   <textarea
                     name="company_description"
                     defaultValue={company.description || ''}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
               </div>
@@ -574,14 +575,14 @@ export default async function ProfilePage() {
 
           {/* Candidate Information (if candidate) */}
           {candidate && (
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <User className="w-5 h-5" />
                 Professional Information
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                     Current Role
                   </label>
                   <input
@@ -589,14 +590,14 @@ export default async function ProfilePage() {
                     name="current_role"
                     defaultValue={candidate.current_role || ''}
                     placeholder="e.g., Senior Software Engineer"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
 
                 <ResumeSkillsUploader defaultResumeUrl={candidate.resume_url || ''} defaultSkills={candidate.skills || []} />
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                     Experience (years)
                   </label>
                   <input
@@ -604,12 +605,12 @@ export default async function ProfilePage() {
                     name="experience_years"
                     defaultValue={candidate.experience_years || ''}
                     min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
                     Bio
                   </label>
                   <textarea
@@ -617,7 +618,7 @@ export default async function ProfilePage() {
                     defaultValue={candidate.bio || ''}
                     rows={4}
                     placeholder="Tell us about yourself..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
               </div>
@@ -637,9 +638,9 @@ export default async function ProfilePage() {
         </form>
 
         {candidate && (
-          <div className="bg-white rounded-lg shadow p-6 mt-6">
+          <div className="bg-white rounded-lg shadow p-6 mt-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-2">Employment history</h2>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">
               Private — only used to power anonymized salary trend graphs, never shown to
               other users.
             </p>
@@ -648,21 +649,21 @@ export default async function ProfilePage() {
         )}
 
         {pendingRecommendations && pendingRecommendations.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mt-6">
+          <div className="bg-white rounded-lg shadow p-6 mt-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-4">Recommendations to review</h2>
             <div className="divide-y">
               {pendingRecommendations.map((rec: any) => (
                 <div key={rec.id} className="py-4 first:pt-0 last:pb-0">
-                  <p className="text-sm text-gray-700 whitespace-pre-line mb-1">&ldquo;{rec.body}&rdquo;</p>
-                  <p className="text-xs text-gray-500 mb-3">&mdash; {rec.profiles?.full_name || 'A Greyin member'}</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-line mb-1 dark:text-gray-300">&ldquo;{rec.body}&rdquo;</p>
+                  <p className="text-xs text-gray-500 mb-3 dark:text-gray-400">&mdash; {rec.profiles?.full_name || 'A Greyin member'}</p>
                   <div className="flex gap-3">
                     <form action={`/api/recommendations/${rec.id}/approve`} method="POST">
-                      <button type="submit" className="text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+                      <button type="submit" className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
                         Approve &amp; show on my profile
                       </button>
                     </form>
                     <form action={`/api/recommendations/${rec.id}/dismiss`} method="POST">
-                      <button type="submit" className="text-xs font-semibold text-gray-500 hover:text-gray-700">
+                      <button type="submit" className="text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
                         Dismiss
                       </button>
                     </form>
@@ -674,20 +675,20 @@ export default async function ProfilePage() {
         )}
 
         {!!pendingReferenceRequestCount && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-6 flex items-center justify-between">
-            <p className="text-sm text-amber-800">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-6 flex items-center justify-between dark:bg-amber-950/40 dark:border-amber-900">
+            <p className="text-sm text-amber-800 dark:text-amber-400">
               You have {pendingReferenceRequestCount} reference request{pendingReferenceRequestCount === 1 ? '' : 's'} waiting on you to answer.
             </p>
-            <Link href="/references/respond" className="text-sm font-semibold text-amber-800 hover:underline">
+            <Link href="/references/respond" className="text-sm font-semibold text-amber-800 hover:underline dark:text-amber-400">
               Respond &rarr;
             </Link>
           </div>
         )}
 
         {myReferences && myReferences.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mt-6">
+          <div className="bg-white rounded-lg shadow p-6 mt-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-1">Your references</h2>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">
               Employers you&rsquo;ve applied to can request a private check from these people — their answer goes straight
               back to the employer, never through you.
             </p>
@@ -695,18 +696,18 @@ export default async function ProfilePage() {
               {myReferences.map((ref: any) => (
                 <div key={ref.id} className="py-3 flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-medium text-gray-900">{ref.profiles?.full_name || 'A reference'}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="font-medium text-gray-900 dark:text-gray-50">{ref.profiles?.full_name || 'A reference'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {RELATIONSHIP_LABEL[ref.relationship_type] || ref.relationship_type} — {ref.relationship_detail}
                     </p>
                     {ref.verified_pillar && (
-                      <p className="text-xs text-green-700 mt-0.5">
+                      <p className="text-xs text-green-700 mt-0.5 dark:text-green-400">
                         Greyin-verified: worked together via {PILLAR_LABEL[ref.verified_pillar] || ref.verified_pillar}
                       </p>
                     )}
                   </div>
                   <form action={`/api/references/${ref.id}/delete`} method="POST">
-                    <button type="submit" className="text-xs font-medium text-gray-400 hover:text-red-600">
+                    <button type="submit" className="text-xs font-medium text-gray-400 hover:text-red-600 dark:text-gray-500">
                       Remove
                     </button>
                   </form>
@@ -717,20 +718,20 @@ export default async function ProfilePage() {
         )}
 
         {mySkills && mySkills.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mt-6">
+          <div className="bg-white rounded-lg shadow p-6 mt-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-4">Your skills</h2>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">
               Endorsements and ratings come from peers and real collaborations across the
               ecosystem &mdash; see them on your{' '}
-              <Link href={`/candidates/${user.id}`} className="text-indigo-600 hover:underline">public profile</Link>.
+              <Link href={`/candidates/${user.id}`} className="text-indigo-600 hover:underline dark:text-indigo-400">public profile</Link>.
               Feature a skill to pin it to the top there.
             </p>
             <div className="divide-y">
               {mySkills.map((s) => (
                 <div key={s.skill} className="py-3 flex items-center justify-between gap-4">
                   <div>
-                    <p className="font-medium text-gray-900">{s.skill}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="font-medium text-gray-900 dark:text-gray-50">{s.skill}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {s.endorsement_count} endorsement{s.endorsement_count === 1 ? '' : 's'}
                       {s.rating_count > 0 ? ` · ${s.avg_rating} avg rating (${s.rating_count})` : ''}
                     </p>
@@ -742,8 +743,8 @@ export default async function ProfilePage() {
                       type="submit"
                       className={
                         s.featured
-                          ? 'text-xs font-medium text-indigo-600'
-                          : 'text-xs font-medium text-gray-500 hover:text-indigo-600'
+                          ? 'text-xs font-medium text-indigo-600 dark:text-indigo-400'
+                          : 'text-xs font-medium text-gray-500 hover:text-indigo-600 dark:text-gray-400'
                       }
                     >
                       {s.featured ? 'Featured – remove' : 'Feature this skill'}

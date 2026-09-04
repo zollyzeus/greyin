@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Briefcase, ArrowLeft, Layers } from 'lucide-react'
+import { Building2, ArrowLeft, Layers } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const CREDIT_TYPES: { key: string; label: string; wired: boolean }[] = [
   { key: 'job_post', label: 'Job posts', wired: false },
@@ -49,29 +50,30 @@ export default async function SubscriptionTiersPage({
     .order('sort_order')
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-indigo-600" />
+              <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               <span className="ml-2 text-2xl font-bold">DeepEdge</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/admin/subscriptions" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6">
+        <Link href="/admin/subscriptions" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to subscriptions
         </Link>
 
         <div className="flex items-center gap-2 mb-2">
-          <Layers className="h-6 w-6 text-indigo-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Hiring subscription tiers</h1>
+          <Layers className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Hiring subscription tiers</h1>
         </div>
-        <p className="text-sm text-gray-600 mb-6">
+        <p className="text-sm text-gray-600 mb-6 dark:text-gray-400">
           Sets the monthly price and credit allowance per tier. Use <span className="font-mono">-1</span> for unlimited,{' '}
           <span className="font-mono">0</span> to withhold that credit type from a tier entirely. Only{' '}
           <strong>candidate profile views</strong> is enforced today; the others are priced and ready but not
@@ -79,12 +81,12 @@ export default async function SubscriptionTiersPage({
         </p>
 
         {success && (
-          <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+          <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
             Tier updated.
           </div>
         )}
         {error && (
-          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
             {decodeURIComponent(error)}
           </div>
         )}
@@ -95,20 +97,20 @@ export default async function SubscriptionTiersPage({
               key={tier.id}
               action="/api/admin/subscription-tiers/update"
               method="POST"
-              className="bg-white rounded-lg shadow-md p-5 space-y-4"
+              className="bg-white rounded-lg shadow-md p-5 space-y-4 dark:bg-gray-900"
             >
               <input type="hidden" name="tier_id" value={tier.id} />
               <input type="hidden" name="return_to" value="/admin/subscription-tiers" />
-              <h2 className="font-semibold text-gray-900">{tier.name} <span className="text-xs text-gray-400 font-normal">({tier.tier_key})</span></h2>
+              <h2 className="font-semibold text-gray-900 dark:text-gray-50">{tier.name} <span className="text-xs text-gray-400 font-normal dark:text-gray-500">({tier.tier_key})</span></h2>
 
               <label className="block text-sm">
-                <span className="text-gray-600">Price (₹/mo)</span>
+                <span className="text-gray-600 dark:text-gray-400">Price (₹/mo)</span>
                 <input
                   type="number"
                   name="price_inr"
                   min="0"
                   defaultValue={tier.price_inr}
-                  className="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2"
+                  className="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </label>
 
@@ -117,10 +119,10 @@ export default async function SubscriptionTiersPage({
                   const credit = tier.subscription_tier_credits?.find((c: any) => c.credit_type === ct.key)
                   return (
                     <label key={ct.key} className="block text-sm">
-                      <span className="text-gray-600 flex items-center gap-1.5">
+                      <span className="text-gray-600 flex items-center gap-1.5 dark:text-gray-400">
                         {ct.label}
                         {!ct.wired && (
-                          <span className="text-[10px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-full">not yet enforced</span>
+                          <span className="text-[10px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-full dark:text-amber-400 dark:bg-amber-950/40">not yet enforced</span>
                         )}
                       </span>
                       <input
@@ -128,7 +130,7 @@ export default async function SubscriptionTiersPage({
                         name={`credit_${ct.key}`}
                         min="-1"
                         defaultValue={credit?.monthly_allowance ?? 0}
-                        className="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2"
+                        className="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                       />
                     </label>
                   )

@@ -31,27 +31,27 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:from-gray-950 dark:to-gray-900">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-amber-700">
+          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-amber-700 dark:text-amber-400">
             <Telescope className="w-8 h-8" />
             <span>Longlist</span>
           </a>
-          <h2 className="mt-4 text-2xl font-bold text-gray-900">Reset your password</h2>
-          <p className="mt-2 text-sm text-gray-600">Enter your email and we&apos;ll send you a reset code</p>
+          <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-gray-50">Reset your password</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Enter your email and we&apos;ll send you a reset code</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 dark:bg-gray-900">
           {error && (
-            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email address
               </label>
               <input
@@ -62,7 +62,7 @@ export default function ResetPasswordPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 dark:border-gray-700"
                 placeholder="you@example.com"
               />
             </div>
@@ -76,9 +76,9 @@ export default function ResetPasswordPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
             Remembered your password?{' '}
-            <Link href="/login" className="text-amber-700 hover:text-amber-500 font-medium">
+            <Link href="/login" className="text-amber-700 hover:text-amber-500 font-medium dark:text-amber-400">
               Sign in
             </Link>
           </p>

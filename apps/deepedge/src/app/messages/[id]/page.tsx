@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Briefcase, ArrowLeft } from 'lucide-react'
+import { Building2, ArrowLeft } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function MessageThreadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -41,42 +42,43 @@ export default async function MessageThreadPage({ params }: { params: Promise<{ 
     .is('read_at', null)
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 flex flex-col dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-indigo-600" />
+              <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               <span className="ml-2 text-2xl font-bold">DeepEdge</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-        <Link href="/messages" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6">
+        <Link href="/messages" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to messages
         </Link>
 
-        <h1 className="text-xl font-bold text-gray-900 mb-6">{other?.full_name || 'Conversation'}</h1>
+        <h1 className="text-xl font-bold text-gray-900 mb-6 dark:text-gray-50">{other?.full_name || 'Conversation'}</h1>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-4 space-y-4 min-h-[200px]">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-4 space-y-4 min-h-[200px] dark:bg-gray-900">
           {messages && messages.length > 0 ? (
             messages.map((m) => (
               <div key={m.id} className={m.sender_id === user.id ? 'text-right' : 'text-left'}>
                 <span
                   className={`inline-block px-4 py-2 rounded-lg text-sm ${
-                    m.sender_id === user.id ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900'
+                    m.sender_id === user.id ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50'
                   }`}
                 >
                   {m.body}
                 </span>
-                <p className="text-xs text-gray-400 mt-1">{new Date(m.created_at).toLocaleString()}</p>
+                <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">{new Date(m.created_at).toLocaleString()}</p>
               </div>
             ))
           ) : (
-            <p className="text-gray-500 text-sm">No messages yet — say hello.</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">No messages yet — say hello.</p>
           )}
         </div>
 
@@ -86,7 +88,7 @@ export default async function MessageThreadPage({ params }: { params: Promise<{ 
             type="text"
             required
             placeholder="Type a message..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
           />
           <button type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 font-medium">
             Send

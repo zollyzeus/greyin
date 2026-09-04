@@ -1,10 +1,11 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getJobIdByTitle } from '../../utils/admin'
+import { getJobIdByTitle, grantActiveSubscriptionTier, getUserIdByEmail } from '../../utils/admin'
 
 test.describe('Job posting and application lifecycle', () => {
   test('employer posts a job and it appears in the public listing', async ({ page, cleanup }) => {
     const employer = await signUpDeepEdge(page, 'employer', cleanup)
+    await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
     await login(page, employer, '/employer/dashboard')
 
     const jobTitle = `E2E Staff Engineer ${Date.now()}`
@@ -26,6 +27,7 @@ test.describe('Job posting and application lifecycle', () => {
     const employerCtx = await browser.newContext()
     const employerPage = await employerCtx.newPage()
     const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+    await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
     await login(employerPage, employer, '/employer/dashboard')
 
     const jobTitle = `E2E Applications Test Role ${Date.now()}`

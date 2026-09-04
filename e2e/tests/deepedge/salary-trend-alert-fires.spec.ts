@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getUserIdByEmail, getCompanyIdByUserId, createBackdatedJob } from '../../utils/admin'
+import { getUserIdByEmail, getCompanyIdByUserId, createBackdatedJob, grantActiveSubscriptionTier } from '../../utils/admin'
 
 /**
  * Full fire-on-move coverage for salary trend alerts (063), completing
@@ -25,6 +25,7 @@ test('a real salary jump between two UI-visible periods fires a watch alert', as
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(employerPage, employer, '/employer/dashboard')
   const employerId = await getUserIdByEmail(employer.email)
   const companyId = await getCompanyIdByUserId(employerId)

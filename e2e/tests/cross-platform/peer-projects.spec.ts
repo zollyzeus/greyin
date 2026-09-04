@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpSaltNPepper, signUpDeepEdge, login } from '../../utils/auth'
-import { getUserIdByEmail, getGreyinScoreRow } from '../../utils/admin'
+import { getUserIdByEmail, getGreyinScoreRow, grantActiveSubscriptionTier } from '../../utils/admin'
 
 /**
  * Covers 089_peer_projects.sql / 090_peer_rating_anonymity_and_rater_
@@ -30,6 +30,7 @@ test('a peer-confirmed project is tagged, confirmed, mutually rated, and the res
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup, 15, b2bBase)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
 
   // --- A logs in via the hub, creates a project, tags B ---
   await login(aPage, userA, `${hubBase}/dashboard`, hubBase)

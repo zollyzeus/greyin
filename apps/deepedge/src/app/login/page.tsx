@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Briefcase } from 'lucide-react'
+import { Building2 } from 'lucide-react'
 
 export default async function LoginPage({
   searchParams,
@@ -28,27 +28,27 @@ export default async function LoginPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-slate-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-slate-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:from-gray-950 dark:to-gray-900">
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-indigo-600">
-            <Briefcase className="w-8 h-8" />
+          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+            <Building2 className="w-8 h-8" />
             <span>DeepEdge</span>
           </a>
-          <h2 className="font-display mt-4 text-2xl font-semibold text-gray-900">Welcome back</h2>
-          <p className="mt-2 text-sm text-gray-600">Sign in to your account</p>
+          <h2 className="font-display mt-4 text-2xl font-semibold text-gray-900 dark:text-gray-50">Welcome back</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Sign in to your account</p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 dark:bg-gray-900">
           {error && (
-            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
               {decodeURIComponent(error)}
             </div>
           )}
           {message && (
-            <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+            <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
               {decodeURIComponent(message)}
             </div>
           )}
@@ -56,7 +56,7 @@ export default async function LoginPage({
           <form action="/auth/login" method="POST" className="space-y-6">
             {next && <input type="hidden" name="next" value={next} />}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email address
               </label>
               <input
@@ -65,13 +65,13 @@ export default async function LoginPage({
                 type="email"
                 autoComplete="email"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Password
               </label>
               <input
@@ -80,7 +80,7 @@ export default async function LoginPage({
                 type="password"
                 autoComplete="current-password"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="••••••••"
               />
             </div>
@@ -91,14 +91,14 @@ export default async function LoginPage({
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded dark:text-indigo-400 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                   Remember me
                 </label>
               </div>
 
-              <Link href="/reset-password" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+              <Link href="/reset-password" className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                 Forgot password?
               </Link>
             </div>
@@ -114,17 +114,17 @@ export default async function LoginPage({
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-gray-300 dark:border-gray-700" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Don't have an account?</span>
+                <span className="px-2 bg-white text-gray-500 dark:bg-gray-900 dark:text-gray-400">Don't have an account?</span>
               </div>
             </div>
 
             <div className="mt-6">
               <Link
                 href="/signup"
-                className="w-full flex justify-center py-3 px-4 border border-indigo-600 rounded-lg shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                className="w-full flex justify-center py-3 px-4 border border-indigo-600 rounded-lg shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors dark:text-indigo-400 dark:bg-gray-900 dark:hover:bg-indigo-950/40"
               >
                 Create an account
               </Link>
@@ -133,13 +133,13 @@ export default async function LoginPage({
         </div>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-sm text-gray-600">
+        <p className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
           By signing in, you agree to our{' '}
-          <Link href="/terms" className="text-indigo-600 hover:text-indigo-500">
+          <Link href="/terms" className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
             Terms of Service
           </Link>{' '}
           and{' '}
-          <Link href="/privacy" className="text-indigo-600 hover:text-indigo-500">
+          <Link href="/privacy" className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
             Privacy Policy
           </Link>
         </p>

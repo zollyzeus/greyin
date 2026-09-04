@@ -60,15 +60,15 @@ export default async function MentorsPage() {
   })
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-3 mb-2">
-          <GraduationCap className="h-7 w-7 text-purple-600" />
-          <h1 className="text-3xl font-bold text-gray-900">Find a Mentor</h1>
+          <GraduationCap className="h-7 w-7 text-purple-600 dark:text-purple-400" />
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">Find a Mentor</h1>
         </div>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 mb-6 dark:text-gray-400">
           Members willing to help someone entering their domain — whether they pivoted into it themselves
           or have been there all along.
         </p>
@@ -79,41 +79,41 @@ export default async function MentorsPage() {
               const domain = effectiveDomain(mentor)
               const pivoted = mentor.is_pivoter && mentor.pivot_status === 'completed'
               return (
-                <div key={mentor.id} className="bg-white rounded-lg shadow-md p-6">
+                <div key={mentor.id} className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-900">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                      <User className="h-6 w-6 text-purple-600" />
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center dark:bg-purple-950/40">
+                      <User className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{mentor.full_name || 'Member'}</h3>
-                      {mentor.location && <p className="text-sm text-gray-500">{mentor.location}</p>}
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-50">{mentor.full_name || 'Member'}</h3>
+                      {mentor.location && <p className="text-sm text-gray-500 dark:text-gray-400">{mentor.location}</p>}
                     </div>
                   </div>
                   {pivoted ? (
-                    <p className="flex items-center gap-1 text-xs font-semibold text-orange-700 mb-2">
+                    <p className="flex items-center gap-1 text-xs font-semibold text-orange-700 mb-2 dark:text-orange-400">
                       <Shuffle className="h-3.5 w-3.5" />
                       Pivoted: {mentor.pivot_from_domain || '—'} → {mentor.pivot_to_domain || '—'}
                     </p>
                   ) : (
-                    <p className="flex items-center gap-1 text-xs font-semibold text-purple-700 mb-2">
+                    <p className="flex items-center gap-1 text-xs font-semibold text-purple-700 mb-2 dark:text-purple-400">
                       <GraduationCap className="h-3.5 w-3.5" />
                       Domain expert: {domain || '—'}
                     </p>
                   )}
                   {mentor.is_reentry && (
-                    <p className="flex items-center gap-1 text-xs font-medium text-blue-700 mb-2">
+                    <p className="flex items-center gap-1 text-xs font-medium text-blue-700 mb-2 dark:text-blue-400">
                       <RotateCcw className="h-3.5 w-3.5" />
                       Returned to work after a gap
                     </p>
                   )}
-                  {mentor.mentor_note && <p className="text-sm text-gray-600 line-clamp-3 mb-2">{mentor.mentor_note}</p>}
+                  {mentor.mentor_note && <p className="text-sm text-gray-600 line-clamp-3 mb-2 dark:text-gray-400">{mentor.mentor_note}</p>}
                   <div className="flex items-center gap-4 mt-3">
                     {user && user.id !== mentor.id && (
                       <form action="/api/messages/start" method="POST">
                         <input type="hidden" name="other_user_id" value={mentor.id} />
                         <button
                           type="submit"
-                          className="flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-700"
+                          className="flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
                         >
                           <MessageCircle className="h-4 w-4" />
                           Message
@@ -123,7 +123,7 @@ export default async function MentorsPage() {
                     {bookableMentorIds.has(mentor.id) && (
                       <a
                         href={`https://flexpro.greyin.net/mentor-sessions?mentor=${mentor.id}`}
-                        className="flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-700"
+                        className="flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
                       >
                         <CalendarClock className="h-4 w-4" />
                         Book a session
@@ -135,10 +135,10 @@ export default async function MentorsPage() {
             })}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
             <GraduationCap className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No mentors listed yet</h3>
-            <p className="text-gray-600">Verified Expert? List yourself under Mentor Availability on your Greyin profile to show up here.</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-50">No mentors listed yet</h3>
+            <p className="text-gray-600 dark:text-gray-400">Verified Expert? List yourself under Mentor Availability on your Greyin profile to show up here.</p>
           </div>
         )}
       </div>

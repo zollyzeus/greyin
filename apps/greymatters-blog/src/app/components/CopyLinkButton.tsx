@@ -16,7 +16,7 @@ export function CopyLinkButton({ url }: { url: string }) {
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
       }}
-      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-semibold"
+      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm font-semibold dark:text-gray-300"
     >
       {copied ? 'Copied!' : 'Copy Link'}
     </button>

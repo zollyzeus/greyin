@@ -4,6 +4,7 @@ import { BookOpen, Search as SearchIcon, User } from 'lucide-react'
 import { EcosystemSearchResults } from '@/app/components/EcosystemSearchResults'
 import { PeopleSearchResults, PersonResult } from '@/app/components/PeopleSearchResults'
 import { parseSearchQuery } from '@/app/lib/parse-search-query'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function SearchPage({
   searchParams,
@@ -77,35 +78,36 @@ export default async function SearchPage({
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <BookOpen className="h-8 w-8 text-blue-600" />
+              <BookOpen className="h-8 w-8 text-sky-600 dark:text-sky-400" />
               <span className="ml-2 text-2xl font-bold">GreyMatters</span>
             </a>
             <nav className="flex gap-6">
-              <Link href="/" className="text-gray-700 hover:text-blue-600">Home</Link>
-              <Link href="/categories" className="text-gray-700 hover:text-blue-600">Categories</Link>
-              <Link href="/search" className="text-blue-600 font-semibold">Search</Link>
+              <Link href="/" className="text-gray-700 hover:text-blue-600 dark:text-gray-300">Home</Link>
+              <Link href="/categories" className="text-gray-700 hover:text-blue-600 dark:text-gray-300">Categories</Link>
+              <Link href="/search" className="text-blue-600 font-semibold dark:text-blue-400">Search</Link>
             </nav>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Search Articles</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6 dark:text-gray-50">Search Articles</h1>
 
         <form className="mb-8 flex gap-3">
-          <div className="flex-1 flex items-center gap-3 bg-white border border-gray-300 rounded-lg px-4">
-            <SearchIcon className="h-5 w-5 text-gray-400" />
+          <div className="flex-1 flex items-center gap-3 bg-white border border-gray-300 rounded-lg px-4 dark:bg-gray-900 dark:border-gray-700">
+            <SearchIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
             <input
               type="text"
               name="q"
               defaultValue={query}
               placeholder="Search by title or content..."
-              className="flex-1 py-3 outline-none"
+              className="flex-1 py-3 outline-none dark:bg-gray-950 dark:text-gray-100"
             />
           </div>
           <button type="submit" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
@@ -114,7 +116,7 @@ export default async function SearchPage({
         </form>
 
         {query && (
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 dark:text-gray-400">
             {posts?.length || 0} result{posts?.length === 1 ? '' : 's'} for &ldquo;{query}&rdquo;
           </p>
         )}
@@ -125,15 +127,15 @@ export default async function SearchPage({
               <Link
                 key={post.id}
                 href={`/posts/${post.slug}`}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-900"
               >
                 {post.cover_image_url && (
                   <img src={post.cover_image_url} alt={post.title} className="w-full h-40 object-cover" />
                 )}
                 <div className="p-6">
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{post.title}</h3>
-                  <p className="text-sm text-gray-600 line-clamp-2 mb-3">{post.excerpt}</p>
-                  <p className="text-xs text-gray-400 flex items-center gap-1">
+                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 dark:text-gray-50">{post.title}</h3>
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-3 dark:text-gray-400">{post.excerpt}</p>
+                  <p className="text-xs text-gray-400 flex items-center gap-1 dark:text-gray-500">
                     <User className="h-3 w-3" />
                     {post.profiles?.full_name || 'GreyMatters'}
                   </p>

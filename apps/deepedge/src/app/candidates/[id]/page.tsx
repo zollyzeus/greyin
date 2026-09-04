@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Building2, ArrowLeft, BadgeCheck, Lock, RotateCcw, MapPin, ThumbsUp, BookOpen } from 'lucide-react'
+import { Building2, ArrowLeft, BadgeCheck, Lock, RotateCcw, MapPin, ThumbsUp, BookOpen, Users } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const RELATIONSHIP_LABEL: Record<string, string> = {
   in_platform_task: 'Worked together on a Greyin project/gig',
@@ -27,15 +28,28 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
 
-  const { data: candidate } = await supabase
-    .from('candidates')
-    .select('id, user_id, current_title, current_company, skills, experience_years, availability, remote_preference, education, portfolio_url, expected_salary_min, expected_salary_max, currency, willing_to_relocate, profiles ( full_name, location, avatar_url, is_reentry, reentry_reason )')
-    .eq('user_id', id)
+  // The target person's own profile, fetched independently of `candidates`
+  // -- this page is also the profile view for peer-project collaborators
+  // tagged from Salt & Pepper/StackWorks/etc, most of whom never went
+  // through DeepEdge's own candidate signup and so have no `candidates`
+  // row at all (handle_new_user only inserts one for role='candidate').
+  // `candidate` below is optional; only its DeepEdge-specific fields
+  // (title, skills, salary...) are gated on it existing.
+  const { data: targetProfile } = await supabase
+    .from('profiles')
+    .select('full_name, location, avatar_url, is_reentry, reentry_reason')
+    .eq('id', id)
     .maybeSingle()
 
-  if (!candidate) {
+  if (!targetProfile) {
     notFound()
   }
+
+  const { data: candidate } = await supabase
+    .from('candidates')
+    .select('id, current_title, current_company, skills, experience_years, availability, remote_preference, education, portfolio_url, expected_salary_min, expected_salary_max, currency, willing_to_relocate')
+    .eq('user_id', id)
+    .maybeSingle()
 
   const isSelf = user.id === id
 
@@ -49,7 +63,7 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
   let isOwnApplicant = false
   if (profile?.role === 'employer') {
     const { data: company } = await supabase.from('companies').select('id').eq('user_id', user.id).maybeSingle()
-    if (company) {
+    if (company && candidate) {
       const { data: myJobs } = await supabase.from('jobs').select('id').eq('company_id', company.id)
       const jobIds = (myJobs || []).map((j) => j.id)
       if (jobIds.length > 0) {
@@ -78,7 +92,7 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
   const { data: scoreRow } = await supabase
     .from('greyin_scores')
     .select('greyin_score')
-    .eq('user_id', candidate.user_id)
+    .eq('user_id', id)
     .maybeSingle()
 
   // Credit metering (096) is the same "genuine proactive search" concept
@@ -94,7 +108,7 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
     canView = !!data
   }
 
-  const candidateProfile = (candidate as any).profiles
+  const candidateProfile = targetProfile
 
   // Everything below is read for any eligible viewer -- collaboration
   // status (skill endorsements / written recommendations are gated to a
@@ -111,6 +125,21 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
   const requestedByReferenceId = new Map<string, { id: string; status: string }>()
   const responseByReferenceId = new Map<string, string>()
   let articles: any[] = []
+  // RESTORED (2026-09-04, integrity audit): FR-PW-26's own "Employer
+  // view: rating pattern" panel + per-project reciprocity badge shipped
+  // in 090/091, verified by peer-projects.spec.ts, but this page's
+  // 2026-09-02/03 rebuild-from-scratch never carried them forward --
+  // that rebuild's own scope was a different, unrelated set of 5 specs,
+  // and this one was never re-checked afterward. peerProjects itself
+  // (the public list) is public for any eligible viewer; peerRaterStats
+  // and reciprocityFlagsByProject are additionally gated in app code on
+  // top of the real enforcement, which is peer_rater_reliability's and
+  // peer_project_reciprocity_flags' own WHERE EXISTS(...role IN
+  // ('employer','admin')) clauses baked into each view -- a non-employer
+  // querying either gets back zero rows regardless of what this page does.
+  let peerProjects: any[] = []
+  let peerRaterStats: any = null
+  const reciprocityFlagsByProject = new Set<string>()
 
   if (canView) {
     if (!isSelf) {
@@ -185,34 +214,63 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
       .eq('status', 'published')
       .order('published_at', { ascending: false })
     articles = postRows || []
+
+    const { data: memberRows } = await supabase
+      .from('peer_project_members')
+      .select('peer_projects ( id, title, company, description )')
+      .eq('user_id', id)
+      .eq('status', 'confirmed')
+    peerProjects = (memberRows || [])
+      .map((r: any) => r.peer_projects)
+      .filter(Boolean)
+
+    if (profile?.role === 'employer' || profile?.role === 'admin') {
+      const { data: reliabilityRow } = await supabase
+        .from('peer_rater_reliability')
+        .select('*')
+        .eq('rater_id', id)
+        .maybeSingle()
+      peerRaterStats = reliabilityRow
+
+      if (peerProjects.length > 0) {
+        const projectIds = peerProjects.map((p: any) => p.id)
+        const { data: flagRows } = await supabase
+          .from('peer_project_reciprocity_flags')
+          .select('project_id')
+          .in('project_id', projectIds)
+          .or(`person_a.eq.${id},person_b.eq.${id}`)
+        for (const f of flagRows || []) reciprocityFlagsByProject.add(f.project_id)
+      }
+    }
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Building2 className="h-8 w-8 text-indigo-600" />
+              <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               <span className="ml-2 text-2xl font-bold">DeepEdge</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/candidates" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6">
+        <Link href="/candidates" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to candidates
         </Link>
 
         {!canView ? (
-          <div className="bg-white rounded-2xl shadow-md p-10 text-center">
-            <div className="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="h-7 w-7 text-indigo-600" />
+          <div className="bg-white rounded-2xl shadow-md p-10 text-center dark:bg-gray-900">
+            <div className="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-indigo-950/40">
+              <Lock className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Out of profile views for this month</h1>
-            <p className="text-gray-600 mb-8">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-gray-50">Out of profile views for this month</h1>
+            <p className="text-gray-600 mb-8 dark:text-gray-400">
               Your current tier's monthly candidate profile view allowance is used up. Upgrade to a higher
               tier to view more Verified Expert profiles.
             </p>
@@ -222,16 +280,18 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-lg shadow-md p-8 mb-6">
+            <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
-                  <Building2 className="h-8 w-8 text-gray-400" />
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center shrink-0 dark:bg-gray-800">
+                  <Building2 className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">{candidateProfile?.full_name || 'Candidate'}</h1>
-                  <p className="text-gray-600">{candidate.current_title || 'No title provided'}{candidate.current_company ? ` at ${candidate.current_company}` : ''}</p>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">{candidateProfile?.full_name || 'Candidate'}</h1>
+                  {candidate && (
+                    <p className="text-gray-600 dark:text-gray-400">{candidate.current_title || 'No title provided'}{candidate.current_company ? ` at ${candidate.current_company}` : ''}</p>
+                  )}
                   {candidateProfile?.location && (
-                    <p className="flex items-center gap-1 text-sm text-gray-500 mt-1">
+                    <p className="flex items-center gap-1 text-sm text-gray-500 mt-1 dark:text-gray-400">
                       <MapPin className="h-3.5 w-3.5" />
                       {candidateProfile.location}
                     </p>
@@ -239,35 +299,37 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
                 </div>
               </div>
 
-              <p className="flex items-center gap-1 text-sm font-semibold text-indigo-700 mb-4">
+              <p className="flex items-center gap-1 text-sm font-semibold text-indigo-700 mb-4 dark:text-indigo-400">
                 <BadgeCheck className="h-4 w-4" />
                 Verified Expert{scoreRow?.greyin_score != null ? ` · Greyin Score ${scoreRow.greyin_score}` : ''}
               </p>
 
               {candidateProfile?.is_reentry && (
-                <p className="flex items-center gap-1 text-sm font-medium text-blue-700 mb-4">
+                <p className="flex items-center gap-1 text-sm font-medium text-blue-700 mb-4 dark:text-blue-400">
                   <RotateCcw className="h-4 w-4" />
                   Returning to work{candidateProfile.reentry_reason ? ` · ${candidateProfile.reentry_reason}` : ''}
                 </p>
               )}
 
-              <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700 mb-6 border-t border-b py-4">
-                {candidate.experience_years != null && <p><span className="text-gray-500">Experience:</span> {candidate.experience_years} yrs</p>}
-                {candidate.availability && <p className="capitalize"><span className="text-gray-500">Availability:</span> {candidate.availability.replace('_', ' ')}</p>}
-                {candidate.remote_preference && <p className="capitalize"><span className="text-gray-500">Remote preference:</span> {candidate.remote_preference}</p>}
-                {candidate.education && <p><span className="text-gray-500">Education:</span> {candidate.education}</p>}
+              {candidate && (
+              <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700 mb-6 border-t border-b py-4 dark:text-gray-300">
+                {candidate.experience_years != null && <p><span className="text-gray-500 dark:text-gray-400">Experience:</span> {candidate.experience_years} yrs</p>}
+                {candidate.availability && <p className="capitalize"><span className="text-gray-500 dark:text-gray-400">Availability:</span> {candidate.availability.replace('_', ' ')}</p>}
+                {candidate.remote_preference && <p className="capitalize"><span className="text-gray-500 dark:text-gray-400">Remote preference:</span> {candidate.remote_preference}</p>}
+                {candidate.education && <p><span className="text-gray-500 dark:text-gray-400">Education:</span> {candidate.education}</p>}
                 {(candidate.expected_salary_min || candidate.expected_salary_max) && (
-                  <p><span className="text-gray-500">Expected salary:</span> {candidate.currency} {candidate.expected_salary_min?.toLocaleString() || '—'}–{candidate.expected_salary_max?.toLocaleString() || '—'}</p>
+                  <p><span className="text-gray-500 dark:text-gray-400">Expected salary:</span> {candidate.currency} {candidate.expected_salary_min?.toLocaleString() || '—'}–{candidate.expected_salary_max?.toLocaleString() || '—'}</p>
                 )}
-                <p><span className="text-gray-500">Open to relocation:</span> {candidate.willing_to_relocate ? 'Yes' : 'No'}</p>
+                <p><span className="text-gray-500 dark:text-gray-400">Open to relocation:</span> {candidate.willing_to_relocate ? 'Yes' : 'No'}</p>
                 {candidate.portfolio_url && (
-                  <p><span className="text-gray-500">Portfolio:</span> <a href={candidate.portfolio_url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">{candidate.portfolio_url}</a></p>
+                  <p><span className="text-gray-500 dark:text-gray-400">Portfolio:</span> <a href={candidate.portfolio_url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline dark:text-indigo-400">{candidate.portfolio_url}</a></p>
                 )}
               </div>
+              )}
 
-              {candidate.skills && candidate.skills.length > 0 && (
+              {candidate?.skills && candidate.skills.length > 0 && (
                 <>
-                  <h2 className="text-sm font-semibold text-gray-900 mb-2">Skills</h2>
+                  <h2 className="text-sm font-semibold text-gray-900 mb-2 dark:text-gray-50">Skills</h2>
                   <div className="flex flex-col gap-2">
                     {candidate.skills.map((s: string) => {
                       const endorsers = endorsementsBySkill.get(s) || []
@@ -275,28 +337,28 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
                       const viewerEndorsed = endorsers.includes(user.id)
                       return (
                         <div key={s} className="flex items-center gap-3">
-                          <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium">{s}</span>
+                          <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium dark:bg-indigo-950/40 dark:text-indigo-400">{s}</span>
                           {viewerEndorsed ? (
                             <form action={`/api/skills/${id}/unendorse`} method="POST">
                               <input type="hidden" name="skill" value={s} />
-                              <button type="submit" className="flex items-center gap-1 text-xs font-semibold text-indigo-700 hover:text-indigo-900" title="You endorsed this -- click to remove">
+                              <button type="submit" className="flex items-center gap-1 text-xs font-semibold text-indigo-700 hover:text-indigo-900 dark:text-indigo-400" title="You endorsed this -- click to remove">
                                 <ThumbsUp className="h-3 w-3" /> {count}
                               </button>
                             </form>
                           ) : isCollaborator ? (
                             <form action={`/api/skills/${id}/endorse`} method="POST">
                               <input type="hidden" name="skill" value={s} />
-                              <button type="submit" className="text-xs font-semibold text-indigo-600 hover:underline">Endorse</button>
+                              <button type="submit" className="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Endorse</button>
                             </form>
                           ) : (
-                            <span className="text-xs text-gray-500">{count} endorsement{count === 1 ? '' : 's'}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{count} endorsement{count === 1 ? '' : 's'}</span>
                           )}
                         </div>
                       )
                     })}
                   </div>
                   {!isSelf && !isCollaborator && (
-                    <p className="text-xs text-gray-400 mt-2">Endorsing requires a real collaboration with this person -- a completed FlexPro gig, or a shared StackWorks project.</p>
+                    <p className="text-xs text-gray-400 mt-2 dark:text-gray-500">Endorsing requires a real collaboration with this person -- a completed FlexPro gig, or a shared StackWorks project.</p>
                   )}
                 </>
               )}
@@ -304,31 +366,31 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
 
             {/* Written recommendations -- approved ones are public; a real
                 collaborator who hasn't already vouched gets the form. */}
-            <div className="bg-white rounded-lg shadow-md p-8 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Recommendations</h2>
+            <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-50">Recommendations</h2>
               {recommendations.length > 0 ? (
                 <div className="space-y-4 mb-6">
                   {recommendations.map((rec) => (
                     <div key={rec.id} className="border-l-2 border-indigo-100 pl-4">
-                      <p className="text-sm text-gray-700">{rec.body}</p>
-                      <p className="text-xs text-gray-500 mt-1">— {rec.profiles?.full_name || 'A collaborator'}</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">{rec.body}</p>
+                      <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">— {rec.profiles?.full_name || 'A collaborator'}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 mb-6">No recommendations yet.</p>
+                <p className="text-sm text-gray-500 mb-6 dark:text-gray-400">No recommendations yet.</p>
               )}
 
               {!isSelf && (
                 isCollaborator ? (
                   <form action="/api/recommendations/create" method="POST" className="border-t pt-4">
                     <input type="hidden" name="recommendee_id" value={id} />
-                    <label htmlFor="recommendation-body" className="block text-sm font-medium text-gray-700 mb-2">Write a recommendation</label>
-                    <textarea id="recommendation-body" name="body" rows={3} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-2" />
+                    <label htmlFor="recommendation-body" className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">Write a recommendation</label>
+                    <textarea id="recommendation-body" name="body" rows={3} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
                     <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700">Submit</button>
                   </form>
                 ) : (
-                  <p className="text-xs text-gray-400 border-t pt-4">Writing a recommendation requires a real collaboration with this person -- a completed FlexPro gig, or a shared StackWorks project.</p>
+                  <p className="text-xs text-gray-400 border-t pt-4 dark:text-gray-500">Writing a recommendation requires a real collaboration with this person -- a completed FlexPro gig, or a shared StackWorks project.</p>
                 )
               )}
             </div>
@@ -338,21 +400,21 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
                 the common real case is an ex-colleague with no in-platform
                 tie at all), managed afterward from /profile. */}
             {!isSelf && profile?.role !== 'employer' && (
-              <div className="bg-white rounded-lg shadow-md p-8 mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Add as a reference</h2>
+              <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-50">Add as a reference</h2>
                 {alreadyReferenced ? (
-                  <p className="text-sm text-gray-500">You've already added this person as a reference.</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">You've already added this person as a reference.</p>
                 ) : (
                   <form action="/api/references/create" method="POST" className="space-y-3">
                     <input type="hidden" name="reference_user_id" value={id} />
-                    <select name="relationship_type" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" defaultValue="">
+                    <select name="relationship_type" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" defaultValue="">
                       <option value="" disabled>How do you know them?</option>
                       <option value="in_platform_task">Worked together on a Greyin project/gig</option>
                       <option value="ex_colleague">Former colleague</option>
                       <option value="current_colleague">Current colleague</option>
                       <option value="other">Other professional relationship</option>
                     </select>
-                    <textarea name="relationship_detail" rows={2} placeholder="Briefly, how did you work together?" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+                    <textarea name="relationship_detail" rows={2} placeholder="Briefly, how did you work together?" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
                     <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700">Add as reference</button>
                   </form>
                 )}
@@ -364,31 +426,31 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
                 (professional_references' own RLS enforces this, not just
                 the UI) -- with a per-reference "request a check" action. */}
             {profile?.role === 'employer' && referencesForEmployer.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-8 mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">References</h2>
+              <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-50">References</h2>
                 <div className="space-y-3">
                   {referencesForEmployer.map((ref) => {
                     const request = requestedByReferenceId.get(ref.id)
                     const responseBody = responseByReferenceId.get(ref.id)
                     return (
-                      <div key={ref.id} className="border border-gray-200 rounded-lg p-4">
-                        <p className="text-sm text-gray-700">
+                      <div key={ref.id} className="border border-gray-200 rounded-lg p-4 dark:border-gray-800">
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
                           {RELATIONSHIP_LABEL[ref.relationship_type] || ref.relationship_type} — {ref.relationship_detail}
                         </p>
                         {ref.verified_pillar && (
-                          <p className="text-xs text-green-700 mt-0.5">
+                          <p className="text-xs text-green-700 mt-0.5 dark:text-green-400">
                             Greyin-verified: worked together via {PILLAR_LABEL[ref.verified_pillar] || ref.verified_pillar}
                           </p>
                         )}
                         {responseBody ? (
-                          <p className="text-sm text-gray-800 mt-3 bg-gray-50 rounded p-3">{responseBody}</p>
+                          <p className="text-sm text-gray-800 mt-3 bg-gray-50 rounded p-3 dark:text-gray-100 dark:bg-gray-950">{responseBody}</p>
                         ) : request ? (
-                          <p className="text-xs text-gray-500 mt-3">Request sent — waiting on a response.</p>
+                          <p className="text-xs text-gray-500 mt-3 dark:text-gray-400">Request sent — waiting on a response.</p>
                         ) : (
                           <form action="/api/references/request" method="POST" className="mt-3">
                             <input type="hidden" name="reference_id" value={ref.id} />
                             <input type="hidden" name="candidate_profile_id" value={id} />
-                            <button type="submit" className="text-xs font-semibold text-indigo-600 hover:underline">Request a reference check</button>
+                            <button type="submit" className="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400">Request a reference check</button>
                           </form>
                         )}
                       </div>
@@ -403,17 +465,63 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
                 a candidate's published articles surface here, where an
                 employer is actually looking. */}
             {articles.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-8">
-                <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
-                  <BookOpen className="h-5 w-5 text-sky-600" />
+              <div className="bg-white rounded-lg shadow-md p-8 dark:bg-gray-900">
+                <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4 dark:text-gray-50">
+                  <BookOpen className="h-5 w-5 text-sky-600 dark:text-sky-400" />
                   Authored articles on GreyMatters
                 </h2>
                 <div className="space-y-3">
                   {articles.map((a) => (
-                    <a key={a.id} href={`https://greymatters.greyin.net/posts/${a.slug}`} target="_blank" rel="noreferrer" className="block hover:bg-gray-50 -mx-2 px-2 py-1 rounded">
-                      <p className="text-sm font-medium text-sky-700">{a.title}</p>
-                      {a.excerpt && <p className="text-xs text-gray-500 mt-0.5">{a.excerpt}</p>}
+                    <a key={a.id} href={`https://greymatters.greyin.net/posts/${a.slug}`} target="_blank" rel="noreferrer" className="block hover:bg-gray-50 -mx-2 px-2 py-1 rounded dark:hover:bg-gray-800">
+                      <p className="text-sm font-medium text-sky-700 dark:text-sky-400">{a.title}</p>
+                      {a.excerpt && <p className="text-xs text-gray-500 mt-0.5 dark:text-gray-400">{a.excerpt}</p>}
                     </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* RESTORED (2026-09-04, integrity audit): see comment at the
+                top of the canView block for why this was ever missing. */}
+            {peerProjects.length > 0 && (
+              <div className="bg-white rounded-lg shadow-md p-8 dark:bg-gray-900">
+                <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-1 dark:text-gray-50">
+                  <Users className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                  Peer-confirmed projects
+                </h2>
+                <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">
+                  Work confirmed by real teammates, kept separate from the platform-verified Greyin Score above.
+                </p>
+
+                {peerRaterStats && (
+                  <div className="mb-6 border border-amber-200 bg-amber-50 rounded-lg p-4 dark:border-amber-900 dark:bg-amber-950/40">
+                    <h3 className="text-sm font-semibold text-amber-800 mb-1 dark:text-amber-300">
+                      Employer view: rating pattern as a peer rater
+                    </h3>
+                    <p className="text-sm text-amber-700 dark:text-amber-400">
+                      {peerRaterStats.ratings_given_count} rating{peerRaterStats.ratings_given_count === 1 ? '' : 's'} given, average {peerRaterStats.avg_rating_given}/5
+                      ({peerRaterStats.top_rating_pct}% top rating).
+                      {peerRaterStats.mutual_pair_count > 0 && (
+                        <> {peerRaterStats.mutual_high_rating_pct}% are part of a mutual pair where both sides rated each other 4 or higher.</>
+                      )}
+                    </p>
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  {peerProjects.map((project) => (
+                    <div key={project.id} className="border border-gray-200 rounded-lg p-4 dark:border-gray-800">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-50">{project.title}</h3>
+                        {reciprocityFlagsByProject.has(project.id) && (
+                          <span className="text-xs font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded-full dark:bg-red-950/40 dark:text-red-400">
+                            ⚠ Possible reciprocal rating
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{project.company}</p>
+                      {project.description && <p className="text-sm text-gray-600 mt-1 dark:text-gray-400">{project.description}</p>}
+                    </div>
                   ))}
                 </div>
               </div>

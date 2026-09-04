@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Users, ArrowLeft, Rss } from 'lucide-react'
 import { FeedCard } from '@/components/FeedCard'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function FeedPage() {
   const supabase = await createClient()
@@ -29,27 +30,28 @@ export default async function FeedPage() {
     : { data: [] }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Users className="h-8 w-8 text-purple-600" />
+              <Users className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               <span className="ml-2 text-2xl font-bold">Salt & Pepper</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-purple-600 mb-6">
+        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-purple-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to dashboard
         </Link>
 
         <div className="flex items-center gap-2 mb-6">
-          <Rss className="h-6 w-6 text-purple-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Feed</h1>
+          <Rss className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Feed</h1>
         </div>
 
         {items && items.length > 0 ? (
@@ -59,11 +61,11 @@ export default async function FeedPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
             <Rss className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Nobody you follow has posted anything yet</h3>
-            <p className="text-gray-600 mb-4">Follow people from the Members directory to see their activity here.</p>
-            <Link href="/members" className="text-purple-600 font-semibold hover:text-purple-700">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-50">Nobody you follow has posted anything yet</h3>
+            <p className="text-gray-600 mb-4 dark:text-gray-400">Follow people from the Members directory to see their activity here.</p>
+            <Link href="/members" className="text-purple-600 font-semibold hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300">
               Browse Members &rarr;
             </Link>
           </div>

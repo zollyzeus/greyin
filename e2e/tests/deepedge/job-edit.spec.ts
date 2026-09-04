@@ -1,9 +1,10 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getJobIdByTitle } from '../../utils/admin'
+import { getJobIdByTitle, grantActiveSubscriptionTier, getUserIdByEmail } from '../../utils/admin'
 
 test('an employer can edit a job and the change reflects on the public listing and their own dashboard', async ({ page, cleanup }) => {
   const employer = await signUpDeepEdge(page, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(page, employer, '/employer/dashboard')
 
   const originalTitle = `E2E Job Edit Original ${Date.now()}`

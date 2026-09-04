@@ -34,5 +34,9 @@ test('a Salt & Pepper discussion shows up in deepedge\'s Ecosystem Search', asyn
 
   await page.goto(`${greyinB2BBase}/search?q=${encodeURIComponent(title)}`)
   await expect(page.getByText(title)).toBeVisible()
-  await expect(page.getByText(/Salt & Pepper/)).toBeVisible()
+  // Plain /Salt & Pepper/ also matches the shared footer's own link to
+  // saltnpepper.greyin.net (strict-mode violation) -- the result card's
+  // pillar tag renders as "Salt & Pepper · discussion", so anchor on
+  // that suffix to scope the match to the actual search result.
+  await expect(page.getByText(/Salt & Pepper · discussion/)).toBeVisible()
 })

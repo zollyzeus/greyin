@@ -1,0 +1,41 @@
+-- ============================================================
+-- Drop razorpay_config + payment_analytics: confirmed dead schema
+-- ============================================================
+--
+-- Found during the same code-vs-database integrity audit as
+-- 112_drop_dead_gig_reviews.sql (2026-09-04, direct user request).
+-- Both from 002_razorpay_integration.sql, the platform's original
+-- Razorpay scaffolding.
+--
+-- razorpay_config: its own creation comment says real API keys were
+-- always meant to live in environment variables, not this table --
+-- the payment_capture_mode/currency/receipt_prefix knobs it holds are
+-- hardcoded directly in the actual checkout/webhook code instead. It
+-- has held exactly one never-updated placeholder row
+-- (webhook_secret='CHANGE_THIS_WEBHOOK_SECRET') since creation.
+-- Misleading to leave in place: the column name alone implies this is
+-- where webhook signature verification config lives, when the real
+-- verification uses an env var entirely.
+--
+-- payment_analytics: a daily payment-metrics aggregate view, but it
+-- only ever reads gig_orders -- confirmed via a live count of every
+-- table with a razorpay-related column (author_tips,
+-- company_subscriptions, flexpro_subscriptions, gig_orders,
+-- payout_requests, razorpay_webhooks, subscription_plans,
+-- subscription_tiers, subscription_webhooks -- 9 total) that this view
+-- predates almost all of. No admin dashboard was ever built to consume
+-- it; a real payments-analytics feature today would need a rewrite
+-- covering the other 8 tables regardless, so this version isn't a
+-- useful head start, just a narrowly-scoped, misleadingly-named
+-- leftover from the platform's earliest payment integration.
+--
+-- Verified safe to drop immediately before this migration: 1 row in
+-- razorpay_config (the unused placeholder seed), 0 foreign keys
+-- reference it, 0 views depend on either object, and 0 live functions
+-- (excluding aggregates) mention either by name.
+--
+-- Run this after 112_drop_dead_gig_reviews.sql
+-- ============================================================
+
+DROP VIEW IF EXISTS public.payment_analytics;
+DROP TABLE IF EXISTS public.razorpay_config;

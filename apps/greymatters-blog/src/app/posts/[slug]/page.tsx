@@ -10,6 +10,7 @@ import { TipButton } from '@/app/components/TipButton'
 import { CopyLinkButton } from '@/app/components/CopyLinkButton'
 import { FollowButton } from '@/app/components/FollowButton'
 import { absoluteUrl } from '@/app/lib/site-url'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 interface PostDetailPageProps {
   params: Promise<{ slug: string }>
@@ -94,20 +95,21 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
   const readingTime = Math.ceil((post.content?.length || 0) / 1000) // Rough estimate: 1000 chars = 1 min
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Header */}
-      <header className="bg-white border-b">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <BookOpen className="h-8 w-8 text-blue-600" />
+              <BookOpen className="h-8 w-8 text-sky-600 dark:text-sky-400" />
               <span className="ml-2 text-2xl font-bold">GreyMatters</span>
             </a>
             <nav className="flex gap-6">
-              <Link href="/" className="text-gray-700 hover:text-blue-600">Home</Link>
-              <Link href="/categories" className="text-gray-700 hover:text-blue-600">Categories</Link>
-              <Link href="/about" className="text-gray-700 hover:text-blue-600">About</Link>
+              <Link href="/" className="text-gray-700 hover:text-blue-600 dark:text-gray-300">Home</Link>
+              <Link href="/categories" className="text-gray-700 hover:text-blue-600 dark:text-gray-300">Categories</Link>
+              <Link href="/about" className="text-gray-700 hover:text-blue-600 dark:text-gray-300">About</Link>
             </nav>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -125,39 +127,39 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back button */}
-        <Link href="/" className="flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to blog
         </Link>
 
-        <article className="bg-white rounded-lg shadow-md p-8 md:p-12">
+        <article className="bg-white rounded-lg shadow-md p-8 md:p-12 dark:bg-gray-900">
           {/* Category Badge */}
           {post.categories && (
             <Link
               href={`/categories/${post.categories.slug}`}
-              className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4 hover:bg-blue-200"
+              className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4 hover:bg-blue-200 dark:bg-blue-950/40 dark:text-blue-400"
             >
               {post.categories.name}
             </Link>
           )}
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 dark:text-gray-50">
             {post.title}
           </h1>
 
           {/* Meta */}
-          <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mb-8 pb-8 border-b">
+          <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 mb-8 pb-8 border-b dark:text-gray-400">
             <div className="flex items-center gap-2">
               {post.profiles?.avatar_url ? (
                 <img src={post.profiles.avatar_url} alt={post.profiles.full_name} className="w-10 h-10 rounded-full" />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                  <User className="h-6 w-6 text-gray-400" />
+                  <User className="h-6 w-6 text-gray-400 dark:text-gray-500" />
                 </div>
               )}
               <div>
-                <p className="font-semibold text-gray-900">{post.profiles?.full_name || 'Anonymous'}</p>
+                <p className="font-semibold text-gray-900 dark:text-gray-50">{post.profiles?.full_name || 'Anonymous'}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -172,7 +174,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
               <span>{post.views_count || 0} views</span>
             </div>
             {qualityScore && (
-              <div className="flex items-center gap-1 text-blue-700 font-medium" title={qualityScore.notes || undefined}>
+              <div className="flex items-center gap-1 text-blue-700 font-medium dark:text-blue-400" title={qualityScore.notes || undefined}>
                 <span>AI quality: {qualityScore.score}/100</span>
               </div>
             )}
@@ -188,12 +190,12 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-8 pb-8 border-b">
-              <Tag className="h-5 w-5 text-gray-400" />
+              <Tag className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               {post.tags.map((tag: string) => (
                 <Link
                   key={tag}
                   href={`/tags/${encodeURIComponent(tag)}`}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200"
+                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300"
                 >
                   #{tag}
                 </Link>
@@ -208,8 +210,8 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
             const postUrl = absoluteUrl(`/posts/${post.slug}`).toString()
             return (
               <div className="flex items-center gap-4 mb-12 flex-wrap">
-                <Share2 className="h-5 w-5 text-gray-600" />
-                <span className="text-sm font-semibold text-gray-700">Share this article:</span>
+                <Share2 className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Share this article:</span>
                 <a
                   href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`}
                   target="_blank"
@@ -233,18 +235,18 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
 
           {/* Author Bio */}
           {post.profiles && (
-            <div className="bg-gray-50 rounded-lg p-6 mb-12">
+            <div className="bg-gray-50 rounded-lg p-6 mb-12 dark:bg-gray-950">
               <div className="flex gap-4">
                 {post.profiles.avatar_url ? (
                   <img src={post.profiles.avatar_url} alt={post.profiles.full_name} className="w-16 h-16 rounded-full" />
                 ) : (
                   <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                    <User className="h-8 w-8 text-gray-400" />
+                    <User className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                   </div>
                 )}
                 <div className="flex-1">
                   <h3 className="font-bold text-lg mb-1">{post.profiles.full_name}</h3>
-                  <p className="text-gray-600 text-sm mb-3">
+                  <p className="text-gray-600 text-sm mb-3 dark:text-gray-400">
                     Writer at GreyMatters, sharing insights on technology, career, and innovation.
                   </p>
                   <TipButton
@@ -269,20 +271,20 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
         {/* Related Posts */}
         {relatedPosts && relatedPosts.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Related Articles</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 dark:text-gray-50">Related Articles</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedPosts.map((related: any) => (
                 <Link
                   key={related.id}
                   href={`/posts/${related.slug}`}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
+                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-900"
                 >
                   {related.cover_image_url && (
                     <img src={related.cover_image_url} alt={related.title} className="w-full h-40 object-cover" />
                   )}
                   <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{related.title}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-2">{related.excerpt}</p>
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 dark:text-gray-50">{related.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2 dark:text-gray-400">{related.excerpt}</p>
                   </div>
                 </Link>
               ))}
@@ -292,18 +294,18 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
 
         {/* Comments Section */}
         <div id="comments" className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 dark:text-gray-50">
             Comments ({comments?.length || 0})
           </h2>
 
           {/* Comment Form */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-gray-900">
             {user ? (
               <form action={`/api/posts/${post.slug}/comments`} method="POST">
                 <textarea
                   name="content"
                   required
-                  className="w-full border border-gray-300 rounded-lg p-4 mb-4"
+                  className="w-full border border-gray-300 rounded-lg p-4 mb-4 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   rows={4}
                   placeholder="Share your thoughts..."
                 ></textarea>
@@ -312,8 +314,8 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                 </button>
               </form>
             ) : (
-              <p className="text-gray-600">
-                <Link href={`/login?next=/posts/${post.slug}`} className="text-blue-600 hover:text-blue-700 font-semibold">
+              <p className="text-gray-600 dark:text-gray-400">
+                <Link href={`/login?next=/posts/${post.slug}`} className="text-blue-600 hover:text-blue-700 font-semibold dark:text-blue-400 dark:hover:text-blue-300">
                   Sign in
                 </Link>{' '}
                 to join the discussion.
@@ -325,30 +327,30 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
           <div className="space-y-4">
             {comments && comments.length > 0 ? (
               comments.map((comment: any) => (
-                <div key={comment.id} className="bg-white rounded-lg shadow-md p-6">
+                <div key={comment.id} className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-900">
                   <div className="flex gap-4">
                     {comment.profiles?.avatar_url ? (
                       <img src={comment.profiles.avatar_url} alt={comment.profiles.full_name} className="w-10 h-10 rounded-full" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                        <User className="h-6 w-6 text-gray-400" />
+                        <User className="h-6 w-6 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-semibold text-gray-900">{comment.profiles?.full_name || 'Anonymous'}</span>
-                        <span className="text-sm text-gray-500">
+                        <span className="font-semibold text-gray-900 dark:text-gray-50">{comment.profiles?.full_name || 'Anonymous'}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
                           {new Date(comment.created_at).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-gray-700">{comment.content}</p>
+                      <p className="text-gray-700 dark:text-gray-300">{comment.content}</p>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                <p className="text-gray-600">No comments yet. Be the first to share your thoughts!</p>
+              <div className="bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
+                <p className="text-gray-600 dark:text-gray-400">No comments yet. Be the first to share your thoughts!</p>
               </div>
             )}
           </div>

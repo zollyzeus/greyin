@@ -23,7 +23,7 @@ test('a post author is notified when someone comments', async ({ browser, cleanu
   await commenterCtx.close()
 
   await authorPage.goto('/dashboard')
-  await expect(authorPage.getByTitle('Notifications')).toContainText('1')
+  await expect(authorPage.getByLabel('Notifications')).toContainText('1')
 
   await authorPage.goto('/notifications')
   await expect(authorPage.getByText('New comment on your post')).toBeVisible()

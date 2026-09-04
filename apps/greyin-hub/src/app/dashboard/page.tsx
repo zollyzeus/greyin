@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
-import { BadgeCheck, Shuffle, RotateCcw, GraduationCap, ArrowUpRight, Users, User } from 'lucide-react'
+import Link from 'next/link'
+import { BadgeCheck, Shuffle, RotateCcw, GraduationCap, ArrowUpRight, Users, User, ShieldCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { SiteHeader } from '@/components/SiteHeader'
 import { EcosystemWidget } from '@/components/EcosystemWidget'
@@ -21,7 +22,7 @@ export default async function DashboardPage() {
   }
 
   const [{ data: profile }, { data: scoreRow }, { data: activity }, { data: memberships }, { data: collaboratorRows }, { data: pendingTagRows }, { data: myConfirmedRows }] = await Promise.all([
-    supabase.from('profiles').select('created_at, is_pivoter, pivot_from_domain, pivot_to_domain, is_reentry, reentry_reason, is_mentor').eq('id', user.id).single(),
+    supabase.from('profiles').select('role, created_at, is_pivoter, pivot_from_domain, pivot_to_domain, is_reentry, reentry_reason, is_mentor').eq('id', user.id).single(),
     // peer_score/peer_evidence deliberately NOT selected here for the
     // main badge -- see PeerProjectsSection's own header comment on
     // why platform-verified and peer-confirmed stay two numbers.
@@ -97,13 +98,35 @@ export default async function DashboardPage() {
     : { data: [] }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Ecosystem Dashboard</h1>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6 dark:text-gray-50">Your Ecosystem Dashboard</h1>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        {/* Platform-wide admin (wishlist, feedback, LLM config, threshold
+            votes, peer-project moderation) lives only on the Hub -- see
+            admin/page.tsx's own header comment. Every other pillar app
+            with its own /admin surfaces a link on its dashboard the same
+            way; this one was missing here, so an admin had no way to
+            discover /admin short of typing the URL directly. */}
+        {profile?.role === 'admin' && (
+          <Link
+            href="/admin"
+            className="flex items-center justify-between bg-white rounded-lg shadow p-6 mb-6 border-2 border-red-100 hover:border-red-200 transition dark:bg-gray-900"
+          >
+            <div className="flex items-center gap-3">
+              <ShieldCheck className="w-8 h-8 text-red-600 flex-shrink-0 dark:text-red-400" />
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Admin</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Moderate the wishlist and feedback, manage LLM providers, review peer-project flags, and set the Verified Expert threshold.</p>
+              </div>
+            </div>
+            <ArrowUpRight className="h-5 w-5 text-red-600 flex-shrink-0 dark:text-red-400" />
+          </Link>
+        )}
+
+        <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <BadgeCheck className="w-5 h-5" />
@@ -121,7 +144,7 @@ export default async function DashboardPage() {
                   089_peer_projects.sql's header comment. */}
               {scoreRow?.peer_score != null && (
                 <span
-                  className="px-3 py-1 bg-white border-2 border-indigo-200 text-indigo-700 rounded-lg text-sm font-bold"
+                  className="px-3 py-1 bg-white border-2 border-indigo-200 text-indigo-700 rounded-lg text-sm font-bold dark:bg-gray-900 dark:border-indigo-900 dark:text-indigo-400"
                   title={`Peer-confirmed, not platform-verified -- from ${scoreRow.peer_evidence} contribution rating${scoreRow.peer_evidence === 1 ? '' : 's'}`}
                 >
                   Peer-confirmed: {scoreRow.peer_score}
@@ -140,36 +163,36 @@ export default async function DashboardPage() {
         />
 
         {(profile?.is_pivoter || profile?.is_reentry || profile?.is_mentor) && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-4">Your tags</h2>
             <div className="flex flex-wrap gap-3">
               {profile?.is_pivoter && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-orange-50 text-orange-700">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400">
                   <Shuffle className="h-4 w-4" />
                   Pivoting: {profile.pivot_from_domain || '—'} → {profile.pivot_to_domain || '—'}
                 </span>
               )}
               {profile?.is_reentry && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-blue-50 text-blue-700">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400">
                   <RotateCcw className="h-4 w-4" />
                   Returning to work{profile.reentry_reason ? ` · ${profile.reentry_reason}` : ''}
                 </span>
               )}
               {profile?.is_mentor && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-purple-50 text-purple-700">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400">
                   <GraduationCap className="h-4 w-4" />
                   Listed as a mentor
                 </span>
               )}
             </div>
-            <a href="https://deepedge.greyin.net/profile" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700">
+            <a href="https://deepedge.greyin.net/profile" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
               Manage on your profile <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
           </div>
         )}
 
         {collaboratorProfiles && collaboratorProfiles.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Users className="w-5 h-5" />
               People you&rsquo;ve worked with
@@ -179,11 +202,11 @@ export default async function DashboardPage() {
                 <a
                   key={person.id}
                   href={`https://deepedge.greyin.net/candidates/${person.id}`}
-                  className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 hover:border-indigo-300 hover:bg-indigo-50"
+                  className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 hover:border-indigo-300 hover:bg-indigo-50 dark:border-gray-800 dark:hover:border-indigo-700 dark:hover:bg-indigo-950/40"
                 >
-                  <User className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm text-gray-800">{person.full_name || 'A collaborator'}</span>
-                  <span className="text-xs text-gray-400">
+                  <User className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                  <span className="text-sm text-gray-800 dark:text-gray-100">{person.full_name || 'A collaborator'}</span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
                     via {[...(pillarsByCollaborator.get(person.id) || [])].map((p) => PILLAR_LABEL[p] || p).join(' & ')}
                   </span>
                 </a>

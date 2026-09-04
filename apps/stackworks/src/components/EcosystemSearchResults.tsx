@@ -38,21 +38,21 @@ export function EcosystemSearchResults({ results }: { results: SearchResult[] })
 
   return (
     <div className="mt-8">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">More across Greyin</h2>
+      <h2 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-50">More across Greyin</h2>
       <div className="space-y-3">
         {results.map((r) => (
           <a
             key={`${r.type}-${r.id}`}
             href={`${PILLAR_DOMAINS[r.pillar]}${r.path}`}
-            className="block bg-white rounded-lg shadow p-4 hover:shadow-md transition"
+            className="block bg-white rounded-lg shadow p-4 hover:shadow-md transition dark:bg-gray-900"
           >
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs font-semibold text-gray-400 uppercase">
+                <span className="text-xs font-semibold text-gray-400 uppercase dark:text-gray-500">
                   {PILLAR_LABELS[r.pillar]} &middot; {r.type}
                 </span>
-                <h3 className="font-medium text-gray-900">{r.title}</h3>
-                {r.description && <p className="text-sm text-gray-600 line-clamp-1">{r.description}</p>}
+                <h3 className="font-medium text-gray-900 dark:text-gray-50">{r.title}</h3>
+                {r.description && <p className="text-sm text-gray-600 line-clamp-1 dark:text-gray-400">{r.description}</p>}
               </div>
               <ExternalLink className="h-4 w-4 text-gray-300 flex-shrink-0" />
             </div>

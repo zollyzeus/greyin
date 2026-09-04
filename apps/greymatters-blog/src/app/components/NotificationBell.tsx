@@ -114,7 +114,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={handleToggle}
-        className="relative p-2 text-gray-700 hover:text-sky-600"
+        className="relative p-2 text-gray-700 hover:text-sky-600 dark:text-gray-300"
         aria-label="Notifications"
       >
         <Bell className="h-5 w-5" />
@@ -126,15 +126,15 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 dark:bg-gray-900 dark:border-gray-800">
           {items.length > 0 ? (
             <div className="divide-y max-h-96 overflow-y-auto">
               {items.map((n) => {
                 const { href, external } = resolveNotificationHref(n)
                 const body = (
-                  <div className="px-4 py-3 hover:bg-gray-50">
-                    <p className="text-sm font-medium text-gray-900">{n.title}</p>
-                    {n.body && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{n.body}</p>}
+                  <div className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-50">{n.title}</p>
+                    {n.body && <p className="text-xs text-gray-500 mt-0.5 line-clamp-2 dark:text-gray-400">{n.body}</p>}
                   </div>
                 )
                 return external ? (
@@ -145,12 +145,12 @@ export function NotificationBell() {
               })}
             </div>
           ) : (
-            <p className="px-4 py-6 text-sm text-gray-500 text-center">No notifications yet.</p>
+            <p className="px-4 py-6 text-sm text-gray-500 text-center dark:text-gray-400">No notifications yet.</p>
           )}
           <Link
             href="/notifications"
             onClick={() => setOpen(false)}
-            className="block text-center text-sm font-medium text-sky-600 py-2.5 border-t hover:bg-gray-50"
+            className="block text-center text-sm font-medium text-sky-600 py-2.5 border-t hover:bg-gray-50 dark:text-sky-400 dark:hover:bg-gray-800"
           >
             View all
           </Link>

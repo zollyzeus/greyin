@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Briefcase, Star, Clock, User, ArrowLeft, BadgeCheck, Award } from 'lucide-react'
 import { FollowButton } from '@/components/FollowButton'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 /**
  * Minimal read-only seller profile -- built to fix a pre-existing dead
@@ -80,18 +81,19 @@ export default async function SellerProfilePage({ params }: { params: { id: stri
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Link href="/gigs" className="text-orange-600 hover:text-orange-700 flex items-center gap-2">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b sticky top-0 z-10 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/gigs" className="text-orange-600 hover:text-orange-700 flex items-center gap-2 dark:text-orange-400 dark:hover:text-orange-300">
             <ArrowLeft className="w-5 h-5" />
             Back to Browse Gigs
           </Link>
-        </div>
+            <ThemeToggle />
+          </div>
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
           <div className="flex items-center gap-4 mb-4">
             {seller.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -103,9 +105,9 @@ export default async function SellerProfilePage({ params }: { params: { id: stri
             )}
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-gray-900">{seller.full_name || 'Seller'}</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">{seller.full_name || 'Seller'}</h1>
                 {isTopTier && (
-                  <span className="flex items-center gap-1 bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full" title="Verified Expert with a demonstrated FlexPro track record">
+                  <span className="flex items-center gap-1 bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full dark:bg-amber-950/40 dark:text-amber-400" title="Verified Expert with a demonstrated FlexPro track record">
                     <Award className="w-3.5 h-3.5" />
                     Top Tier
                   </span>
@@ -115,11 +117,11 @@ export default async function SellerProfilePage({ params }: { params: { id: stri
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   <span className="font-medium">{seller.seller_rating.toFixed(1)}</span>
-                  <span className="text-sm text-gray-500">({seller.total_reviews} reviews)</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">({seller.total_reviews} reviews)</span>
                 </div>
               )}
               {trackRecord && (
-                <div className="flex items-center gap-1 text-sm text-green-700 font-medium mt-0.5">
+                <div className="flex items-center gap-1 text-sm text-green-700 font-medium mt-0.5 dark:text-green-400">
                   <BadgeCheck className="w-4 h-4" />
                   {trackRecord.count} verified on StackWorks · avg {trackRecord.avgScore}/100
                 </div>
@@ -127,10 +129,10 @@ export default async function SellerProfilePage({ params }: { params: { id: stri
             </div>
           </div>
 
-          {seller.bio && <p className="text-gray-700">{seller.bio}</p>}
+          {seller.bio && <p className="text-gray-700 dark:text-gray-300">{seller.bio}</p>}
 
           {collaboratorRow && (
-            <p className="mt-3 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2 inline-block">
+            <p className="mt-3 text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2 inline-block dark:text-green-400 dark:bg-green-950/40">
               You&rsquo;ve worked together via {PILLAR_LABEL[collaboratorRow.pillar] || collaboratorRow.pillar}
               {collaboratorRow.occurred_at && ` · ${new Date(collaboratorRow.occurred_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`}
             </p>
@@ -143,16 +145,16 @@ export default async function SellerProfilePage({ params }: { params: { id: stri
           )}
         </div>
 
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Active Gigs</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4 dark:text-gray-50">Active Gigs</h2>
         {gigs && gigs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {gigs.map((gig: any) => (
               <Link
                 key={gig.id}
                 href={`/gigs/${gig.id}`}
-                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition dark:bg-gray-900"
               >
-                <div className="h-40 bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center">
+                <div className="h-40 bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center dark:from-gray-950 dark:to-gray-900">
                   {gig.images && gig.images.length > 0 ? (
                     <img src={gig.images[0]} alt={gig.title} className="w-full h-full object-cover" />
                   ) : (
@@ -160,19 +162,19 @@ export default async function SellerProfilePage({ params }: { params: { id: stri
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{gig.title}</h3>
+                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 dark:text-gray-50">{gig.title}</h3>
                   {gig.category && (
-                    <span className="inline-block px-2 py-1 bg-orange-50 text-orange-700 rounded text-xs font-medium mb-2">
+                    <span className="inline-block px-2 py-1 bg-orange-50 text-orange-700 rounded text-xs font-medium mb-2 dark:bg-orange-950/40 dark:text-orange-400">
                       {gig.category.name}
                     </span>
                   )}
-                  <div className="flex items-center justify-between pt-2 border-t text-sm text-gray-600">
+                  <div className="flex items-center justify-between pt-2 border-t text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
                       {gig.delivery_days ? `${gig.delivery_days} days` : '—'}
                     </div>
                     {gig.price_min != null && (
-                      <div className="font-semibold text-orange-600">From ₹{gig.price_min.toLocaleString()}</div>
+                      <div className="font-semibold text-orange-600 dark:text-orange-400">From ₹{gig.price_min.toLocaleString()}</div>
                     )}
                   </div>
                 </div>
@@ -180,7 +182,7 @@ export default async function SellerProfilePage({ params }: { params: { id: stri
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-sm bg-white rounded-lg shadow p-4">No active gigs right now.</p>
+          <p className="text-gray-500 text-sm bg-white rounded-lg shadow p-4 dark:text-gray-400 dark:bg-gray-900">No active gigs right now.</p>
         )}
       </div>
     </div>

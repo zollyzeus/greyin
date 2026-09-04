@@ -11,6 +11,9 @@ const OTHER_PILLARS = PILLARS.filter((p) => p.key !== 'deepedge')
 // (this app's own header already has a "More Platforms" dropdown; the
 // footer had no equivalent at all until now, unlike every other pillar's
 // footer being built alongside this one).
+// Deliberately theme-invariant -- see apps/greyin-hub/src/components/
+// SiteFooter.tsx's own comment: already a dark surface before light/dark
+// mode existed, and stays that way in both themes.
 export function SiteFooter() {
   return (
     <footer className="bg-gray-900 text-gray-300 py-12">

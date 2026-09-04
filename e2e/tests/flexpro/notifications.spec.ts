@@ -32,8 +32,12 @@ test('a seller is notified when a buyer sends an order message', async ({ browse
   await buyerPage.getByRole('button', { name: 'Send' }).click()
   await buyerCtx.close()
 
+  // Structural sync pass (2026-09-05): the dashboard's own hand-rolled
+  // bell+badge link (title="Notifications") was replaced with the shared
+  // <NotificationBell /> component, whose button carries aria-label
+  // instead of a title attribute -- same visible badge, different locator.
   await sellerPage.goto('/dashboard')
-  await expect(sellerPage.getByTitle('Notifications')).toContainText('1')
+  await expect(sellerPage.getByLabel('Notifications')).toContainText('1')
 
   await sellerPage.goto('/notifications')
   await expect(sellerPage.getByText('New message')).toBeVisible()

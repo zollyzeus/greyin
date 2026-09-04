@@ -55,7 +55,7 @@ export function TeammateTagPicker({ currentUserId }: { currentUserId: string }) 
 
   return (
     <div>
-      <label htmlFor="teammate-search" className="block text-sm font-medium text-gray-700 mb-1">
+      <label htmlFor="teammate-search" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
         Tag teammates (must already be on Greyin)
       </label>
       <input
@@ -64,17 +64,17 @@ export function TeammateTagPicker({ currentUserId }: { currentUserId: string }) 
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search by name..."
-        className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+        className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700"
         autoComplete="off"
       />
       {results.length > 0 && (
-        <div className="mt-1 border border-gray-200 rounded-lg shadow-sm bg-white divide-y divide-gray-100">
+        <div className="mt-1 border border-gray-200 rounded-lg shadow-sm bg-white divide-y divide-gray-100 dark:border-gray-800 dark:bg-gray-900 dark:divide-gray-800">
           {results.map((r) => (
             <button
               key={r.user_id}
               type="button"
               onClick={() => addTeammate(r)}
-              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
             >
               {r.full_name || 'Unnamed member'}
             </button>
@@ -84,7 +84,7 @@ export function TeammateTagPicker({ currentUserId }: { currentUserId: string }) 
       {selected.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {selected.map((s) => (
-            <span key={s.user_id} className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-sm rounded-full pl-3 pr-2 py-1">
+            <span key={s.user_id} className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-sm rounded-full pl-3 pr-2 py-1 dark:bg-indigo-950/40 dark:text-indigo-400">
               {s.full_name || 'Unnamed member'}
               <button type="button" onClick={() => removeTeammate(s.user_id)} aria-label={`Remove ${s.full_name || 'teammate'}`}>
                 <X className="h-3.5 w-3.5" />

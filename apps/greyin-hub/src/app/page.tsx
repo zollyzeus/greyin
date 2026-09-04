@@ -68,7 +68,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
+    <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
       <SiteHeader />
 
       {/* Hero -- common ecosystem copy, not marketplace-flavored (the
@@ -78,17 +78,17 @@ export default async function Home() {
         <div className="flex items-center justify-center gap-3 mb-6">
           <div className="relative inline-block w-16 h-16 flex-shrink-0">
             <Image src="/logo_bgnd.png" alt="" fill className="object-contain" priority />
-            <Image src="/logo.png" alt="" width={44} height={44} className="absolute inset-0 m-auto h-11 w-11" priority />
+            <Image src="/logo.png" alt="" width={44} height={44} className="absolute inset-0 m-auto h-11 w-11 dark:brightness-0 dark:invert" priority />
           </div>
-          <Image src="/GreyIn.png" alt="Greyin" width={220} height={36} className="h-9 w-auto" priority />
+          <Image src="/GreyIn.png" alt="Greyin" width={220} height={36} className="h-9 w-auto dark:brightness-0 dark:invert" priority />
         </div>
-        <p className="inline-block text-sm font-semibold text-indigo-600 uppercase tracking-wide mb-4 bg-indigo-50 rounded-full px-4 py-1.5">
+        <p className="inline-block text-sm font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-4 bg-indigo-50 dark:bg-indigo-950 rounded-full px-4 py-1.5">
           Built for senior professionals
         </p>
-        <h1 className="font-display text-5xl md:text-6xl font-semibold text-gray-900 mb-6">
+        <h1 className="font-display text-5xl md:text-6xl font-semibold text-gray-900 dark:text-gray-50 mb-6">
           One account. Six platforms.
         </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           Greyin exists because senior talent keeps getting filtered out by keyword-matching software,
           pushed out by restructuring, or made redundant — not because they stopped being good at the
           work. Hire, write, freelance, build, connect with peers, and get seen for roles that don't
@@ -105,9 +105,9 @@ export default async function Home() {
           rows of three since Longlist (2026-08-31) filled out row 2. */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div className="text-center mb-10">
-          <p className="text-sm font-semibold text-indigo-600 uppercase tracking-wide mb-3">Six platforms, one identity</p>
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Sign in once, standing everywhere</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">Six platforms, one identity</p>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-50 mb-3">Sign in once, standing everywhere</h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Your track record on any platform below feeds a single Greyin Score — Verified Expert status
             earned through real work, not just years on paper.
           </p>
@@ -127,24 +127,24 @@ export default async function Home() {
       </section>
 
       {/* Two cross-pillar tracks */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-gray-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <p className="text-sm font-semibold text-indigo-600 uppercase tracking-wide mb-3">Not everyone's path is a straight line</p>
-            <h2 className="text-3xl font-bold text-gray-900">Cross-pillar tracks</h2>
+            <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-3">Not everyone's path is a straight line</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-50">Cross-pillar tracks</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link href="/pivoting" className="block bg-orange-50 border border-orange-200 rounded-2xl p-8 hover:shadow-md transition-shadow">
-              <Shuffle className="h-8 w-8 text-orange-600 mb-4" />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Pivoting</h3>
-              <p className="text-gray-600 text-sm">Career changers get matched to employers explicitly open to it, a place to build a track record in the new domain, and mentors who've made a similar jump.</p>
-              <span className="text-sm font-semibold text-orange-700 inline-flex items-center gap-1 mt-4">Learn more <ArrowRight className="h-3.5 w-3.5" /></span>
+            <Link href="/pivoting" className="block bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-900 rounded-2xl p-8 hover:shadow-md dark:hover:shadow-none dark:hover:border-orange-700 transition-shadow">
+              <Shuffle className="h-8 w-8 text-orange-600 dark:text-orange-400 mb-4" />
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50 mb-2">Pivoting</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">Career changers get matched to employers explicitly open to it, a place to build a track record in the new domain, and mentors who've made a similar jump.</p>
+              <span className="text-sm font-semibold text-orange-700 dark:text-orange-400 inline-flex items-center gap-1 mt-4">Learn more <ArrowRight className="h-3.5 w-3.5" /></span>
             </Link>
-            <Link href="/reentry" className="block bg-blue-50 border border-blue-200 rounded-2xl p-8 hover:shadow-md transition-shadow">
-              <RotateCcw className="h-8 w-8 text-blue-600 mb-4" />
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Returning to work</h3>
-              <p className="text-gray-600 text-sm">A gap in your timeline — caregiving, health, layoff, sabbatical — shouldn't cost you a real hiring conversation. Tag it, and employers see the context up front.</p>
-              <span className="text-sm font-semibold text-blue-700 inline-flex items-center gap-1 mt-4">Learn more <ArrowRight className="h-3.5 w-3.5" /></span>
+            <Link href="/reentry" className="block bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-2xl p-8 hover:shadow-md dark:hover:shadow-none dark:hover:border-blue-700 transition-shadow">
+              <RotateCcw className="h-8 w-8 text-blue-600 dark:text-blue-400 mb-4" />
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50 mb-2">Returning to work</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">A gap in your timeline — caregiving, health, layoff, sabbatical — shouldn't cost you a real hiring conversation. Tag it, and employers see the context up front.</p>
+              <span className="text-sm font-semibold text-blue-700 dark:text-blue-400 inline-flex items-center gap-1 mt-4">Learn more <ArrowRight className="h-3.5 w-3.5" /></span>
             </Link>
           </div>
         </div>
@@ -161,7 +161,7 @@ export default async function Home() {
               <p className="text-xl text-indigo-100 mb-10">Your ecosystem dashboard is one click away.</p>
               <Link
                 href="/dashboard"
-                className="inline-block bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition"
+                className="inline-block bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition dark:bg-gray-900 dark:text-indigo-400 dark:hover:bg-gray-800"
               >
                 Go to Dashboard
               </Link>
@@ -173,7 +173,7 @@ export default async function Home() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
                   href="https://deepedge.greyin.net/signup"
-                  className="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition"
+                  className="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition dark:bg-gray-900 dark:text-indigo-400 dark:hover:bg-gray-800"
                 >
                   Create Your Account
                 </a>
@@ -198,7 +198,7 @@ function PillarCard({ pillar, stat }: { pillar: (typeof PILLARS)[number]; stat: 
   return (
     <a
       href={pillar.url}
-      className="group relative flex flex-col bg-white rounded-2xl border-2 p-7 hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
+      className="group relative flex flex-col bg-white dark:bg-gray-900 rounded-2xl border-2 p-7 hover:shadow-xl dark:hover:shadow-none hover:-translate-y-1 transition-all duration-200"
       style={{ borderColor: `${pillar.color}2a` }}
     >
       <div
@@ -207,8 +207,8 @@ function PillarCard({ pillar, stat }: { pillar: (typeof PILLARS)[number]; stat: 
       >
         <Icon className="h-7 w-7" style={{ color: pillar.color }} />
       </div>
-      <h3 className="text-xl font-bold text-gray-900 mb-1.5">{pillar.label}</h3>
-      <p className="text-gray-600 text-sm mb-5 flex-1">{pillar.description}</p>
+      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-50 mb-1.5">{pillar.label}</h3>
+      <p className="text-gray-600 dark:text-gray-400 text-sm mb-5 flex-1">{pillar.description}</p>
       <div className="flex items-center justify-between">
         <span
           className="text-xs font-semibold px-2.5 py-1 rounded-full"

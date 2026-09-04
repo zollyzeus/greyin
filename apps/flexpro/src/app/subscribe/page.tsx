@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, CreditCard, Check } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 // Mirrors deepedge's own /subscribe (039) -- open to any authenticated
 // user, not gated to a role, since FreeAgent has no employer/candidate
@@ -45,32 +46,33 @@ export default async function SubscribePage({
   const showTierPicker = existing?.status !== 'active' || !!error
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <Link href="/" className="flex items-center gap-2 text-orange-600 hover:text-orange-700">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300">
             <ArrowLeft className="w-4 h-4" />
             <span>Back to FlexPro</span>
           </Link>
-        </div>
+            <ThemeToggle />
+          </div>
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">Subscribe to post on FlexPro</h1>
-        <p className="text-gray-600 mb-8 text-center max-w-xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center dark:text-gray-50">Subscribe to post on FlexPro</h1>
+        <p className="text-gray-600 mb-8 text-center max-w-xl mx-auto dark:text-gray-400">
           Unlocks posting a gig listing as a freelancer and posting a job as a client. Applying to jobs
           and buying gigs stay free. A modest service fee applies to both sides once a transaction is
           accepted.
         </p>
 
         {error && (
-          <div className="max-w-md mx-auto rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 mb-6">
+          <div className="max-w-md mx-auto rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 mb-6 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-400">
             {decodeURIComponent(error)}
           </div>
         )}
 
         {!showTierPicker ? (
-          <div className="max-w-md mx-auto rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+          <div className="max-w-md mx-auto rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
             You already have an active {existingTierName || ''} subscription.
           </div>
         ) : (
@@ -90,18 +92,18 @@ export default async function SubscribePage({
                     className={`bg-white rounded-lg shadow p-6 border-2 flex flex-col ${isPro ? 'border-orange-500' : 'border-transparent'}`}
                   >
                     {isPro && (
-                      <span className="self-start mb-2 text-xs font-semibold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
+                      <span className="self-start mb-2 text-xs font-semibold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full dark:text-orange-400 dark:bg-orange-950/40">
                         Most popular
                       </span>
                     )}
-                    <h2 className="text-lg font-bold text-gray-900">{tier.name}</h2>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">{tier.name}</h2>
                     <div className="my-3">
-                      <span className="text-3xl font-bold text-orange-600">₹{tier.price_inr.toLocaleString()}</span>
-                      <span className="text-sm text-gray-500">/mo</span>
+                      <span className="text-3xl font-bold text-orange-600 dark:text-orange-400">₹{tier.price_inr.toLocaleString()}</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">/mo</span>
                     </div>
                     {allowanceLabel && (
-                      <p className="flex items-center gap-2 text-sm text-gray-700 mb-6">
-                        <Check className="w-4 h-4 text-green-600 shrink-0" />
+                      <p className="flex items-center gap-2 text-sm text-gray-700 mb-6 dark:text-gray-300">
+                        <Check className="w-4 h-4 text-green-600 shrink-0 dark:text-green-400" />
                         {allowanceLabel}
                       </p>
                     )}
@@ -117,7 +119,7 @@ export default async function SubscribePage({
               })}
             </div>
 
-            <p className="text-xs text-gray-500 mt-6 text-center">
+            <p className="text-xs text-gray-500 mt-6 text-center dark:text-gray-400">
               Secure payment powered by Razorpay. Cancel any time.
             </p>
           </>

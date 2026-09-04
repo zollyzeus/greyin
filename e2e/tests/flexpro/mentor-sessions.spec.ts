@@ -1,6 +1,7 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, signUpFlexPro, login } from '../../utils/auth'
 import { mockRazorpayCheckout } from '../../utils/razorpay'
+import { getUserIdByEmail, grantFreeagentSubscription } from '../../utils/admin'
 
 const isLocal = process.env.E2E_TARGET === 'local'
 const greyinB2BBase = isLocal ? `http://localhost:${process.env.E2E_DEEPEDGE_PORT || 3100}` : 'https://deepedge.greyin.net'
@@ -24,6 +25,14 @@ test('a mentor can offer free and paid sessions, and a supporter can book both',
   await mentorPage.locator('input[name="is_mentor"]').check()
   await mentorPage.locator('input[name="mentor_domain"]').fill('E2E Mentor Sessions Domain')
   await mentorPage.getByRole('button', { name: 'Save Mentor Availability' }).click()
+
+  // gigs' own INSERT RLS policy ("An active subscriber can post a gig
+  // listing") requires flexpro_subscriptions.status='active' -- mentor
+  // sessions reuse the gigs table (056) so this applies here too, but
+  // api/mentor-sessions/gigs/route.ts has no pre-check the way the
+  // regular /gigs/new flow does, so a missing grant fails silently as a
+  // generic "Could not create session type" redirect instead of /subscribe.
+  await grantFreeagentSubscription(await getUserIdByEmail(mentor.email))
 
   // Same account, same shared session (SSO), now on FlexPro.
   await mentorPage.goto('/mentor-sessions/manage')

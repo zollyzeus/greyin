@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Building2, Users, ArrowLeft, Briefcase, BadgeCheck, Lock, RotateCcw } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function CandidatesPage({
   searchParams,
@@ -45,25 +46,26 @@ export default async function CandidatesPage({
 
   if (!hasActiveSubscription) {
     return (
-      <main className="min-h-screen bg-gray-50">
-        <header className="bg-white border-b">
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        <header className="bg-white border-b dark:bg-gray-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <a href="https://greyin.net" className="flex items-center">
-                <Building2 className="h-8 w-8 text-indigo-600" />
+                <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
                 <span className="ml-2 text-2xl font-bold">DeepEdge</span>
               </a>
+            <ThemeToggle />
             </div>
           </div>
         </header>
 
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <div className="bg-white rounded-2xl shadow-md p-10">
-            <div className="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="h-7 w-7 text-indigo-600" />
+          <div className="bg-white rounded-2xl shadow-md p-10 dark:bg-gray-900">
+            <div className="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-indigo-950/40">
+              <Lock className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Subscribe to search the Verified Expert pool</h1>
-            <p className="text-gray-600 mb-8">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-gray-50">Subscribe to search the Verified Expert pool</h1>
+            <p className="text-gray-600 mb-8 dark:text-gray-400">
               Reviewing applicants to your own job postings is always free. Proactively browsing every
               Verified Expert candidate requires a subscription.
             </p>
@@ -71,7 +73,7 @@ export default async function CandidatesPage({
               <Link href="/subscribe" className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700">
                 Subscribe (Starter)
               </Link>
-              <Link href="/pricing" className="border-2 border-indigo-600 text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-indigo-50">
+              <Link href="/pricing" className="border-2 border-indigo-600 text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40">
                 See pricing
               </Link>
             </div>
@@ -125,12 +127,12 @@ export default async function CandidatesPage({
   }))
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Building2 className="h-8 w-8 text-indigo-600" />
+              <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               <span className="ml-2 text-2xl font-bold">DeepEdge</span>
             </a>
           </div>
@@ -138,12 +140,12 @@ export default async function CandidatesPage({
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/employer/dashboard" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6">
+        <Link href="/employer/dashboard" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to dashboard
         </Link>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Browse Candidates</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6 dark:text-gray-50">Browse Candidates</h1>
 
         <form className="mb-6 flex flex-wrap gap-3">
           <input
@@ -151,12 +153,12 @@ export default async function CandidatesPage({
             name="skill"
             defaultValue={skill || ''}
             placeholder="Filter by skill (e.g. Rust)"
-            className="flex-1 min-w-[12rem] border border-gray-300 rounded-lg px-4 py-2"
+            className="flex-1 min-w-[12rem] border border-gray-300 rounded-lg px-4 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
           />
           <select
             name="min_experience"
             defaultValue={min_experience || ''}
-            className="border border-gray-300 rounded-lg px-4 py-2"
+            className="border border-gray-300 rounded-lg px-4 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
           >
             <option value="">Any experience</option>
             <option value="5">5+ years</option>
@@ -167,7 +169,7 @@ export default async function CandidatesPage({
           <select
             name="availability"
             defaultValue={availability || ''}
-            className="border border-gray-300 rounded-lg px-4 py-2"
+            className="border border-gray-300 rounded-lg px-4 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
           >
             <option value="">Any availability</option>
             <option value="immediate">Immediate</option>
@@ -178,7 +180,7 @@ export default async function CandidatesPage({
           <select
             name="remote_preference"
             defaultValue={remote_preference || ''}
-            className="border border-gray-300 rounded-lg px-4 py-2"
+            className="border border-gray-300 rounded-lg px-4 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
           >
             <option value="">Any location preference</option>
             <option value="remote">Remote</option>
@@ -194,30 +196,30 @@ export default async function CandidatesPage({
         {candidates && candidates.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {candidates.map((candidate: any) => (
-              <Link key={candidate.id} href={`/candidates/${candidate.user_id}`} className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+              <Link key={candidate.id} href={`/candidates/${candidate.user_id}`} className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow dark:bg-gray-900">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                    <Users className="h-6 w-6 text-gray-400" />
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center dark:bg-gray-800">
+                    <Users className="h-6 w-6 text-gray-400 dark:text-gray-500" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">{candidate.profiles?.full_name || 'Candidate'}</h3>
-                    <p className="text-sm text-gray-600">{candidate.current_title || 'No title provided'}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-50">{candidate.profiles?.full_name || 'Candidate'}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{candidate.current_title || 'No title provided'}</p>
                   </div>
                 </div>
 
-                <p className="flex items-center gap-1 text-xs font-semibold text-indigo-700 mb-3">
+                <p className="flex items-center gap-1 text-xs font-semibold text-indigo-700 mb-3 dark:text-indigo-400">
                   <BadgeCheck className="h-3.5 w-3.5" />
                   Verified Expert{scoreByUserId.get(candidate.user_id) != null ? ` · Greyin Score ${scoreByUserId.get(candidate.user_id)}` : ''}
                 </p>
 
                 {candidate.profiles?.is_reentry && (
-                  <p className="flex items-center gap-1 text-xs font-medium text-blue-700 mb-3">
+                  <p className="flex items-center gap-1 text-xs font-medium text-blue-700 mb-3 dark:text-blue-400">
                     <RotateCcw className="h-3.5 w-3.5" />
                     Returning to work{candidate.profiles.reentry_reason ? ` · ${candidate.profiles.reentry_reason}` : ''}
                   </p>
                 )}
 
-                <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-3">
+                <div className="flex flex-wrap gap-4 text-xs text-gray-500 mb-3 dark:text-gray-400">
                   {candidate.experience_years != null && <span>{candidate.experience_years} yrs experience</span>}
                   {candidate.availability && <span className="capitalize">{candidate.availability.replace('_', ' ')}</span>}
                   {candidate.remote_preference && <span className="capitalize">{candidate.remote_preference}</span>}
@@ -226,7 +228,7 @@ export default async function CandidatesPage({
                 {candidate.skills && candidate.skills.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {candidate.skills.slice(0, 6).map((s: string) => (
-                      <span key={s} className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium">
+                      <span key={s} className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium dark:bg-indigo-950/40 dark:text-indigo-400">
                         {s}
                       </span>
                     ))}
@@ -236,10 +238,10 @@ export default async function CandidatesPage({
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
             <Briefcase className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No candidates found</h3>
-            <p className="text-gray-600">Try a different skill filter</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-50">No candidates found</h3>
+            <p className="text-gray-600 dark:text-gray-400">Try a different skill filter</p>
           </div>
         )}
       </div>

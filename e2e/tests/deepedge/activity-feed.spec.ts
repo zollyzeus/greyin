@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getUserIdByEmail, createTestFollow, deleteTestFollow } from '../../utils/admin'
+import { getUserIdByEmail, createTestFollow, deleteTestFollow, grantActiveSubscriptionTier } from '../../utils/admin'
 
 /**
  * Replicated activity-feed smoke test (see the Salt & Pepper reference:
@@ -18,6 +18,7 @@ test('a followed employer\'s new job appears in the follower\'s /feed via the jo
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(employerPage, employer, '/employer/dashboard')
 
   const jobTitle = `E2E Feed Job ${Date.now()}`

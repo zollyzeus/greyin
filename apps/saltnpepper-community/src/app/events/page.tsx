@@ -18,7 +18,7 @@ export default async function EventsPage() {
     .limit(50)
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
       <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-12">
@@ -32,7 +32,7 @@ export default async function EventsPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Upcoming</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Upcoming</h2>
           <Link
             href="/events/new"
             className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 font-semibold"
@@ -51,17 +51,17 @@ export default async function EventsPage() {
                 <Link
                   key={e.id}
                   href={`/events/${e.id}`}
-                  className="block bg-white rounded-lg shadow-md hover:shadow-lg transition p-6"
+                  className="block bg-white rounded-lg shadow-md hover:shadow-lg transition p-6 dark:bg-gray-900"
                 >
                   <div className="flex gap-4">
-                    <div className="w-14 h-14 bg-purple-100 rounded-lg flex flex-col items-center justify-center flex-shrink-0 text-purple-700">
+                    <div className="w-14 h-14 bg-purple-100 rounded-lg flex flex-col items-center justify-center flex-shrink-0 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400">
                       <span className="text-xs font-semibold uppercase">{new Date(e.starts_at).toLocaleDateString(undefined, { month: 'short' })}</span>
                       <span className="text-lg font-bold leading-none">{new Date(e.starts_at).getDate()}</span>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{e.title}</h3>
-                      <p className="text-gray-700 line-clamp-2 mb-3">{e.description}</p>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1 dark:text-gray-50">{e.title}</h3>
+                      <p className="text-gray-700 line-clamp-2 mb-3 dark:text-gray-300">{e.description}</p>
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                         <span className="flex items-center gap-1">
                           {e.is_virtual ? <Video className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
                           {e.is_virtual ? 'Virtual' : e.location || 'In person'}
@@ -83,10 +83,10 @@ export default async function EventsPage() {
             })}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
             <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No upcoming events</h3>
-            <p className="text-gray-600 mb-6">Be the first to host one.</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-50">No upcoming events</h3>
+            <p className="text-gray-600 mb-6 dark:text-gray-400">Be the first to host one.</p>
             <Link
               href="/events/new"
               className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-semibold"

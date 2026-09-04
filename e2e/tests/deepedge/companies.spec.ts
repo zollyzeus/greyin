@@ -1,9 +1,11 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
+import { grantActiveSubscriptionTier, getUserIdByEmail } from '../../utils/admin'
 
 test.describe('Company directory', () => {
   test('a new employer\'s company appears in the public directory with their job listed', async ({ page, cleanup }) => {
     const employer = await signUpDeepEdge(page, 'employer', cleanup)
+    await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
     await login(page, employer, '/employer/dashboard')
 
     const jobTitle = `E2E Company Directory Role ${Date.now()}`

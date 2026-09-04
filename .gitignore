@@ -30,6 +30,11 @@ e2e/playwright-report/
 /greyin_b1.7z
 /greyin_b2.7z
 
+# Database backups -- raw pg_dump output, never belongs in git regardless
+# of repo visibility. These accumulate automatically (nightly rotation)
+# and were previously committed by mistake; untracked going forward.
+deployment/backups/*.sql.gz
+
 # OS
 .DS_Store
 Thumbs.db

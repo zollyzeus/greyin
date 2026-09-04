@@ -21,20 +21,20 @@ export function MarkdownEditor({ defaultValue }: { defaultValue?: string }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Content (Markdown supported)
         </label>
         <button
           type="button"
           onClick={() => setShowPreview((v) => !v)}
-          className="text-xs font-medium text-blue-600 hover:text-blue-700"
+          className="text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
         >
           {showPreview ? 'Back to editing' : 'Preview'}
         </button>
       </div>
 
       {showPreview ? (
-        <div className="prose max-w-none border border-gray-300 rounded-lg p-4 min-h-[300px] bg-white">
+        <div className="prose max-w-none border border-gray-300 rounded-lg p-4 min-h-[300px] bg-white dark:border-gray-700 dark:bg-gray-900">
           <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
             {content || '*Nothing to preview yet.*'}
           </ReactMarkdown>
@@ -47,7 +47,7 @@ export function MarkdownEditor({ defaultValue }: { defaultValue?: string }) {
           required
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+          className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono text-sm dark:border-gray-700"
         />
       )}
     </div>

@@ -22,6 +22,12 @@ test('a freelancer can upload a cover image when listing a gig', async ({ page, 
   await page.getByRole('button', { name: 'Publish Gig' }).click()
   await page.waitForURL(/\/gigs\/[^/]+$/)
 
-  const coverImage = page.locator('img[src*="public-images/gig-images/"]')
+  // ImageUploader.tsx nests uploads under the uploader's own user.id
+  // before the folder name (`${user.id}/${folder}/...`), so the real
+  // storage path is public-images/<userId>/gig-images/<file> -- not
+  // public-images/gig-images/<file> adjacent, which this locator
+  // incorrectly assumed and could never match regardless of whether the
+  // upload itself worked.
+  const coverImage = page.locator('img[src*="/gig-images/"]')
   await expect(coverImage).toBeVisible()
 })

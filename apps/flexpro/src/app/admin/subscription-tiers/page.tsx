@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Briefcase, ArrowLeft, Layers } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 // Admin-configurable pricing + posting credits for the 3 FlexPro
 // posting tiers (096, product='flexpro_posting'). Same
@@ -34,40 +35,41 @@ export default async function SubscriptionTiersPage({
     .order('sort_order')
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-blue-600" />
+              <Briefcase className="h-8 w-8 text-orange-600 dark:text-orange-400" />
               <span className="ml-2 text-2xl font-bold">FlexPro</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/admin" className="flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/admin" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to admin
         </Link>
 
         <div className="flex items-center gap-2 mb-6">
-          <Layers className="h-6 w-6 text-blue-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Posting subscription tiers</h1>
+          <Layers className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Posting subscription tiers</h1>
         </div>
-        <p className="text-sm text-gray-600 mb-6">
+        <p className="text-sm text-gray-600 mb-6 dark:text-gray-400">
           Sets the monthly price and gig/job posting credit allowance for each tier. A subscriber can post
           this many gigs or client jobs (combined) per billing month; use <span className="font-mono">-1</span> for unlimited.
         </p>
 
         {success && (
-          <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+          <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
             Tier updated.
           </div>
         )}
         {error && (
-          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
             {decodeURIComponent(error)}
           </div>
         )}
@@ -80,31 +82,31 @@ export default async function SubscriptionTiersPage({
                 key={tier.id}
                 action="/api/admin/subscription-tiers/update"
                 method="POST"
-                className="bg-white rounded-lg shadow-md p-5 space-y-4"
+                className="bg-white rounded-lg shadow-md p-5 space-y-4 dark:bg-gray-900"
               >
                 <input type="hidden" name="tier_id" value={tier.id} />
                 <input type="hidden" name="return_to" value="/admin/subscription-tiers" />
-                <h2 className="font-semibold text-gray-900">{tier.name} <span className="text-xs text-gray-400 font-normal">({tier.tier_key})</span></h2>
+                <h2 className="font-semibold text-gray-900 dark:text-gray-50">{tier.name} <span className="text-xs text-gray-400 font-normal dark:text-gray-500">({tier.tier_key})</span></h2>
 
                 <label className="block text-sm">
-                  <span className="text-gray-600">Price (₹/mo)</span>
+                  <span className="text-gray-600 dark:text-gray-400">Price (₹/mo)</span>
                   <input
                     type="number"
                     name="price_inr"
                     min="0"
                     defaultValue={tier.price_inr}
-                    className="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2"
+                    className="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </label>
 
                 <label className="block text-sm">
-                  <span className="text-gray-600">Gig/job posting credits per month</span>
+                  <span className="text-gray-600 dark:text-gray-400">Gig/job posting credits per month</span>
                   <input
                     type="number"
                     name="gig_post_allowance"
                     min="-1"
                     defaultValue={gigCredit?.monthly_allowance ?? 0}
-                    className="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2"
+                    className="mt-1 w-full text-sm border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </label>
 

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Package, ArrowLeft, ShoppingCart, CreditCard } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function CheckoutPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -32,26 +33,27 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Link href={`/gigs/${params.id}`} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href={`/gigs/${params.id}`} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Gig</span>
           </Link>
-        </div>
+            <ThemeToggle />
+          </div>
       </header>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Checkout</h1>
-          <p className="text-gray-600">Complete your order for {gig.title}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 dark:text-gray-50">Checkout</h1>
+          <p className="text-gray-600 dark:text-gray-400">Complete your order for {gig.title}</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Order Summary */}
           <div className="md:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                 <ShoppingCart className="w-5 h-5" />
                 Order Summary
@@ -67,8 +69,8 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
                 )}
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg">{gig.title}</h3>
-                  <p className="text-sm text-gray-600">by {gig.seller?.full_name || 'Seller'}</p>
-                  <p className="text-xs text-gray-500 mt-1">{gig.category?.name}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">by {gig.seller?.full_name || 'Seller'}</p>
+                  <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">{gig.category?.name}</p>
                 </div>
               </div>
 
@@ -79,10 +81,10 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
                 <div className="space-y-3">
                   <label className="flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer hover:border-indigo-500 transition-colors">
                     <div className="flex items-center gap-3">
-                      <input type="radio" name="package" value="basic" defaultChecked className="w-4 h-4 text-indigo-600" />
+                      <input type="radio" name="package" value="basic" defaultChecked className="w-4 h-4 text-indigo-600 dark:text-indigo-400 dark:bg-gray-950 dark:text-gray-100" />
                       <div>
                         <p className="font-semibold">Basic Package</p>
-                        <p className="text-sm text-gray-600">Standard delivery</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Standard delivery</p>
                       </div>
                     </div>
                     <span className="font-bold text-lg">₹{packages.basic.toLocaleString()}</span>
@@ -90,10 +92,10 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
 
                   <label className="flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer hover:border-indigo-500 transition-colors">
                     <div className="flex items-center gap-3">
-                      <input type="radio" name="package" value="standard" className="w-4 h-4 text-indigo-600" />
+                      <input type="radio" name="package" value="standard" className="w-4 h-4 text-indigo-600 dark:text-indigo-400 dark:bg-gray-950 dark:text-gray-100" />
                       <div>
                         <p className="font-semibold">Standard Package</p>
-                        <p className="text-sm text-gray-600">Priority delivery with revisions</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Priority delivery with revisions</p>
                       </div>
                     </div>
                     <span className="font-bold text-lg">₹{packages.standard.toLocaleString()}</span>
@@ -101,10 +103,10 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
 
                   <label className="flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer hover:border-indigo-500 transition-colors">
                     <div className="flex items-center gap-3">
-                      <input type="radio" name="package" value="premium" className="w-4 h-4 text-indigo-600" />
+                      <input type="radio" name="package" value="premium" className="w-4 h-4 text-indigo-600 dark:text-indigo-400 dark:bg-gray-950 dark:text-gray-100" />
                       <div>
                         <p className="font-semibold">Premium Package</p>
-                        <p className="text-sm text-gray-600">Express delivery with unlimited revisions</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Express delivery with unlimited revisions</p>
                       </div>
                     </div>
                     <span className="font-bold text-lg">₹{packages.premium.toLocaleString()}</span>
@@ -116,21 +118,21 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
 
           {/* Payment Summary */}
           <div className="md:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6 sticky top-4">
+            <div className="bg-white rounded-lg shadow p-6 sticky top-4 dark:bg-gray-900">
               <h2 className="text-lg font-semibold mb-4">Payment Summary</h2>
               
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Package Price</span>
+                  <span className="text-gray-600 dark:text-gray-400">Package Price</span>
                   <span className="font-semibold" id="package-price">₹{packages.basic.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Service Fee (2%)</span>
+                  <span className="text-gray-600 dark:text-gray-400">Service Fee (2%)</span>
                   <span className="font-semibold" id="service-fee">₹{Math.round(packages.basic * 0.02).toLocaleString()}</span>
                 </div>
                 <div className="border-t pt-3 flex justify-between">
                   <span className="font-bold">Total</span>
-                  <span className="font-bold text-xl text-indigo-600" id="total-amount">₹{Math.round(packages.basic * 1.02).toLocaleString()}</span>
+                  <span className="font-bold text-xl text-indigo-600 dark:text-indigo-400" id="total-amount">₹{Math.round(packages.basic * 1.02).toLocaleString()}</span>
                 </div>
               </div>
 
@@ -142,7 +144,7 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
                 Proceed to Payment
               </button>
 
-              <p className="text-xs text-gray-500 mt-4 text-center">
+              <p className="text-xs text-gray-500 mt-4 text-center dark:text-gray-400">
                 Secure payment powered by Razorpay
               </p>
             </div>

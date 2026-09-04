@@ -128,7 +128,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+        <Loader2 className="w-6 h-6 animate-spin text-indigo-600 dark:text-indigo-400" />
       </div>
     )
   }
@@ -142,7 +142,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
   if (review && !showReviewForm) {
     return (
       <div className="space-y-4">
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-gray-50 rounded-lg p-4 dark:bg-gray-950">
           <div className="flex items-start gap-3 mb-3">
             <div className="flex-shrink-0">
               {review.reviewer.avatar_url ? (
@@ -174,9 +174,9 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
                 </div>
               </div>
               {review.review_text && (
-                <p className="text-gray-700 text-sm mb-2">{review.review_text}</p>
+                <p className="text-gray-700 text-sm mb-2 dark:text-gray-300">{review.review_text}</p>
               )}
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 {new Date(review.created_at).toLocaleDateString()}
               </span>
             </div>
@@ -184,11 +184,11 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
 
           {/* Seller Response */}
           {review.response && (
-            <div className="ml-13 mt-4 pl-4 border-l-2 border-indigo-200">
-              <p className="text-sm font-semibold text-indigo-600 mb-1">Seller Response:</p>
-              <p className="text-sm text-gray-700">{review.response}</p>
+            <div className="ml-13 mt-4 pl-4 border-l-2 border-indigo-200 dark:border-indigo-900">
+              <p className="text-sm font-semibold text-indigo-600 mb-1 dark:text-indigo-400">Seller Response:</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300">{review.response}</p>
               {review.response_at && (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   {new Date(review.response_at).toLocaleDateString()}
                 </span>
               )}
@@ -199,7 +199,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
           {isSeller && !review.response && (
             <button
               onClick={() => setShowResponseForm(!showResponseForm)}
-              className="mt-4 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+              className="mt-4 text-sm text-indigo-600 hover:text-indigo-700 font-medium dark:text-indigo-400 dark:hover:text-indigo-300"
             >
               Respond to Review
             </button>
@@ -209,7 +209,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
           {isBuyer && (
             <button
               onClick={() => setShowReviewForm(true)}
-              className="mt-4 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+              className="mt-4 text-sm text-indigo-600 hover:text-indigo-700 font-medium dark:text-indigo-400 dark:hover:text-indigo-300"
             >
               Edit Review
             </button>
@@ -218,15 +218,15 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
 
         {/* Response Form */}
         {showResponseForm && (
-          <form onSubmit={submitResponse} className="bg-white border-2 border-indigo-200 rounded-lg p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <form onSubmit={submitResponse} className="bg-white border-2 border-indigo-200 rounded-lg p-4 dark:bg-gray-900 dark:border-indigo-900">
+            <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
               Your Response
             </label>
             <textarea
               value={response}
               onChange={(e) => setResponse(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:border-gray-700"
               placeholder="Thank the customer and address their feedback..."
               required
             />
@@ -241,7 +241,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
               <button
                 type="button"
                 onClick={() => setShowResponseForm(false)}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
               >
                 Cancel
               </button>
@@ -257,7 +257,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
     return (
       <form onSubmit={submitReview} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
             Rate Your Experience *
           </label>
           <div className="flex items-center gap-1">
@@ -281,7 +281,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
               </button>
             ))}
             {rating > 0 && (
-              <span className="ml-2 text-sm text-gray-600">
+              <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
                 {rating === 1 && 'Poor'}
                 {rating === 2 && 'Fair'}
                 {rating === 3 && 'Good'}
@@ -293,14 +293,14 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
             Review (Optional)
           </label>
           <textarea
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:border-gray-700"
             placeholder="Share your experience with this service..."
           />
         </div>
@@ -321,7 +321,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
                 setRating(review.rating)
                 setReviewText(review.review_text || '')
               }}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
             >
               Cancel
             </button>
@@ -334,7 +334,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
   // Seller view - waiting for buyer to leave review
   if (isSeller) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
         <p>Waiting for buyer to leave a review...</p>
       </div>
     )

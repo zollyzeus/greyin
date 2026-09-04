@@ -13,14 +13,14 @@ export default async function ClientJobsPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Jobs</h1>
-            <p className="text-gray-600 mt-1">Posted by verified experts who need something done. Applying is free.</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">Jobs</h1>
+            <p className="text-gray-600 mt-1 dark:text-gray-400">Posted by verified experts who need something done. Applying is free.</p>
           </div>
           <Link href="/client-jobs/new" className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium">
             <PlusCircle className="h-4 w-4" />
@@ -31,28 +31,28 @@ export default async function ClientJobsPage() {
         {jobs && jobs.length > 0 ? (
           <div className="space-y-4">
             {jobs.map((job: any) => (
-              <Link key={job.id} href={`/client-jobs/${job.id}`} className="block bg-white rounded-lg shadow-md hover:shadow-lg transition p-6">
+              <Link key={job.id} href={`/client-jobs/${job.id}`} className="block bg-white rounded-lg shadow-md hover:shadow-lg transition p-6 dark:bg-gray-900">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">{job.title}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-2">{job.description}</p>
-                    <div className="flex items-center gap-2 mt-3 text-xs text-gray-500">
+                    <h3 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">{job.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2 dark:text-gray-400">{job.description}</p>
+                    <div className="flex items-center gap-2 mt-3 text-xs text-gray-500 dark:text-gray-400">
                       <User className="h-3.5 w-3.5" />
                       {job.client?.full_name || 'A client'}
                     </div>
                   </div>
                   {job.budget_amount && (
-                    <span className="font-bold text-gray-900 flex-shrink-0 ml-4">₹{job.budget_amount.toLocaleString('en-IN')}</span>
+                    <span className="font-bold text-gray-900 flex-shrink-0 ml-4 dark:text-gray-50">₹{job.budget_amount.toLocaleString('en-IN')}</span>
                   )}
                 </div>
               </Link>
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <Briefcase className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-sm font-medium text-gray-900 mb-1">No open jobs right now</h3>
-            <p className="text-sm text-gray-500">Check back soon, or post one yourself.</p>
+          <div className="bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
+            <Briefcase className="h-12 w-12 text-gray-400 mx-auto mb-4 dark:text-gray-500" />
+            <h3 className="text-sm font-medium text-gray-900 mb-1 dark:text-gray-50">No open jobs right now</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Check back soon, or post one yourself.</p>
           </div>
         )}
       </div>

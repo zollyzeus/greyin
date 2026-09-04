@@ -36,29 +36,29 @@ function VerifyForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:from-gray-950 dark:to-gray-900">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-teal-600">
+          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-teal-600 dark:text-teal-400">
             <FlaskConical className="w-8 h-8" />
             <span>StackWorks</span>
           </a>
-          <h2 className="mt-4 text-2xl font-bold text-gray-900">Verify your email</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-gray-50">Verify your email</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             We sent a 6-digit code to <span className="font-medium">{email || 'your email'}</span>
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 dark:bg-gray-900">
           {error && (
-            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="code" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Verification code
               </label>
               <input
@@ -71,7 +71,7 @@ function VerifyForm() {
                 maxLength={6}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-center text-2xl tracking-[0.5em] focus:outline-none focus:ring-teal-500 focus:border-teal-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-center text-2xl tracking-[0.5em] focus:outline-none focus:ring-teal-500 focus:border-teal-500 dark:border-gray-700"
                 placeholder="000000"
               />
             </div>
@@ -85,9 +85,9 @@ function VerifyForm() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
             Didn&apos;t get a code, or it expired?{' '}
-            <Link href="/signup" className="text-teal-600 hover:text-teal-500 font-medium">
+            <Link href="/signup" className="text-teal-600 hover:text-teal-500 font-medium dark:text-teal-400">
               Sign up again
             </Link>{' '}
             to get a new one.

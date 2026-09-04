@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Building2, MapPin, Users, Globe, ArrowLeft, Briefcase, Star } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function CompanyDetailPage({
   params,
@@ -68,49 +69,50 @@ export default async function CompanyDetailPage({
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Building2 className="h-8 w-8 text-blue-600" />
+              <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               <span className="ml-2 text-2xl font-bold">DeepEdge</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/companies" className="flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/companies" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to companies
         </Link>
 
         {success && (
-          <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+          <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
             Review submitted. Thanks for sharing.
           </div>
         )}
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
             {decodeURIComponent(error)}
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-md p-8 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 dark:bg-gray-800">
               {company.logo_url ? (
                 <img src={company.logo_url} alt={company.name} className="w-16 h-16 object-contain" />
               ) : (
-                <Building2 className="h-10 w-10 text-gray-400" />
+                <Building2 className="h-10 w-10 text-gray-400 dark:text-gray-500" />
               )}
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{company.name}</h1>
-              {company.industry && <p className="text-gray-600 mt-1">{company.industry}</p>}
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">{company.name}</h1>
+              {company.industry && <p className="text-gray-600 mt-1 dark:text-gray-400">{company.industry}</p>}
               {avgRating != null && (
-                <p className="flex items-center gap-1 text-sm text-amber-600 font-medium mt-1">
+                <p className="flex items-center gap-1 text-sm text-amber-600 font-medium mt-1 dark:text-amber-400">
                   <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                   {avgRating.toFixed(1)} &middot; {reviewCount} review{reviewCount === 1 ? '' : 's'}
                 </p>
@@ -119,10 +121,10 @@ export default async function CompanyDetailPage({
           </div>
 
           {company.description && (
-            <p className="text-gray-700 mt-6">{company.description}</p>
+            <p className="text-gray-700 mt-6 dark:text-gray-300">{company.description}</p>
           )}
 
-          <div className="flex flex-wrap gap-6 mt-6 text-sm text-gray-600">
+          <div className="flex flex-wrap gap-6 mt-6 text-sm text-gray-600 dark:text-gray-400">
             {company.location && (
               <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{company.location}</span>
             )}
@@ -130,47 +132,47 @@ export default async function CompanyDetailPage({
               <span className="flex items-center gap-1"><Users className="h-4 w-4" />{company.size} employees</span>
             )}
             {company.website && (
-              <a href={company.website} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-blue-600 hover:text-blue-700">
+              <a href={company.website} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                 <Globe className="h-4 w-4" />{company.website}
               </a>
             )}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Open Positions</h2>
+        <div className="bg-white rounded-lg shadow-md p-8 dark:bg-gray-900">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 dark:text-gray-50">Open Positions</h2>
           {jobs && jobs.length > 0 ? (
             <div className="space-y-3">
               {jobs.map((job) => (
                 <Link
                   key={job.id}
                   href={`/jobs/${job.id}`}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition"
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition dark:border-gray-800 dark:hover:border-blue-700"
                 >
                   <div>
-                    <h3 className="font-semibold text-gray-900">{job.title}</h3>
-                    <p className="text-sm text-gray-600">{job.location || 'Remote'} • {job.employment_type}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-50">{job.title}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{job.location || 'Remote'} • {job.employment_type}</p>
                   </div>
-                  <Briefcase className="h-5 w-5 text-gray-400" />
+                  <Briefcase className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                 </Link>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">No open positions right now.</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">No open positions right now.</p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-8 mt-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Reviews</h2>
-          <p className="text-sm text-gray-500 mb-4">
+        <div className="bg-white rounded-lg shadow-md p-8 mt-6 dark:bg-gray-900">
+          <h2 className="text-xl font-bold text-gray-900 mb-1 dark:text-gray-50">Reviews</h2>
+          <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">
             Only from candidates who actually applied here &mdash; shown anonymously.
           </p>
 
           {canReview && !alreadyReviewed && (
-            <form action={`/api/companies/${id}/reviews/create`} method="POST" className="border border-gray-200 rounded-lg p-4 mb-6 space-y-3">
+            <form action={`/api/companies/${id}/reviews/create`} method="POST" className="border border-gray-200 rounded-lg p-4 mb-6 space-y-3 dark:border-gray-800">
               <div>
-                <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-1">Your rating</label>
-                <select id="rating" name="rating" required defaultValue="" className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Your rating</label>
+                <select id="rating" name="rating" required defaultValue="" className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
                   <option value="" disabled>Select a rating</option>
                   {[5, 4, 3, 2, 1].map((n) => (
                     <option key={n} value={n}>{n} star{n === 1 ? '' : 's'}</option>
@@ -181,7 +183,7 @@ export default async function CompanyDetailPage({
                 name="review_text"
                 rows={3}
                 placeholder="What was your experience applying here? (optional)"
-                className="w-full border border-gray-300 rounded-lg p-3 text-sm"
+                className="w-full border border-gray-300 rounded-lg p-3 text-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
               />
               <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 text-sm font-semibold">
                 Submit review
@@ -189,25 +191,25 @@ export default async function CompanyDetailPage({
             </form>
           )}
           {alreadyReviewed && (
-            <p className="text-sm text-gray-500 mb-6">You&rsquo;ve already reviewed this company.</p>
+            <p className="text-sm text-gray-500 mb-6 dark:text-gray-400">You&rsquo;ve already reviewed this company.</p>
           )}
 
           {reviews && reviews.length > 0 ? (
             <div className="space-y-4">
               {reviews.map((review) => (
-                <div key={review.id} className="border-t border-gray-100 pt-4 first:border-t-0 first:pt-0">
+                <div key={review.id} className="border-t border-gray-100 pt-4 first:border-t-0 first:pt-0 dark:border-gray-800">
                   <div className="flex items-center gap-1 mb-1">
                     {[1, 2, 3, 4, 5].map((n) => (
                       <Star key={n} className={`h-4 w-4 ${n <= review.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`} />
                     ))}
-                    <span className="text-xs text-gray-400 ml-2">{new Date(review.created_at).toLocaleDateString()}</span>
+                    <span className="text-xs text-gray-400 ml-2 dark:text-gray-500">{new Date(review.created_at).toLocaleDateString()}</span>
                   </div>
-                  {review.review_text && <p className="text-sm text-gray-700">{review.review_text}</p>}
+                  {review.review_text && <p className="text-sm text-gray-700 dark:text-gray-300">{review.review_text}</p>}
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">No reviews yet.</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">No reviews yet.</p>
           )}
         </div>
       </div>

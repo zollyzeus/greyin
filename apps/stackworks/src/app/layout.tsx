@@ -25,10 +25,19 @@ function PreviewBanner() {
   )
 }
 
+// Light/dark mode (2026-09-04) -- see apps/greyin-hub/src/app/layout.tsx's
+// own comment for the full rationale. Applies the persisted (or
+// OS-default) theme to <html> before first paint, synchronously, so
+// there's no flash from light to dark for a visitor who'd chosen dark.
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('greyin:theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark')}catch(e){}})();`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${newsreader.variable} ${inter.variable}`}>
-      <body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
         <PreviewBanner />
         {children}
         <SiteFooter />

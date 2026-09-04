@@ -29,7 +29,7 @@ export default async function FeedbackPage({
     : { data: null }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-12">
@@ -41,44 +41,44 @@ export default async function FeedbackPage({
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {success && (
-          <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+          <div className="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
             Thanks for the feedback — the team will take a look.
           </div>
         )}
         {error && (
-          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
             {decodeURIComponent(error)}
           </div>
         )}
 
         {user ? (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <MessageSquareHeart className="h-5 w-5 text-indigo-600" />
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8 dark:bg-gray-900">
+            <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2 dark:text-gray-50">
+              <MessageSquareHeart className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               Share your feedback
             </h2>
             <form action="/api/feedback/create" method="POST" className="space-y-4">
               {app && <input type="hidden" name="source_app" value={app} />}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Rating (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Rating (optional)</label>
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <label key={n} className="cursor-pointer">
-                      <input type="radio" name="rating" value={n} className="peer sr-only" />
+                      <input type="radio" name="rating" value={n} className="peer sr-only dark:bg-gray-950 dark:text-gray-100" />
                       <Star className="h-7 w-7 text-gray-300 peer-checked:text-amber-400 peer-checked:fill-amber-400 hover:text-amber-300" />
                     </label>
                   ))}
                 </div>
               </div>
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Your feedback</label>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Your feedback</label>
                 <textarea
                   id="message"
                   name="message"
                   rows={5}
                   required
                   placeholder="What's on your mind?"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
               <button type="submit" className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 font-semibold text-sm">
@@ -87,17 +87,17 @@ export default async function FeedbackPage({
             </form>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8 text-sm text-gray-600">
-            <a href={`/login?next=/feedback${app ? `?app=${app}` : ''}`} className="text-indigo-600 hover:text-indigo-700 font-semibold">Sign in</a> to send feedback.
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8 text-sm text-gray-600 dark:bg-gray-900 dark:text-gray-400">
+            <a href={`/login?next=/feedback${app ? `?app=${app}` : ''}`} className="text-indigo-600 hover:text-indigo-700 font-semibold dark:text-indigo-400 dark:hover:text-indigo-300">Sign in</a> to send feedback.
           </div>
         )}
 
         {myFeedback && myFeedback.length > 0 && (
           <div>
-            <h2 className="font-semibold text-gray-900 mb-3">Your feedback history</h2>
+            <h2 className="font-semibold text-gray-900 mb-3 dark:text-gray-50">Your feedback history</h2>
             <div className="space-y-3">
               {myFeedback.map((f) => (
-                <div key={f.id} className="bg-white rounded-lg shadow p-5">
+                <div key={f.id} className="bg-white rounded-lg shadow p-5 dark:bg-gray-900">
                   <div className="flex items-center justify-between mb-2">
                     {f.rating && (
                       <div className="flex gap-0.5">
@@ -106,14 +106,14 @@ export default async function FeedbackPage({
                         ))}
                       </div>
                     )}
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${f.status === 'replied' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${f.status === 'replied' ? 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}`}>
                       {f.status === 'replied' ? 'Replied' : 'Awaiting reply'}
                     </span>
                   </div>
-                  <p className="text-gray-700 mb-2">{f.message}</p>
+                  <p className="text-gray-700 mb-2 dark:text-gray-300">{f.message}</p>
                   {f.admin_reply && (
-                    <div className="mt-3 pl-4 border-l-2 border-indigo-200 text-sm text-gray-700 bg-indigo-50/50 rounded-r-lg py-2 pr-3">
-                      <p className="font-medium text-indigo-700 mb-1">Team reply</p>
+                    <div className="mt-3 pl-4 border-l-2 border-indigo-200 text-sm text-gray-700 bg-indigo-50/50 rounded-r-lg py-2 pr-3 dark:border-indigo-900 dark:text-gray-300">
+                      <p className="font-medium text-indigo-700 mb-1 dark:text-indigo-400">Team reply</p>
                       {f.admin_reply}
                     </div>
                   )}

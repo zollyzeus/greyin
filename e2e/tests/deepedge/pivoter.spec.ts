@@ -1,12 +1,13 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getJobIdByTitle, getUserIdByEmail, grantActiveSubscription } from '../../utils/admin'
+import { getJobIdByTitle, getUserIdByEmail, grantActiveSubscription, grantActiveSubscriptionTier } from '../../utils/admin'
 
 test.describe('Pivoter track', () => {
   test('a Verified Expert who tags themselves a pivoter can apply to a career-changer job and is excluded from the general candidate pool', async ({ browser, cleanup }) => {
     const employerCtx = await browser.newContext()
     const employerPage = await employerCtx.newPage()
     const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+    await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
     await login(employerPage, employer, '/employer/dashboard')
     const employerId = await getUserIdByEmail(employer.email)
     await grantActiveSubscription(employerId)

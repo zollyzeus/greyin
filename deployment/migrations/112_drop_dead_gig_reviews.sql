@@ -1,0 +1,32 @@
+-- ============================================================
+-- Drop gig_reviews + gig_reviews_view: confirmed dead schema
+-- ============================================================
+--
+-- Found during a code-vs-database integrity audit (2026-09-04, direct
+-- user request). gig_reviews was FlexPro's (then FreeAgent's) original
+-- order-review table from 001_initial_schema.sql, touched once more by
+-- an RLS policy in 003_rls_enhancements.sql, then superseded five
+-- migrations later by order_reviews (006_order_reviews.sql) -- a
+-- richer redesign (reviewee_id for seller-side stats, helpful_count,
+-- a seller response/response_at field the original had no room for)
+-- with its own trigger-maintained aggregates on gigs/profiles. Never
+-- dropped afterward.
+--
+-- gig_reviews_view is not actually built on gig_reviews at all --
+-- despite the name, it was created fresh inside 006_order_reviews.sql
+-- itself, reading from the new order_reviews (joined with reviewer
+-- profile, order package_type, gig title). No app code ever adopted
+-- it; every page that needed review+context wrote its own equivalent
+-- select with embeds directly against order_reviews instead.
+--
+-- Verified safe to drop immediately before this migration: gig_reviews
+-- has 0 rows, 0 other tables reference it via foreign key, and nothing
+-- depends on gig_reviews_view. Confirmed via a full code/migration
+-- sweep that neither object is referenced anywhere in any of the 7
+-- apps' app code or in any other migration's functions/triggers.
+--
+-- Run this after 111_restore_future_interests_on_people_index.sql
+-- ============================================================
+
+DROP VIEW IF EXISTS public.gig_reviews_view;
+DROP TABLE IF EXISTS public.gig_reviews;

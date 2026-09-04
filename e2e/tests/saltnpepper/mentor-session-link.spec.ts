@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpSaltNPepper, signUpFlexPro, login, signUpDeepEdge } from '../../utils/auth'
-import { getUserIdByEmail } from '../../utils/admin'
+import { getUserIdByEmail, grantFreeagentSubscription } from '../../utils/admin'
 
 const isLocal = process.env.E2E_TARGET === 'local'
 const greyinB2BBase = isLocal ? `http://localhost:${process.env.E2E_DEEPEDGE_PORT || 3100}` : 'https://deepedge.greyin.net'
@@ -42,6 +42,12 @@ test('a mentor with a real bookable session shows a "Book a session" link on Sal
   // Create a real active session gig on FlexPro for this same mentor.
   const faCtx = await browser.newContext()
   const faPage = await faCtx.newPage()
+  // gigs' own INSERT RLS policy requires an active flexpro_subscriptions
+  // row -- mentor-session creation reuses the gigs table (056) so this
+  // applies here too, but api/mentor-sessions/gigs/route.ts has no
+  // pre-check, so a missing grant fails silently as a generic "Could not
+  // create session type" redirect instead of a helpful /subscribe one.
+  await grantFreeagentSubscription(mentorId)
   await login(faPage, mentor, `${flexproBase}/dashboard`, flexproBase)
   const sessionTitle = `E2E Cross-App Session ${Date.now()}`
   await faPage.goto(`${flexproBase}/mentor-sessions/manage`)

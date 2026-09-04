@@ -3,7 +3,10 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { isBuilder } from '@/lib/stackworks-role'
 import { absoluteUrl } from '@/lib/site-url'
-import { FlaskConical, FolderKanban, ClipboardList, Hammer, Settings, LogOut, ShieldCheck, Users, Bell, Rss } from 'lucide-react'
+import { FlaskConical, FolderKanban, ClipboardList, Hammer, Settings, LogOut, ShieldCheck, Users, Rss } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { NotificationBell } from '@/components/NotificationBell'
+import { EcosystemWidget } from '@/components/EcosystemWidget'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -21,11 +24,10 @@ export default async function DashboardPage() {
 
   const builder = profile ? isBuilder(profile) : false
 
-  const { count: unreadCount } = await supabase
-    .from('notifications')
-    .select('id', { count: 'exact', head: true })
+  const { data: memberships } = await supabase
+    .from('pillar_memberships')
+    .select('pillar')
     .eq('user_id', user.id)
-    .eq('read', false)
 
   const { data: myUpdates } = await supabase
     .from('project_updates')
@@ -41,11 +43,11 @@ export default async function DashboardPage() {
     : { count: 0 }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-950 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <a href="https://greyin.net" className="flex items-center gap-2 text-xl font-bold text-teal-600">
+            <a href="https://greyin.net" className="flex items-center gap-2 text-xl font-bold text-teal-600 dark:text-teal-400">
               <FlaskConical className="w-6 h-6" />
               <span>StackWorks</span>
             </a>
@@ -53,17 +55,11 @@ export default async function DashboardPage() {
               <Link href="/feed" className="p-2" title="Feed">
                 <Rss className="w-5 h-5" />
               </Link>
-              <Link href="/notifications" className="relative p-2" title="Notifications">
-                <Bell className="w-5 h-5" />
-                {!!unreadCount && (
-                  <span className="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </Link>
+              <NotificationBell />
               <Link href="/profile" className="p-2" title="Profile">
                 <Settings className="w-5 h-5" />
               </Link>
+                <ThemeToggle />
               <form action="/auth/logout" method="POST">
                 <button className="flex items-center gap-2 px-4 py-2">
                   <LogOut className="w-4 h-4" />
@@ -76,7 +72,7 @@ export default async function DashboardPage() {
       </header>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-1">Welcome, {profile?.full_name || (builder ? 'Builder' : 'Supporter')}!</h1>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 mb-6 dark:text-gray-400">
           {builder
             ? (askCount ?? 0) > 0
               ? `You have posted ${askCount} ask${askCount === 1 ? '' : 's'}. Review who applies below.`
@@ -84,40 +80,40 @@ export default async function DashboardPage() {
             : 'Browse open asks and apply to help a Builder ship.'}
         </p>
         <div className="grid gap-4 md:grid-cols-2">
-          <Link href="/projects" className="p-6 bg-white rounded-lg shadow hover:shadow-lg">
-            <FolderKanban className="w-8 h-8 text-teal-600 mb-2" />
+          <Link href="/projects" className="p-6 bg-white rounded-lg shadow hover:shadow-lg dark:bg-gray-900">
+            <FolderKanban className="w-8 h-8 text-teal-600 mb-2 dark:text-teal-400" />
             <h2 className="text-xl font-semibold">Browse Projects</h2>
-            <p className="text-gray-600">See what Builders are shipping and where they need help</p>
+            <p className="text-gray-600 dark:text-gray-400">See what Builders are shipping and where they need help</p>
           </Link>
-          <Link href="/applications" className="p-6 bg-white rounded-lg shadow hover:shadow-lg">
-            <ClipboardList className="w-8 h-8 text-teal-600 mb-2" />
+          <Link href="/applications" className="p-6 bg-white rounded-lg shadow hover:shadow-lg dark:bg-gray-900">
+            <ClipboardList className="w-8 h-8 text-teal-600 mb-2 dark:text-teal-400" />
             <h2 className="text-xl font-semibold">My Applications</h2>
-            <p className="text-gray-600">Track the asks you've applied to</p>
+            <p className="text-gray-600 dark:text-gray-400">Track the asks you've applied to</p>
           </Link>
-          <Link href="/people" className="p-6 bg-white rounded-lg shadow hover:shadow-lg">
-            <Users className="w-8 h-8 text-teal-600 mb-2" />
+          <Link href="/people" className="p-6 bg-white rounded-lg shadow hover:shadow-lg dark:bg-gray-900">
+            <Users className="w-8 h-8 text-teal-600 mb-2 dark:text-teal-400" />
             <h2 className="text-xl font-semibold">People</h2>
-            <p className="text-gray-600">See Builders and Supporters with a verified track record</p>
+            <p className="text-gray-600 dark:text-gray-400">See Builders and Supporters with a verified track record</p>
           </Link>
           {builder && (
-            <Link href="/projects/new" className="p-6 bg-white rounded-lg shadow hover:shadow-lg">
-              <Hammer className="w-8 h-8 text-teal-600 mb-2" />
+            <Link href="/projects/new" className="p-6 bg-white rounded-lg shadow hover:shadow-lg dark:bg-gray-900">
+              <Hammer className="w-8 h-8 text-teal-600 mb-2 dark:text-teal-400" />
               <h2 className="text-xl font-semibold">Post a Project</h2>
-              <p className="text-gray-600">Share what you're building and open asks for help</p>
+              <p className="text-gray-600 dark:text-gray-400">Share what you're building and open asks for help</p>
             </Link>
           )}
           {profile?.role === 'admin' && (
-            <Link href="/admin" className="p-6 bg-white rounded-lg shadow hover:shadow-lg">
-              <ShieldCheck className="w-8 h-8 text-red-600 mb-2" />
+            <Link href="/admin" className="p-6 bg-white rounded-lg shadow hover:shadow-lg dark:bg-gray-900">
+              <ShieldCheck className="w-8 h-8 text-red-600 mb-2 dark:text-red-400" />
               <h2 className="text-xl font-semibold">Admin</h2>
-              <p className="text-gray-600">Moderate projects and asks</p>
+              <p className="text-gray-600 dark:text-gray-400">Moderate projects and asks</p>
             </Link>
           )}
         </div>
 
-        <div className="mt-8 bg-white rounded-lg shadow p-6">
+        <div className="mt-8 bg-white rounded-lg shadow p-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-1">Your track record badge</h2>
-          <p className="text-gray-500 text-sm mb-4">
+          <p className="text-gray-500 text-sm mb-4 dark:text-gray-400">
             Embed your verified outcome count on a resume, LinkedIn, or personal site &mdash; no login required to view it.
           </p>
           <div className="flex flex-wrap items-center gap-4">
@@ -126,32 +122,32 @@ export default async function DashboardPage() {
             <textarea
               readOnly
               rows={2}
-              className="flex-1 min-w-[260px] border border-gray-200 rounded-lg p-2 text-xs font-mono text-gray-600 bg-gray-50"
+              className="flex-1 min-w-[260px] border border-gray-200 rounded-lg p-2 text-xs font-mono text-gray-600 bg-gray-50 dark:border-gray-800 dark:text-gray-400 dark:bg-gray-950"
               value={`[![StackWorks track record](${absoluteUrl(`/api/badge/${user.id}`)})](${absoluteUrl('/people')})`}
             />
           </div>
         </div>
 
         {myUpdates && myUpdates.length > 0 && (
-          <div className="mt-8 bg-white rounded-lg shadow p-6">
+          <div className="mt-8 bg-white rounded-lg shadow p-6 dark:bg-gray-900">
             <h2 className="text-lg font-semibold mb-4">My recent activity</h2>
             <div className="divide-y">
               {myUpdates.map((u: any) => (
                 <div key={u.id} className="py-3 flex items-center justify-between gap-4">
-                  <Link href={`/projects/${u.project_id}`} className="font-medium text-gray-900 hover:text-teal-600">
+                  <Link href={`/projects/${u.project_id}`} className="font-medium text-gray-900 hover:text-teal-600 dark:text-gray-50">
                     Update on {u.builder_projects?.title || 'project'}
                   </Link>
                   <form action={`/api/project-updates/${u.id}/feed-visibility`} method="POST" className="flex items-center gap-2">
                     <select
                       name="feed_visibility"
                       defaultValue={u.feed_visibility}
-                      className="text-xs border border-gray-300 rounded-lg px-2 py-1"
+                      className="text-xs border border-gray-300 rounded-lg px-2 py-1 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                     >
                       <option value="public">Public</option>
                       <option value="followers">Followers only</option>
                       <option value="private">Don&rsquo;t include</option>
                     </select>
-                    <button type="submit" className="text-xs font-medium text-teal-600 hover:text-teal-700">
+                    <button type="submit" className="text-xs font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300">
                       Save
                     </button>
                   </form>
@@ -160,6 +156,9 @@ export default async function DashboardPage() {
             </div>
           </div>
         )}
+        <div className="mt-8">
+          <EcosystemWidget activePillars={(memberships || []).map((m) => m.pillar)} />
+        </div>
       </div>
     </div>
   )

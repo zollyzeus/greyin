@@ -48,14 +48,14 @@ export function ImageUploader({ name, defaultValue, folder }: { name: string; de
       <input type="hidden" name={name} value={url} />
       {url && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt="" className="w-40 h-24 object-cover rounded mb-2 border border-gray-200" />
+        <img src={url} alt="" className="w-40 h-24 object-cover rounded mb-2 border border-gray-200 dark:border-gray-800" />
       )}
-      <label className="inline-flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-50">
+      <label className="inline-flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-50 dark:text-gray-400 dark:border-gray-700 dark:hover:bg-gray-800">
         <ImagePlus className="w-4 h-4" />
         <span>{uploading ? 'Uploading...' : url ? 'Change image' : 'Upload image'}</span>
-        <input type="file" accept="image/*" onChange={handleFile} className="hidden" disabled={uploading} />
+        <input type="file" accept="image/*" onChange={handleFile} className="hidden dark:bg-gray-950 dark:text-gray-100" disabled={uploading} />
       </label>
-      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+      {error && <p className="text-xs text-red-600 mt-1 dark:text-red-400">{error}</p>}
     </div>
   )
 }

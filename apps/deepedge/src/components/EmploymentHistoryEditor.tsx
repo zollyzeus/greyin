@@ -27,17 +27,17 @@ export function EmploymentHistoryEditor({ entries }: { entries: EmploymentHistor
           {entries.map((entry) => (
             <div key={entry.id} className="p-4 flex items-start justify-between gap-4">
               <div>
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-gray-900 dark:text-gray-50">
                   {entry.title} &middot; {entry.company}
                 </p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-500 mt-0.5 dark:text-gray-400">
                   {entry.location ? `${entry.location} · ` : ''}
                   {entry.start_date} &ndash; {entry.is_current ? 'Present' : entry.end_date || '—'}
                   {entry.salary_amount ? ` · ${entry.currency || 'USD'} ${entry.salary_amount.toLocaleString()}` : ''}
                 </p>
               </div>
               <form action={`/api/candidates/employment-history/${entry.id}`} method="POST">
-                <button type="submit" className="text-xs font-medium text-red-600 hover:text-red-700 whitespace-nowrap">
+                <button type="submit" className="text-xs font-medium text-red-600 hover:text-red-700 whitespace-nowrap dark:text-red-400 dark:hover:text-red-300">
                   Remove
                 </button>
               </form>
@@ -47,12 +47,12 @@ export function EmploymentHistoryEditor({ entries }: { entries: EmploymentHistor
       )}
 
       <form action="/api/candidates/employment-history" method="POST" className="border rounded-lg p-4 space-y-3">
-        <p className="text-sm font-medium text-gray-700">Add a past role</p>
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Add a past role</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <input name="title" type="text" required placeholder="Title" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input name="company" type="text" required placeholder="Company" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <input name="location" type="text" placeholder="Location" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <select name="level" defaultValue="" className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+          <input name="title" type="text" required placeholder="Title" className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
+          <input name="company" type="text" required placeholder="Company" className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
+          <input name="location" type="text" placeholder="Location" className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
+          <select name="level" defaultValue="" className="border border-gray-300 rounded-lg px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
             <option value="">Level (optional)</option>
             <option value="junior">Junior</option>
             <option value="mid">Mid</option>
@@ -62,23 +62,23 @@ export function EmploymentHistoryEditor({ entries }: { entries: EmploymentHistor
             <option value="executive">Executive</option>
           </select>
           <div>
-            <label htmlFor="start_date" className="block text-xs text-gray-500 mb-1">Start date</label>
-            <input id="start_date" name="start_date" type="date" required className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full" />
+            <label htmlFor="start_date" className="block text-xs text-gray-500 mb-1 dark:text-gray-400">Start date</label>
+            <input id="start_date" name="start_date" type="date" required className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
           </div>
           <div>
-            <label htmlFor="end_date" className="block text-xs text-gray-500 mb-1">End date (leave blank if current)</label>
-            <input id="end_date" name="end_date" type="date" className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full" />
+            <label htmlFor="end_date" className="block text-xs text-gray-500 mb-1 dark:text-gray-400">End date (leave blank if current)</label>
+            <input id="end_date" name="end_date" type="date" className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
           </div>
         </div>
-        <label className="flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" name="is_current" value="true" className="rounded" />
+        <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+          <input type="checkbox" name="is_current" value="true" className="rounded dark:bg-gray-950 dark:text-gray-100" />
           This is my current role
         </label>
         <div>
-          <label htmlFor="salary_amount" className="block text-xs text-gray-500 mb-1">
+          <label htmlFor="salary_amount" className="block text-xs text-gray-500 mb-1 dark:text-gray-400">
             Salary at the time (private — only used in anonymized salary trend aggregates)
           </label>
-          <input id="salary_amount" name="salary_amount" type="number" min={0} placeholder="e.g. 150000" className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-48" />
+          <input id="salary_amount" name="salary_amount" type="number" min={0} placeholder="e.g. 150000" className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-full sm:w-48 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
         </div>
         <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-sm font-semibold">
           Add

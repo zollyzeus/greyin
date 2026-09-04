@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Building2, ArrowLeft } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 interface ApplyPageProps {
   params: Promise<{ id: string }>
@@ -44,40 +45,41 @@ export default async function ApplyPage({ params, searchParams }: ApplyPageProps
     : { data: null }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Building2 className="h-8 w-8 text-blue-600" />
+              <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               <span className="ml-2 text-2xl font-bold">DeepEdge</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href={`/jobs/${id}`} className="flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href={`/jobs/${id}`} className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to job
         </Link>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+        <div className="bg-white rounded-lg shadow-md p-8 dark:bg-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1 dark:text-gray-50">
             Apply for {job.title}
           </h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 dark:text-gray-400">
             at {(job.companies as unknown as { name: string } | null)?.name || 'this company'}
           </p>
 
           {error && (
-            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
               {decodeURIComponent(error)}
             </div>
           )}
 
           {existingApplication ? (
-            <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-700">
+            <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-sm text-blue-700 dark:bg-blue-950/40 dark:border-blue-900 dark:text-blue-400">
               You already applied to this job. Current status:{' '}
               <span className="font-semibold capitalize">{existingApplication.status}</span>.{' '}
               <Link href="/dashboard/applications" className="underline">
@@ -89,20 +91,20 @@ export default async function ApplyPage({ params, searchParams }: ApplyPageProps
               <input type="hidden" name="job_id" value={id} />
 
               <div>
-                <label htmlFor="cover_letter" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="cover_letter" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Cover letter
                 </label>
                 <textarea
                   id="cover_letter"
                   name="cover_letter"
                   rows={6}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   placeholder="Tell them why you're a great fit..."
                 />
               </div>
 
               <div>
-                <label htmlFor="resume_url" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="resume_url" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Resume URL
                 </label>
                 <input
@@ -110,17 +112,17 @@ export default async function ApplyPage({ params, searchParams }: ApplyPageProps
                   name="resume_url"
                   type="url"
                   defaultValue={candidate?.resume_url || ''}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   placeholder="https://..."
                 />
                 {candidate?.resume_url && (
-                  <p className="text-xs text-gray-500 mt-1">Pre-filled from your profile — edit if this role needs a different resume.</p>
+                  <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Pre-filled from your profile — edit if this role needs a different resume.</p>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="expected_salary" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="expected_salary" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Expected salary
                   </label>
                   <input
@@ -128,20 +130,20 @@ export default async function ApplyPage({ params, searchParams }: ApplyPageProps
                     name="expected_salary"
                     type="number"
                     min={0}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                     placeholder="120000"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="available_from" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="available_from" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Available from
                   </label>
                   <input
                     id="available_from"
                     name="available_from"
                     type="date"
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
               </div>

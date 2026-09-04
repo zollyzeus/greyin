@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Briefcase, ArrowLeft, ShieldCheck } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function AdminPage({
   searchParams,
@@ -47,46 +48,47 @@ export default async function AdminPage({
     .limit(50)
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-blue-600" />
+              <Briefcase className="h-8 w-8 text-orange-600 dark:text-orange-400" />
               <span className="ml-2 text-2xl font-bold">FlexPro</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to dashboard
         </Link>
 
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-6 w-6 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Admin</h1>
+            <ShieldCheck className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Admin</h1>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/admin/subscription-tiers" className="text-sm font-medium text-gray-600 hover:text-blue-600">
+            <Link href="/admin/subscription-tiers" className="text-sm font-medium text-gray-600 hover:text-blue-600 dark:text-gray-400">
               Posting tiers & credits →
             </Link>
             {/* AI providers/feature flags are platform-wide (llm_providers/
                 llm_feature_flags have no per-app scoping), managed from
                 this one panel rather than duplicated per app. */}
-            <a href="https://stackworks.greyin.net/admin/llm" className="text-sm font-medium text-gray-600 hover:text-blue-600">
+            <a href="https://stackworks.greyin.net/admin/llm" className="text-sm font-medium text-gray-600 hover:text-blue-600 dark:text-gray-400">
               Manage AI providers →
             </a>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4">Pending withdrawal requests</h2>
           {error && (
-            <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
               {decodeURIComponent(error)}
             </div>
           )}
@@ -96,25 +98,25 @@ export default async function AdminPage({
                 <div key={p.id} className="py-3 flex items-center justify-between gap-4">
                   <div>
                     <p className="font-medium">₹{p.amount.toLocaleString()} &middot; {p.bank_account_name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       A/C {p.bank_account_number} &middot; {p.bank_ifsc} &middot; requested {new Date(p.requested_at).toLocaleDateString()}
                     </p>
                     {p.failure_reason && (
-                      <p className="text-xs text-red-600 mt-1">Last attempt failed: {p.failure_reason}</p>
+                      <p className="text-xs text-red-600 mt-1 dark:text-red-400">Last attempt failed: {p.failure_reason}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
                     <form action="/api/admin/payouts/update" method="POST">
                       <input type="hidden" name="payout_id" value={p.id} />
                       <input type="hidden" name="status" value="paid" />
-                      <button type="submit" className="text-sm font-medium text-green-600 hover:text-green-700">
+                      <button type="submit" className="text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300">
                         Mark paid
                       </button>
                     </form>
                     <form action="/api/admin/payouts/update" method="POST">
                       <input type="hidden" name="payout_id" value={p.id} />
                       <input type="hidden" name="status" value="rejected" />
-                      <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700">
+                      <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
                         Reject
                       </button>
                     </form>
@@ -123,11 +125,11 @@ export default async function AdminPage({
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">No pending withdrawal requests.</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">No pending withdrawal requests.</p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4">Disputed orders</h2>
           {disputedOrders && disputedOrders.length > 0 ? (
             <div className="divide-y">
@@ -135,23 +137,23 @@ export default async function AdminPage({
                 <div key={o.id} className="py-3 flex items-center justify-between gap-4">
                   <div>
                     <p className="font-medium">{o.gig?.title || 'Order'} &middot; ₹{o.amount.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       Buyer: {o.buyer?.full_name || o.buyer?.email} &middot; Seller: {o.seller?.full_name || o.seller?.email}
                     </p>
-                    {o.dispute_reason && <p className="text-xs text-gray-600 mt-1">{o.dispute_reason}</p>}
+                    {o.dispute_reason && <p className="text-xs text-gray-600 mt-1 dark:text-gray-400">{o.dispute_reason}</p>}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <form action="/api/admin/orders/resolve-dispute" method="POST">
                       <input type="hidden" name="orderId" value={o.id} />
                       <input type="hidden" name="resolution" value="release" />
-                      <button type="submit" className="text-sm font-medium text-green-600 hover:text-green-700">
+                      <button type="submit" className="text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300">
                         Release to freelancer
                       </button>
                     </form>
                     <form action="/api/admin/orders/resolve-dispute" method="POST">
                       <input type="hidden" name="orderId" value={o.id} />
                       <input type="hidden" name="resolution" value="refund" />
-                      <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700">
+                      <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
                         Refund buyer
                       </button>
                     </form>
@@ -160,11 +162,11 @@ export default async function AdminPage({
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">No disputed orders.</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">No disputed orders.</p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4">Gig listings</h2>
           {gigs && gigs.length > 0 ? (
             <div className="divide-y">
@@ -172,11 +174,11 @@ export default async function AdminPage({
                 <div key={gig.id} className="py-3 flex items-center justify-between">
                   <div>
                     <p className="font-medium">{gig.title}</p>
-                    <span className="text-xs text-gray-500 capitalize">{gig.status}</span>
+                    <span className="text-xs text-gray-500 capitalize dark:text-gray-400">{gig.status}</span>
                   </div>
                   <form action="/api/admin/gigs/close" method="POST">
                     <input type="hidden" name="gig_id" value={gig.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700">
+                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
                       Close listing
                     </button>
                   </form>
@@ -184,31 +186,31 @@ export default async function AdminPage({
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">No active gig listings.</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">No active gig listings.</p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mt-6">
+        <div className="bg-white rounded-lg shadow-md p-6 mt-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4">Users</h2>
           <div className="divide-y">
             {users?.map((u) => (
               <div key={u.id} className="py-3 flex items-center justify-between gap-4">
                 <div>
                   <p className="font-medium">{u.full_name || u.email}</p>
-                  <p className="text-xs text-gray-500">{u.email}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{u.email}</p>
                 </div>
                 <form action="/api/admin/users/update-role" method="POST" className="flex items-center gap-2">
                   <input type="hidden" name="user_id" value={u.id} />
                   <select
                     name="role"
                     defaultValue={u.role}
-                    className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 capitalize"
+                    className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 capitalize dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   >
                     {['client', 'freelancer', 'admin'].map((r) => (
                       <option key={r} value={r}>{r}</option>
                     ))}
                   </select>
-                  <button type="submit" className="text-sm font-medium text-blue-600 hover:text-blue-700">
+                  <button type="submit" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                     Update
                   </button>
                 </form>

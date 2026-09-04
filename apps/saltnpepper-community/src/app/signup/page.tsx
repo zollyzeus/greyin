@@ -17,24 +17,24 @@ export default async function SignupPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:from-gray-950 dark:to-gray-900">
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8">
-          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-purple-600">
+          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-purple-600 dark:text-purple-400">
             <Users className="w-8 h-8" />
             <span>Salt & Pepper</span>
           </a>
-          <h2 className="font-display mt-4 text-2xl font-semibold text-gray-900">Request an invite</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <h2 className="font-display mt-4 text-2xl font-semibold text-gray-900 dark:text-gray-50">Request an invite</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             A private lounge for senior domain talent
           </p>
         </div>
 
         {/* Signup Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8 dark:bg-gray-900">
           {searchParams?.error && (
-            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
               {searchParams.error}
             </div>
           )}
@@ -42,7 +42,7 @@ export default async function SignupPage({
           <form action="/auth/signup" method="POST" className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="first-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   First name
                 </label>
                 <input
@@ -50,13 +50,13 @@ export default async function SignupPage({
                   name="first_name"
                   type="text"
                   required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   placeholder="John"
                 />
               </div>
 
               <div>
-                <label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="last-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Last name
                 </label>
                 <input
@@ -64,14 +64,14 @@ export default async function SignupPage({
                   name="last_name"
                   type="text"
                   required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   placeholder="Doe"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email address
               </label>
               <input
@@ -80,13 +80,13 @@ export default async function SignupPage({
                 type="email"
                 autoComplete="email"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="years-experience" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="years-experience" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Years of professional experience
               </label>
               <input
@@ -95,16 +95,16 @@ export default async function SignupPage({
                 type="number"
                 min={0}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="14"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Salt & Pepper is reserved for senior professionals.
               </p>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Password
               </label>
               <input
@@ -114,14 +114,14 @@ export default async function SignupPage({
                 autoComplete="new-password"
                 required
                 minLength={8}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="••••••••"
               />
-              <p className="mt-1 text-sm text-gray-500">Must be at least 8 characters</p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Must be at least 8 characters</p>
             </div>
 
             <div>
-              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Confirm password
               </label>
               <input
@@ -130,7 +130,7 @@ export default async function SignupPage({
                 type="password"
                 autoComplete="new-password"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="••••••••"
               />
             </div>
@@ -141,15 +141,15 @@ export default async function SignupPage({
                 name="terms"
                 type="checkbox"
                 required
-                className="h-4 w-4 mt-1 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                className="h-4 w-4 mt-1 text-purple-600 focus:ring-purple-500 border-gray-300 rounded dark:text-purple-400 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
               />
-              <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
+              <label htmlFor="terms" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                 I agree to the{' '}
-                <Link href="/terms" className="text-purple-600 hover:text-purple-500">
+                <Link href="/terms" className="text-purple-600 hover:text-purple-500 dark:text-purple-400">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link href="/privacy" className="text-purple-600 hover:text-purple-500">
+                <Link href="/privacy" className="text-purple-600 hover:text-purple-500 dark:text-purple-400">
                   Privacy Policy
                 </Link>
               </label>
@@ -166,17 +166,17 @@ export default async function SignupPage({
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-gray-300 dark:border-gray-700" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Already a member?</span>
+                <span className="px-2 bg-white text-gray-500 dark:bg-gray-900 dark:text-gray-400">Already a member?</span>
               </div>
             </div>
 
             <div className="mt-6">
               <Link
                 href="/login"
-                className="w-full flex justify-center py-3 px-4 border border-purple-600 rounded-lg shadow-sm text-sm font-medium text-purple-600 bg-white hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+                className="w-full flex justify-center py-3 px-4 border border-purple-600 rounded-lg shadow-sm text-sm font-medium text-purple-600 bg-white hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors dark:text-purple-400 dark:bg-gray-900 dark:hover:bg-purple-950/40"
               >
                 Sign in instead
               </Link>

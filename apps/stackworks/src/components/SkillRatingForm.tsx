@@ -47,7 +47,7 @@ export default function SkillRatingForm({
 
   if (!skills || skills.length === 0) return null
   if (loading) {
-    return <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+    return <Loader2 className="w-4 h-4 animate-spin text-gray-400 dark:text-gray-500" />
   }
 
   async function rate(skill: string, rating: number, revise: boolean) {
@@ -72,8 +72,8 @@ export default function SkillRatingForm({
 
   return (
     <div className="mt-4 pt-4 border-t">
-      <p className="text-sm font-medium text-gray-900 mb-2">Rate specific skills</p>
-      {error && <p className="text-xs text-red-600 mb-2">{error}</p>}
+      <p className="text-sm font-medium text-gray-900 mb-2 dark:text-gray-50">Rate specific skills</p>
+      {error && <p className="text-xs text-red-600 mb-2 dark:text-red-400">{error}</p>}
       <div className="space-y-2">
         {skills.map((skill) => {
           const saved = ratings[skill]
@@ -82,7 +82,7 @@ export default function SkillRatingForm({
           const current = saved?.rating || 0
           return (
             <div key={skill} className="flex items-center justify-between gap-3">
-              <span className="text-sm text-gray-700">{skill}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{skill}</span>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button
@@ -95,9 +95,9 @@ export default function SkillRatingForm({
                     <Star className={`w-4 h-4 ${n <= current ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`} />
                   </button>
                 ))}
-                {saved?.stage === 'verified' && <span className="text-xs text-teal-600 ml-1">Verified</span>}
-                {saved?.stage === 'initial' && !verified && <span className="text-xs text-gray-400 ml-1">Saved</span>}
-                {canRevise && <span className="text-xs text-gray-400 ml-1">Tap to revise</span>}
+                {saved?.stage === 'verified' && <span className="text-xs text-teal-600 ml-1 dark:text-teal-400">Verified</span>}
+                {saved?.stage === 'initial' && !verified && <span className="text-xs text-gray-400 ml-1 dark:text-gray-500">Saved</span>}
+                {canRevise && <span className="text-xs text-gray-400 ml-1 dark:text-gray-500">Tap to revise</span>}
               </div>
             </div>
           )

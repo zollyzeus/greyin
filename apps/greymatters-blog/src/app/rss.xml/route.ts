@@ -28,10 +28,24 @@ export async function GET() {
       },
     }
   )
-  const posts: Array<{ title: string; slug: string; excerpt: string | null; published_at: string }> =
-    await postsRes.json().catch(() => [])
+  // A failed request can still resolve with valid JSON that isn't a post
+  // array -- a PostgREST error body ({message, code, ...}) on a non-2xx
+  // response, most commonly. .catch(() => []) alone only guards a JSON
+  // *parse* failure; it does nothing for a well-formed non-array body,
+  // which then reaches posts.map() below and throws (found via a local
+  // build with no reachable Supabase host, but the same shape of failure
+  // -- a non-2xx response with a parseable body -- can happen in
+  // production too, so this is a real defensive gap, not just a
+  // local-environment quirk). Gate on both postsRes.ok and Array.isArray
+  // so any failure mode here degrades to an empty feed instead of a
+  // 500.
+  let posts: Array<{ title: string; slug: string; excerpt: string | null; published_at: string }> = []
+  if (postsRes.ok) {
+    const body = await postsRes.json().catch(() => null)
+    if (Array.isArray(body)) posts = body
+  }
 
-  const items = (posts || [])
+  const items = posts
     .map(
       (p) => `
     <item>

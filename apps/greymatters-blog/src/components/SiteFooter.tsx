@@ -12,6 +12,9 @@ const OTHER_PILLARS = PILLARS.filter((p) => p.key !== 'greymatters')
 // homepage's own "One login, five more platforms" card-grid section
 // above this stays homepage-only promotional content, not duplicated
 // here.
+// Deliberately theme-invariant -- see apps/greyin-hub/src/components/
+// SiteFooter.tsx's own comment: already a dark surface before light/dark
+// mode existed, and stays that way in both themes.
 export function SiteFooter() {
   return (
     <footer className="bg-gray-900 text-gray-300 py-12">

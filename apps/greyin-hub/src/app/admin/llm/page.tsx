@@ -67,45 +67,45 @@ export default async function LLMAdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/admin" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6">
+        <Link href="/admin" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to admin
         </Link>
 
         <div className="flex items-center gap-2 mb-6">
-          <Bot className="h-6 w-6 text-indigo-600" />
-          <h1 className="text-2xl font-bold text-gray-900">AI Providers</h1>
+          <Bot className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">AI Providers</h1>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-indigo-600" />
+            <Sparkles className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
             AI Quality Scoring — Backlog Overview
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
             <div>
-              <p className="text-gray-500">GreyMatters posts</p>
-              <p className="font-semibold text-gray-900">{backlog.greymatters_post} unscored <span className="text-gray-400 font-normal">(of last 50 published)</span></p>
-              <a href="https://greymatters.greyin.net/admin" className="text-xs text-indigo-600 hover:text-indigo-700">Sweep on GreyMatters →</a>
+              <p className="text-gray-500 dark:text-gray-400">GreyMatters posts</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-50">{backlog.greymatters_post} unscored <span className="text-gray-400 font-normal dark:text-gray-500">(of last 50 published)</span></p>
+              <a href="https://greymatters.greyin.net/admin" className="text-xs text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Sweep on GreyMatters →</a>
             </div>
             <div>
-              <p className="text-gray-500">Salt &amp; Pepper replies</p>
-              <p className="font-semibold text-gray-900">{backlog.saltnpepper_reply} unscored <span className="text-gray-400 font-normal">(of last 50)</span></p>
-              <a href="https://saltnpepper.greyin.net/admin" className="text-xs text-indigo-600 hover:text-indigo-700">Sweep on Salt &amp; Pepper →</a>
+              <p className="text-gray-500 dark:text-gray-400">Salt &amp; Pepper replies</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-50">{backlog.saltnpepper_reply} unscored <span className="text-gray-400 font-normal dark:text-gray-500">(of last 50)</span></p>
+              <a href="https://saltnpepper.greyin.net/admin" className="text-xs text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Sweep on Salt &amp; Pepper →</a>
             </div>
             <div>
-              <p className="text-gray-500">FlexPro deliveries</p>
-              <p className="font-semibold text-gray-900">{backlog.flexpro_delivery} scored</p>
-              <p className="text-xs text-gray-400">Scored once at review time, by design — no sweep/backlog here.</p>
+              <p className="text-gray-500 dark:text-gray-400">FlexPro deliveries</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-50">{backlog.flexpro_delivery} scored</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">Scored once at review time, by design — no sweep/backlog here.</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4">Configured providers</h2>
           {providers && providers.length > 0 ? (
             <div className="divide-y mb-6">
@@ -113,27 +113,27 @@ export default async function LLMAdminPage() {
                 <div key={p.id} className="py-3 flex items-center justify-between gap-4 flex-wrap">
                   <div>
                     <p className="font-medium">
-                      {p.label} <span className="text-xs text-gray-500 capitalize">({p.provider} · {p.model})</span>
+                      {p.label} <span className="text-xs text-gray-500 capitalize dark:text-gray-400">({p.provider} · {p.model})</span>
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       priority {p.priority} · key {maskKey(p.api_key)}
                       {p.base_url ? ` · ${p.base_url}` : ''}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${p.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${p.enabled ? 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'}`}>
                       {p.enabled ? 'Enabled' : 'Disabled'}
                     </span>
                     <form action="/api/admin/llm/providers/update" method="POST">
                       <input type="hidden" name="provider_id" value={p.id} />
                       <input type="hidden" name="enabled" value={(!p.enabled).toString()} />
-                      <button type="submit" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                      <button type="submit" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
                         {p.enabled ? 'Disable' : 'Enable'}
                       </button>
                     </form>
                     <form action="/api/admin/llm/providers/delete" method="POST">
                       <input type="hidden" name="provider_id" value={p.id} />
-                      <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700">
+                      <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
                         Delete
                       </button>
                     </form>
@@ -142,47 +142,47 @@ export default async function LLMAdminPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm mb-6">
+            <p className="text-gray-500 text-sm mb-6 dark:text-gray-400">
               No providers configured — AI verification will run in manual-review-only mode until one is added.
             </p>
           )}
 
           <form action="/api/admin/llm/providers/create" method="POST" className="border-t pt-6 space-y-4">
-            <h3 className="font-semibold text-gray-900">Add a provider</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-50">Add a provider</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="provider" className="block text-sm font-medium text-gray-700 mb-1">Provider</label>
-                <select id="provider" name="provider" required className="w-full border border-gray-300 rounded-lg px-3 py-2">
+                <label htmlFor="provider" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Provider</label>
+                <select id="provider" name="provider" required className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
                   <option value="anthropic">Anthropic</option>
                   <option value="openai">OpenAI</option>
                   <option value="ollama">Ollama (self-hosted)</option>
                 </select>
               </div>
               <div>
-                <label htmlFor="label" className="block text-sm font-medium text-gray-700 mb-1">Label</label>
+                <label htmlFor="label" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Label</label>
                 <input id="label" name="label" type="text" required placeholder="e.g. Claude (primary)"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
               </div>
               <div>
-                <label htmlFor="model" className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                <label htmlFor="model" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Model</label>
                 <input id="model" name="model" type="text" required placeholder="e.g. claude-sonnet-4-5 / gpt-4o / llama3.1"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
               </div>
               <div>
-                <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Priority</label>
                 <input id="priority" name="priority" type="number" defaultValue={0}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2" />
-                <p className="text-xs text-gray-500 mt-1">Lower tried first; falls through to the next enabled provider on failure.</p>
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
+                <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Lower tried first; falls through to the next enabled provider on failure.</p>
               </div>
               <div>
-                <label htmlFor="api_key" className="block text-sm font-medium text-gray-700 mb-1">API key (not needed for Ollama)</label>
+                <label htmlFor="api_key" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">API key (not needed for Ollama)</label>
                 <input id="api_key" name="api_key" type="password" autoComplete="off"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
               </div>
               <div>
-                <label htmlFor="base_url" className="block text-sm font-medium text-gray-700 mb-1">Base URL (Ollama only)</label>
+                <label htmlFor="base_url" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">Base URL (Ollama only)</label>
                 <input id="base_url" name="base_url" type="text" placeholder="http://ollama-host:11434"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
               </div>
             </div>
             <button type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 font-semibold">
@@ -191,7 +191,7 @@ export default async function LLMAdminPage() {
           </form>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4">Feature access</h2>
           <div className="divide-y">
             {flags?.map((f) => (
@@ -199,18 +199,18 @@ export default async function LLMAdminPage() {
                 <p className="font-medium mb-2">{f.feature_key}</p>
                 <form action="/api/admin/llm/feature-flags/update" method="POST" className="flex items-center gap-3 flex-wrap">
                   <input type="hidden" name="feature_key" value={f.feature_key} />
-                  <select name="enabled" defaultValue={f.enabled.toString()} className="text-sm border border-gray-300 rounded-lg px-3 py-1.5">
+                  <select name="enabled" defaultValue={f.enabled.toString()} className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
                     <option value="true">Enabled</option>
                     <option value="false">Disabled</option>
                   </select>
-                  <select name="provider_id" defaultValue={f.provider_id || ''} className="text-sm border border-gray-300 rounded-lg px-3 py-1.5">
+                  <select name="provider_id" defaultValue={f.provider_id || ''} className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
                     <option value="">Use highest-priority enabled provider</option>
                     {providers?.map((p) => (
                       <option key={p.id} value={p.id}>{p.label}</option>
                     ))}
                   </select>
                   {SWEEPABLE_FEATURE_KEYS.has(f.feature_key) && (
-                    <label className="flex items-center gap-1.5 text-sm text-gray-600">
+                    <label className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
                       Sweep every
                       <input
                         type="number"
@@ -218,17 +218,17 @@ export default async function LLMAdminPage() {
                         min={1}
                         defaultValue={f.sweep_interval_minutes ?? ''}
                         placeholder="off"
-                        className="w-20 text-sm border border-gray-300 rounded-lg px-2 py-1.5"
+                        className="w-20 text-sm border border-gray-300 rounded-lg px-2 py-1.5 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                       />
                       min
                     </label>
                   )}
-                  <button type="submit" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                  <button type="submit" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
                     Save
                   </button>
                 </form>
                 {SWEEPABLE_FEATURE_KEYS.has(f.feature_key) && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">
                     {f.sweep_interval_minutes
                       ? `Periodic sweep last ran ${f.last_swept_at ? new Date(f.last_swept_at).toLocaleString() : 'never yet'}.`
                       : 'Periodic sweep off — leave blank to rely on page-visit-triggered catch-up only.'}

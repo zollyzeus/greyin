@@ -154,3 +154,24 @@ test('a crafted next= parameter on login cannot redirect off-platform, in either
   expect(getLocation).toBeTruthy()
   expect(getLocation!).not.toContain('evil.com')
 })
+
+/**
+ * SEC-040 (2026-09-05): the collaborators view lost security_invoker=true
+ * when 089_peer_projects.sql recreated it (CREATE OR REPLACE VIEW does
+ * not preserve reloptions from the version it replaces), reverting it to
+ * run as its owner (postgres, RLS-bypassing) instead of the querying
+ * user -- combined with anon's standard PostgREST SELECT grant, a
+ * completely unauthenticated request returned real cross-user
+ * collaboration pairs platform-wide. Fixed via 115_fix_collaborators_
+ * security_invoker.sql. This is a pure infra/schema check (no signup
+ * needed) so it belongs here, not in a per-app suite.
+ */
+test('the collaborators view never returns data to a completely unauthenticated request', async ({ request }) => {
+  const res = await request.get(`${SUPABASE_URL}/rest/v1/collaborators?select=*&limit=5`, {
+    headers: { apikey: ANON_KEY },
+  })
+  expect(res.ok()).toBeTruthy()
+  const rows = await res.json()
+  expect(Array.isArray(rows)).toBe(true)
+  expect(rows.length).toBe(0)
+})

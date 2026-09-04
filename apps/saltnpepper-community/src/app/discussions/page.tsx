@@ -51,7 +51,7 @@ export default async function DiscussionsPage({
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
       {/* Hero */}
@@ -68,11 +68,11 @@ export default async function DiscussionsPage({
         <div className="flex gap-8">
           {/* Categories Sidebar */}
           <aside className="w-64 flex-shrink-0 hidden lg:block">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
+            <div className="bg-white rounded-lg shadow-md p-6 sticky top-24 dark:bg-gray-900">
               <h2 className="font-semibold text-lg mb-4">Categories</h2>
               <div className="space-y-2">
                 {CATEGORIES.map((cat) => (
-                  <div key={cat.name} className="flex items-center gap-2 p-2 text-sm text-gray-700">
+                  <div key={cat.name} className="flex items-center gap-2 p-2 text-sm text-gray-700 dark:text-gray-300">
                     <span className="text-xl">{cat.icon}</span>
                     <span className="font-medium">{cat.name}</span>
                   </div>
@@ -92,7 +92,7 @@ export default async function DiscussionsPage({
           {/* Discussions Feed */}
           <div className="flex-1">
             <div className="flex justify-between items-center mb-6 lg:hidden">
-              <h1 className="text-2xl font-bold text-gray-900">Discussions</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Discussions</h1>
               <Link
                 href="/discussions/new"
                 className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 font-semibold"
@@ -108,7 +108,7 @@ export default async function DiscussionsPage({
                   key={s}
                   href={`/discussions?sort=${s}`}
                   className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize ${
-                    sort === s ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
+                    sort === s ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-800 dark:hover:border-purple-700'
                   }`}
                 >
                   {s}
@@ -122,21 +122,21 @@ export default async function DiscussionsPage({
                   <Link
                     key={d.id}
                     href={`/discussions/${d.id}`}
-                    className="block bg-white rounded-lg shadow-md hover:shadow-lg transition p-6"
+                    className="block bg-white rounded-lg shadow-md hover:shadow-lg transition p-6 dark:bg-gray-900"
                   >
                     <div className="flex gap-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <User className="h-6 w-6 text-purple-600" />
+                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 dark:bg-purple-950/40">
+                        <User className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                       </div>
                       <div className="flex-1">
                         {d.category && (
-                          <span className="inline-block px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold mb-2">
+                          <span className="inline-block px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold mb-2 dark:bg-purple-950/40 dark:text-purple-400">
                             {d.category}
                           </span>
                         )}
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{d.title}</h3>
-                        <p className="text-gray-700 line-clamp-2 mb-3">{d.body}</p>
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1 dark:text-gray-50">{d.title}</h3>
+                        <p className="text-gray-700 line-clamp-2 mb-3 dark:text-gray-300">{d.body}</p>
+                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                           <span className="font-medium">{d.is_anonymous ? 'Anonymous Member' : d.profiles?.full_name || 'Member'}</span>
                           <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{new Date(d.created_at).toLocaleDateString()}</span>
                           <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" />{d.reply_count} replies</span>
@@ -147,10 +147,10 @@ export default async function DiscussionsPage({
                 ))}
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
+              <div className="bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
                 <MessageCircle className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No discussions yet</h3>
-                <p className="text-gray-600 mb-6">Be the first to start a conversation!</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-50">No discussions yet</h3>
+                <p className="text-gray-600 mb-6 dark:text-gray-400">Be the first to start a conversation!</p>
                 <Link
                   href="/discussions/new"
                   className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-semibold"

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Briefcase, ArrowLeft, Wallet } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const PLATFORM_FEE_RATE = 0.02
 
@@ -47,55 +48,56 @@ export default async function EarningsPage() {
   const available = Math.max(0, netEarned - alreadyClaimed)
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-blue-600" />
+              <Briefcase className="h-8 w-8 text-orange-600 dark:text-orange-400" />
               <span className="ml-2 text-2xl font-bold">FlexPro</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to dashboard
         </Link>
 
-        <div className="bg-white rounded-lg shadow-md p-8 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
           <div className="flex items-center gap-2 mb-6">
-            <Wallet className="h-6 w-6 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Earnings</h1>
+            <Wallet className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Earnings</h1>
           </div>
 
           <div className="grid grid-cols-3 gap-4 text-center mb-2">
             <div>
-              <p className="text-sm text-gray-500">Total earned</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Total earned</p>
               <p className="text-xl font-bold" id="total-earned">₹{netEarned.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Already requested</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Already requested</p>
               <p className="text-xl font-bold" id="already-claimed">₹{alreadyClaimed.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Available balance</p>
-              <p className="text-xl font-bold text-green-600" id="available-balance">₹{available.toLocaleString()}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Available balance</p>
+              <p className="text-xl font-bold text-green-600 dark:text-green-400" id="available-balance">₹{available.toLocaleString()}</p>
             </div>
           </div>
-          <p className="text-xs text-gray-400 text-center">
+          <p className="text-xs text-gray-400 text-center dark:text-gray-500">
             Earnings shown after the platform&apos;s {PLATFORM_FEE_RATE * 100}% service fee. Based on completed orders only.
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-8 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4">Request a withdrawal</h2>
           {available > 0 ? (
             <form action="/api/payouts/request" method="POST" className="space-y-4">
               <div>
-                <label htmlFor="amount" className="block text-sm font-medium text-gray-700">Amount (₹)</label>
+                <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Amount (₹)</label>
                 <input
                   id="amount"
                   name="amount"
@@ -103,39 +105,39 @@ export default async function EarningsPage() {
                   min={1}
                   max={available}
                   required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   placeholder={`Up to ₹${available.toLocaleString()}`}
                 />
               </div>
               <div>
-                <label htmlFor="bank_account_name" className="block text-sm font-medium text-gray-700">Account holder name</label>
+                <label htmlFor="bank_account_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Account holder name</label>
                 <input
                   id="bank_account_name"
                   name="bank_account_name"
                   type="text"
                   required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="bank_account_number" className="block text-sm font-medium text-gray-700">Account number</label>
+                  <label htmlFor="bank_account_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Account number</label>
                   <input
                     id="bank_account_number"
                     name="bank_account_number"
                     type="text"
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
                 <div>
-                  <label htmlFor="bank_ifsc" className="block text-sm font-medium text-gray-700">IFSC code</label>
+                  <label htmlFor="bank_ifsc" className="block text-sm font-medium text-gray-700 dark:text-gray-300">IFSC code</label>
                   <input
                     id="bank_ifsc"
                     name="bank_ifsc"
                     type="text"
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   />
                 </div>
               </div>
@@ -144,11 +146,11 @@ export default async function EarningsPage() {
               </button>
             </form>
           ) : (
-            <p className="text-gray-500 text-sm">No available balance to withdraw yet.</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">No available balance to withdraw yet.</p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
+        <div className="bg-white rounded-lg shadow-md p-8 dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4">Withdrawal history</h2>
           {payoutRequests && payoutRequests.length > 0 ? (
             <div className="divide-y">
@@ -156,17 +158,17 @@ export default async function EarningsPage() {
                 <div key={p.id} className="py-3 flex items-center justify-between">
                   <div>
                     <p className="font-medium">₹{p.amount.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       Requested {new Date(p.requested_at).toLocaleDateString()}
                     </p>
                   </div>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
                       p.status === 'paid'
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400'
                         : p.status === 'rejected'
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-yellow-100 text-yellow-700'
+                        ? 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400'
+                        : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-400'
                     }`}
                   >
                     {p.status}
@@ -175,7 +177,7 @@ export default async function EarningsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">No withdrawal requests yet.</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">No withdrawal requests yet.</p>
           )}
         </div>
       </div>

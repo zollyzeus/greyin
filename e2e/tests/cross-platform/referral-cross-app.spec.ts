@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, signUpSaltNPepper, login } from '../../utils/auth'
-import { getJobIdByTitle } from '../../utils/admin'
+import { getJobIdByTitle, grantActiveSubscriptionTier, getUserIdByEmail } from '../../utils/admin'
 
 /**
  * deepedge/referral.spec.ts already proves the referral bridge when the
@@ -23,6 +23,7 @@ test('a Salt & Pepper member, never signed up on deepedge, gets referred to a jo
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(employerPage, employer, '/employer/dashboard')
 
   const jobTitle = `E2E Cross-App Referral Role ${Date.now()}`

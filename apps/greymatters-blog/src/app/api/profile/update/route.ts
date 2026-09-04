@@ -18,10 +18,13 @@ export async function POST(request: Request) {
       full_name: formData.get('full_name'),
       bio: formData.get('bio'),
       website: formData.get('website'),
-      twitter: formData.get('twitter'),
+      // FIXED (integrity audit 2026-09-04): 'twitter' isn't a real
+      // profiles column -- 'twitter_handle' is. This bundled update was
+      // failing entirely (PostgREST rejects the whole statement on any
+      // unknown column), so no GreyMatters user could save ANY profile
+      // field, not just this one.
+      twitter_handle: formData.get('twitter'),
       location: formData.get('location'),
-      email_notifications: formData.get('email_notifications') === 'on',
-      show_email: formData.get('show_email') === 'on',
       updated_at: new Date().toISOString(),
     })
     .eq('id', user.id)

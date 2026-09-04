@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { ArrowLeft, FileText, MessageCircle, BadgeCheck, Shuffle, RotateCcw } from 'lucide-react'
+import { ArrowLeft, Building2, FileText, MessageCircle, BadgeCheck, Shuffle, RotateCcw } from 'lucide-react'
 
 const STATUSES = [
   'submitted', 'reviewing', 'shortlisted', 'interview', 'offer', 'accepted', 'rejected', 'withdrawn',
@@ -68,31 +68,34 @@ export default async function JobApplicationsPage({
   const scoreByUser = new Map((scoreRows || []).map((r) => [r.user_id, r]))
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <nav className="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="text-2xl font-bold text-indigo-600">DeepEdge</a>
+            <a href="https://greyin.net" className="flex items-center gap-2 text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+              <Building2 className="w-6 h-6" />
+              DeepEdge
+            </a>
           </div>
         </div>
       </nav>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/employer/dashboard" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6">
+        <Link href="/employer/dashboard" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to dashboard
         </Link>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">Applications</h1>
-        <p className="text-gray-600 mb-6">for {job.title}</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-1 dark:text-gray-50">Applications</h1>
+        <p className="text-gray-600 mb-6 dark:text-gray-400">for {job.title}</p>
 
         {success && (
-          <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+          <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
             Application status updated.
           </div>
         )}
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
             {decodeURIComponent(error)}
           </div>
         )}
@@ -100,42 +103,42 @@ export default async function JobApplicationsPage({
         {applications && applications.length > 0 ? (
           <div className="space-y-4">
             {applications.map((app: any) => (
-              <div key={app.id} className="bg-white rounded-lg shadow p-6">
+              <div key={app.id} className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-50">
                       {app.candidates?.profiles?.full_name || 'Candidate'}
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       {app.candidates?.current_title || 'No title provided'}
                       {app.candidates?.experience_years ? ` • ${app.candidates.experience_years} yrs experience` : ''}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">
                       Applied {new Date(app.applied_at).toLocaleDateString()}
                     </p>
                     {scoreByUser.get(app.candidates?.user_id) && (
-                      <p className="flex items-center gap-1 text-xs text-indigo-700 font-semibold mt-1">
+                      <p className="flex items-center gap-1 text-xs text-indigo-700 font-semibold mt-1 dark:text-indigo-400">
                         <BadgeCheck className="h-3.5 w-3.5" />
                         Greyin Score {scoreByUser.get(app.candidates.user_id)!.greyin_score}
                         {scoreByUser.get(app.candidates.user_id)!.is_verified_expert ? ' · Verified Expert' : ''}
                       </p>
                     )}
                     {app.candidates?.profiles?.is_pivoter && (
-                      <p className="flex items-center gap-1 text-xs text-orange-700 font-semibold mt-1">
+                      <p className="flex items-center gap-1 text-xs text-orange-700 font-semibold mt-1 dark:text-orange-400">
                         <Shuffle className="h-3.5 w-3.5" />
                         Career Changer: {app.candidates.profiles.pivot_from_domain || '—'} → {app.candidates.profiles.pivot_to_domain || '—'}
                         {app.candidates.profiles.pivot_note ? ` — "${app.candidates.profiles.pivot_note}"` : ''}
                       </p>
                     )}
                     {app.candidates?.profiles?.is_reentry && (
-                      <p className="flex items-center gap-1 text-xs text-blue-700 font-semibold mt-1">
+                      <p className="flex items-center gap-1 text-xs text-blue-700 font-semibold mt-1 dark:text-blue-400">
                         <RotateCcw className="h-3.5 w-3.5" />
                         Returning to work{app.candidates.profiles.reentry_reason ? ` · ${app.candidates.profiles.reentry_reason}` : ''}
                         {app.candidates.profiles.reentry_note ? ` — "${app.candidates.profiles.reentry_note}"` : ''}
                       </p>
                     )}
                     {trackRecordByUser.get(app.candidates?.user_id) && (
-                      <p className="flex items-center gap-1 text-xs text-green-700 font-medium mt-1">
+                      <p className="flex items-center gap-1 text-xs text-green-700 font-medium mt-1 dark:text-green-400">
                         <BadgeCheck className="h-3.5 w-3.5" />
                         {trackRecordByUser.get(app.candidates.user_id)!.count} verified outcome{trackRecordByUser.get(app.candidates.user_id)!.count === 1 ? '' : 's'} on StackWorks · avg {trackRecordByUser.get(app.candidates.user_id)!.avgScore}/100
                       </p>
@@ -146,7 +149,7 @@ export default async function JobApplicationsPage({
                     <select
                       name="status"
                       defaultValue={app.status}
-                      className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 capitalize"
+                      className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 capitalize dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                     >
                       {STATUSES.map((s) => (
                         <option key={s} value={s}>{s}</option>
@@ -154,7 +157,7 @@ export default async function JobApplicationsPage({
                     </select>
                     <button
                       type="submit"
-                      className="text-sm font-medium text-indigo-600 hover:text-indigo-700 px-3 py-1.5"
+                      className="text-sm font-medium text-indigo-600 hover:text-indigo-700 px-3 py-1.5 dark:text-indigo-400 dark:hover:text-indigo-300"
                     >
                       Update
                     </button>
@@ -162,24 +165,24 @@ export default async function JobApplicationsPage({
                 </div>
 
                 {app.cover_letter && (
-                  <p className="mt-4 text-sm text-gray-700 whitespace-pre-line border-t pt-4">
+                  <p className="mt-4 text-sm text-gray-700 whitespace-pre-line border-t pt-4 dark:text-gray-300">
                     {app.cover_letter}
                   </p>
                 )}
 
                 <div className="mt-4 flex gap-4 text-sm">
                   {app.resume_url && (
-                    <a href={app.resume_url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-700">
+                    <a href={app.resume_url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
                       View Resume
                     </a>
                   )}
                   {app.expected_salary && (
-                    <span className="text-gray-500">Expects ${app.expected_salary.toLocaleString()}</span>
+                    <span className="text-gray-500 dark:text-gray-400">Expects ${app.expected_salary.toLocaleString()}</span>
                   )}
                   {app.candidates?.user_id && (
                     <form action="/api/messages/start" method="POST">
                       <input type="hidden" name="other_user_id" value={app.candidates.user_id} />
-                      <button type="submit" className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700">
+                      <button type="submit" className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
                         <MessageCircle className="h-4 w-4" />
                         Message candidate
                       </button>
@@ -190,9 +193,9 @@ export default async function JobApplicationsPage({
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-sm font-medium text-gray-900">No applications yet</h3>
+          <div className="bg-white rounded-lg shadow p-12 text-center dark:bg-gray-900">
+            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4 dark:text-gray-500" />
+            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-50">No applications yet</h3>
           </div>
         )}
       </div>

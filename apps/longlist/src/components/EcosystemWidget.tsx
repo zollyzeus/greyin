@@ -21,32 +21,30 @@ export const PILLARS = [
  */
 export function EcosystemWidget({ activePillars }: { activePillars: string[] }) {
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
+    <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
       <h2 className="text-lg font-semibold mb-1 flex items-center gap-2">
         <Globe className="w-5 h-5" />
         Your Greyin Ecosystem
       </h2>
-      <p className="text-sm text-gray-600 mb-4">
+      <p className="text-sm text-gray-600 mb-4 dark:text-gray-400">
         One login works across all six Greyin apps — no separate signup needed.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {PILLARS.map((p) => {
           const isActive = activePillars.includes(p.key)
           return (
             <a
               key={p.key}
               href={p.url}
-              className="flex items-start gap-3 p-3 rounded-lg border text-sm border-gray-200 hover:border-gray-300 transition-colors"
+              className="flex flex-col items-center text-center gap-1.5 p-3 rounded-lg border text-sm border-gray-200 hover:border-gray-300 transition-colors dark:border-gray-800 dark:hover:border-gray-700"
               style={isActive ? { borderColor: p.color, backgroundColor: `${p.color}0d` } : undefined}
             >
-              <span className="w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: p.color }} aria-hidden="true" />
-              <div>
-                <p className="font-medium text-gray-900 flex items-center gap-1.5">
-                  {p.label}
-                  {isActive && <CheckCircle2 className="w-3.5 h-3.5" style={{ color: p.color }} />}
-                </p>
-                <p className="text-xs text-gray-500">{isActive ? 'Active' : p.description + ' — visit to join'}</p>
-              </div>
+              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} aria-hidden="true" />
+              <p className="font-medium text-gray-900 flex items-center gap-1 dark:text-gray-50">
+                {p.label}
+                {isActive && <CheckCircle2 className="w-3.5 h-3.5" style={{ color: p.color }} />}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{isActive ? 'Active' : 'Visit to join'}</p>
             </a>
           )
         })}

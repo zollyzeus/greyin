@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { sweepUnscoredReplies } from '@/lib/reply-quality'
 import { Users, ArrowLeft, User, Clock } from 'lucide-react'
 import { FollowButton } from '@/components/FollowButton'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function DiscussionDetailPage({
   params,
@@ -44,36 +45,37 @@ export default async function DiscussionDetailPage({
     : { data: null }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Users className="h-8 w-8 text-purple-600" />
+              <Users className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               <span className="ml-2 text-2xl font-bold">Salt & Pepper</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/discussions" className="flex items-center text-gray-600 hover:text-purple-600 mb-6">
+        <Link href="/discussions" className="flex items-center text-gray-600 hover:text-purple-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to discussions
         </Link>
 
-        <div className="bg-white rounded-lg shadow-md p-8 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
           {discussion.category && (
-            <span className="inline-block px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold mb-3">
+            <span className="inline-block px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold mb-3 dark:bg-purple-950/40 dark:text-purple-400">
               {discussion.category}
             </span>
           )}
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">{discussion.title}</h1>
-          <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4 dark:text-gray-50">{discussion.title}</h1>
+          <div className="flex items-center gap-4 text-sm text-gray-500 mb-6 dark:text-gray-400">
             <span className="flex items-center gap-1"><User className="h-4 w-4" />{discussion.is_anonymous ? 'Anonymous Member' : discussion.profiles?.full_name || 'Member'}</span>
             <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{new Date(discussion.created_at).toLocaleDateString()}</span>
           </div>
-          <p className="text-gray-700 whitespace-pre-line">{discussion.body}</p>
+          <p className="text-gray-700 whitespace-pre-line dark:text-gray-300">{discussion.body}</p>
           {/* Anonymous discussions never expose author_id to follow -- the
               button is simply not rendered, matching how their name is
               already suppressed above. */}
@@ -87,25 +89,25 @@ export default async function DiscussionDetailPage({
         </div>
 
         <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 dark:text-gray-50">
             {replies?.length || 0} {replies?.length === 1 ? 'Reply' : 'Replies'}
           </h2>
 
           <div className="space-y-4 mb-6">
             {replies?.map((reply: any) => (
-              <div key={reply.id} className="bg-white rounded-lg shadow p-6">
+              <div key={reply.id} className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="font-semibold text-gray-900">{reply.is_anonymous ? 'Anonymous Member' : reply.profiles?.full_name || 'Member'}</span>
-                  <span className="text-xs text-gray-500">{new Date(reply.created_at).toLocaleDateString()}</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-50">{reply.is_anonymous ? 'Anonymous Member' : reply.profiles?.full_name || 'Member'}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(reply.created_at).toLocaleDateString()}</span>
                 </div>
-                <p className="text-gray-700 whitespace-pre-line">{reply.body}</p>
+                <p className="text-gray-700 whitespace-pre-line dark:text-gray-300">{reply.body}</p>
               </div>
             ))}
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
             {error && (
-              <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
                 {decodeURIComponent(error)}
               </div>
             )}
@@ -116,10 +118,10 @@ export default async function DiscussionDetailPage({
                   required
                   rows={4}
                   placeholder="Add your reply..."
-                  className="w-full border border-gray-300 rounded-lg p-4 mb-4"
+                  className="w-full border border-gray-300 rounded-lg p-4 mb-4 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 />
-                <label className="flex items-center gap-2 text-sm text-gray-700 mb-4">
-                  <input type="checkbox" name="is_anonymous" value="true" className="rounded text-purple-600" />
+                <label className="flex items-center gap-2 text-sm text-gray-700 mb-4 dark:text-gray-300">
+                  <input type="checkbox" name="is_anonymous" value="true" className="rounded text-purple-600 dark:text-purple-400 dark:bg-gray-950 dark:text-gray-100" />
                   Reply anonymously
                 </label>
                 <button type="submit" className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 font-semibold">
@@ -127,8 +129,8 @@ export default async function DiscussionDetailPage({
                 </button>
               </form>
             ) : (
-              <p className="text-gray-600">
-                <Link href={`/login?next=/discussions/${id}`} className="text-purple-600 hover:text-purple-700 font-semibold">
+              <p className="text-gray-600 dark:text-gray-400">
+                <Link href={`/login?next=/discussions/${id}`} className="text-purple-600 hover:text-purple-700 font-semibold dark:text-purple-400 dark:hover:text-purple-300">
                   Sign in
                 </Link>{' '}
                 to reply.

@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, signUpLongList, login } from '../../utils/auth'
-import { getFutureRoleIdByTitle } from '../../utils/admin'
+import { getFutureRoleIdByTitle, grantActiveSubscriptionTier, getUserIdByEmail } from '../../utils/admin'
 
 /**
  * Longlist's whole mechanic in one real flow: a company posts a future
@@ -23,6 +23,7 @@ test('a company posts a future role anonymously, a member subscribes, and only t
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup, 15, expertedgeBase)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(employerPage, employer, `${expertedgeBase}/employer/dashboard`, expertedgeBase)
 
   // A real job post is what actually creates the companies row (087's
@@ -69,7 +70,13 @@ test('a company posts a future role anonymously, a member subscribes, and only t
   // on the page a browsing member sees, even though the role is theirs.
   await expect(memberPage.locator('body')).not.toContainText(employer.lastName)
 
-  await memberPage.getByRole('button', { name: "I'm future-interested" }).click()
+  // /roles orders by created_at desc, so the role this test just posted
+  // is always first -- .first() is the real target, not a workaround.
+  // Same fix as cross-platform/longlist-activity.spec.ts's own -- a
+  // growing seeded env means more than one role can be listed by the
+  // time this runs, and the bare locator was ambiguous (strict-mode
+  // violation) without it.
+  await memberPage.getByRole('button', { name: "I'm future-interested" }).first().click()
   await expect(memberPage.getByRole('button', { name: "You're future-interested" })).toBeVisible()
 
   // Back to the employer: this is the one place the member's identity
@@ -82,6 +89,7 @@ test('a stranger sees no subscribers on a role they did not post', async ({ brow
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup, 15, expertedgeBase)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(employerPage, employer, `${expertedgeBase}/employer/dashboard`, expertedgeBase)
 
   const jobTitle = `E2E Longlist Stranger Setup ${Date.now()}`
@@ -108,6 +116,7 @@ test('a stranger sees no subscribers on a role they did not post', async ({ brow
   const strangerCtx = await browser.newContext()
   const strangerPage = await strangerCtx.newPage()
   const stranger = await signUpDeepEdge(strangerPage, 'employer', cleanup, 15, expertedgeBase)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(stranger.email), 'basic')
   await login(strangerPage, stranger, `${expertedgeBase}/employer/dashboard`, expertedgeBase)
 
   await strangerPage.goto(`${longlistBase}/employer/roles/${futureRoleId}/candidates`)

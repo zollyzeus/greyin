@@ -80,6 +80,71 @@ export async function POST(request: Request) {
       })
     }
 
+    // Mentor-session bookings pre-claim their gig_orders row via
+    // book_mentor_slot() (056_mentor_sessions.sql), which already stores
+    // the correct amount (gig.price_min at claim time) directly on that
+    // row -- same "trust the pre-claimed order's own amount, don't
+    // recompute" posture as the clientJobEngagement branch above, since
+    // this order was never priced by the basic/standard/premium
+    // multiplier system below (mentor-sessions/checkout/[orderId]/page.tsx
+    // sends packageType: 'mentor_session', which isn't a real multiplier
+    // key and always 400'd here before this branch existed -- the "Pay &
+    // confirm" button would alert() and never open Razorpay at all).
+    if (preClaimedOrderId && !clientJobEngagement) {
+      const { data: existingOrder, error: fetchError } = await supabase
+        .from('gig_orders')
+        .select('id, amount, buyer_id, razorpay_order_id')
+        .eq('id', preClaimedOrderId)
+        .eq('buyer_id', user.id)
+        .single()
+      if (fetchError || !existingOrder) {
+        return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+      }
+      if (existingOrder.razorpay_order_id) {
+        return NextResponse.json({ error: 'Payment already initiated for this order' }, { status: 409 })
+      }
+
+      const razorpayResponse = await fetch('https://api.razorpay.com/v1/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64')}`,
+        },
+        body: JSON.stringify({
+          amount: Math.round(existingOrder.amount * 100),
+          currency: 'INR',
+          receipt: `mentor_${preClaimedOrderId.slice(0, 8)}_${Date.now()}`,
+          notes: { mentor_session: 'true', buyer_id: user.id },
+        }),
+      })
+      if (!razorpayResponse.ok) {
+        const error = await razorpayResponse.json()
+        console.error('Razorpay order creation failed:', error)
+        return NextResponse.json({ error: 'Failed to create payment order' }, { status: 500 })
+      }
+      const razorpayOrder = await razorpayResponse.json()
+
+      const { data: order, error: orderError } = await supabase
+        .from('gig_orders')
+        .update({ razorpay_order_id: razorpayOrder.id })
+        .eq('id', preClaimedOrderId)
+        .eq('buyer_id', user.id)
+        .select()
+        .single()
+      if (orderError) {
+        console.error('Order update failed:', orderError)
+        return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+      }
+
+      return NextResponse.json({
+        orderId: order.id,
+        razorpayOrderId: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        keyId: RAZORPAY_KEY_ID,
+      })
+    }
+
     // Validate input
     if (!gigId || !packageType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })

@@ -23,10 +23,14 @@ export async function POST(request: Request) {
       location: formData.get('location'),
       interests: interests,
       website: formData.get('website'),
-      linkedin: formData.get('linkedin'),
-      twitter: formData.get('twitter'),
-      email_notifications: formData.get('email_notifications') === 'on',
-      comment_notifications: formData.get('comment_notifications') === 'on',
+      // FIXED (integrity audit 2026-09-04): 'linkedin'/'twitter' aren't
+      // real profiles columns -- 'linkedin_url'/'twitter_handle' are.
+      // 'interests' now has a real column too (114) -- confirmed unread
+      // anywhere else on the platform yet, added as a real field on the
+      // strength of its own plausible future value (a directory
+      // filter/shared-interest match), not because anything needs it today.
+      linkedin_url: formData.get('linkedin'),
+      twitter_handle: formData.get('twitter'),
       updated_at: new Date().toISOString(),
     })
     .eq('id', user.id)

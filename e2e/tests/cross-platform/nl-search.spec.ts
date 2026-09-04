@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getUserIdByEmail, setCandidateSkills } from '../../utils/admin'
+import { getUserIdByEmail, setCandidateSkills, grantActiveSubscriptionTier } from '../../utils/admin'
 
 /**
  * Natural-language ecosystem search (platform_people_index, 060 +
@@ -38,6 +38,7 @@ test('a person-intent natural-language query finds a candidate by their seeded s
  */
 test('a content-intent query still returns ordinary ecosystem search results', async ({ page, cleanup }) => {
   const author = await signUpDeepEdge(page, 'employer', cleanup, 15, greyinB2BBase)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(author.email), 'basic')
   await login(page, author, `${greyinB2BBase}/employer/dashboard`, greyinB2BBase)
 
   const jobTitle = `E2E NL Content Search Role ${Date.now()}`

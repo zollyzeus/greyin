@@ -58,11 +58,11 @@ export function MultiImageUploader({ name, folder }: { name: string; folder: str
           {urls.map((url, i) => (
             // eslint-disable-next-line @next/next/no-img-element
             <div key={url} className="relative">
-              <img src={url} alt="" className="w-24 h-24 object-cover rounded border border-gray-200" />
+              <img src={url} alt="" className="w-24 h-24 object-cover rounded border border-gray-200 dark:border-gray-800" />
               <button
                 type="button"
                 onClick={() => removeAt(i)}
-                className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-0.5 hover:bg-gray-50"
+                className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-0.5 hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
                 aria-label="Remove image"
               >
                 <X className="w-3.5 h-3.5" />
@@ -71,12 +71,12 @@ export function MultiImageUploader({ name, folder }: { name: string; folder: str
           ))}
         </div>
       )}
-      <label className="inline-flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-50">
+      <label className="inline-flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-50 dark:text-gray-400 dark:border-gray-700 dark:hover:bg-gray-800">
         <ImagePlus className="w-4 h-4" />
         <span>{uploading ? 'Uploading...' : 'Add image'}</span>
-        <input type="file" accept="image/*" onChange={handleFile} className="hidden" disabled={uploading} />
+        <input type="file" accept="image/*" onChange={handleFile} className="hidden dark:bg-gray-950 dark:text-gray-100" disabled={uploading} />
       </label>
-      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+      {error && <p className="text-xs text-red-600 mt-1 dark:text-red-400">{error}</p>}
     </div>
   )
 }

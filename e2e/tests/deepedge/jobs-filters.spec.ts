@@ -1,5 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
+import { grantActiveSubscriptionTier, getUserIdByEmail } from '../../utils/admin'
 
 /**
  * Covers the /jobs page's real filter form (id="job-filters", wired this
@@ -11,6 +12,7 @@ import { signUpDeepEdge, login } from '../../utils/auth'
  */
 test('the /jobs filter form narrows results by employment type, work location, and minimum experience', async ({ page, cleanup }) => {
   const employer = await signUpDeepEdge(page, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(page, employer, '/employer/dashboard')
 
   const jobA = `E2E Filter Job A ${Date.now()}`

@@ -47,7 +47,7 @@ test('a Builder is notified of a new application, closes the ask, and the still-
   // notify_new_project_application (051) -- the Builder gets notified the
   // moment the application lands.
   await builderPage.goto('/dashboard')
-  await expect(builderPage.getByTitle('Notifications')).toContainText('1')
+  await expect(builderPage.getByLabel('Notifications')).toContainText('1')
   await builderPage.goto('/notifications')
   await expect(builderPage.getByText('New application received')).toBeVisible()
 
@@ -59,7 +59,7 @@ test('a Builder is notified of a new application, closes the ask, and the still-
 
   // notify_ask_closed (051) -- the still-pending applicant is notified.
   await supporterPage.goto('/dashboard')
-  await expect(supporterPage.getByTitle('Notifications')).toContainText('1')
+  await expect(supporterPage.getByLabel('Notifications')).toContainText('1')
   await supporterPage.goto('/notifications')
   await expect(supporterPage.getByText('Ask closed')).toBeVisible()
 

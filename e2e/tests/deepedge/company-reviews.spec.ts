@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getJobIdByTitle } from '../../utils/admin'
+import { getJobIdByTitle, grantActiveSubscriptionTier, getUserIdByEmail } from '../../utils/admin'
 
 /**
  * Company reviews (058_company_reviews.sql) are gated on a real
@@ -13,6 +13,7 @@ test('a candidate who applied can review the company, and the review shows witho
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(employerPage, employer, '/employer/dashboard')
 
   const jobTitle = `E2E Company Review Role ${Date.now()}`

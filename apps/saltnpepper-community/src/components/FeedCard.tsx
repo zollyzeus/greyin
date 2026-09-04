@@ -35,16 +35,16 @@ export function FeedCard({ item }: { item: FeedItem }) {
   return (
     <a
       href={`${PILLAR_DOMAINS[item.pillar]}${item.path}`}
-      className="block bg-white rounded-lg shadow p-4 hover:shadow-md transition"
+      className="block bg-white rounded-lg shadow p-4 hover:shadow-md transition dark:bg-gray-900"
     >
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-xs font-semibold text-gray-400 uppercase">
+          <span className="text-xs font-semibold text-gray-400 uppercase dark:text-gray-500">
             {PILLAR_LABELS[item.pillar]} &middot; {item.content_type.replace('_', ' ')}
           </span>
-          <h3 className="font-medium text-gray-900">{item.title}</h3>
-          {item.description && <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>}
-          <p className="text-xs text-gray-400 mt-1">{new Date(item.occurred_at).toLocaleDateString()}</p>
+          <h3 className="font-medium text-gray-900 dark:text-gray-50">{item.title}</h3>
+          {item.description && <p className="text-sm text-gray-600 line-clamp-2 dark:text-gray-400">{item.description}</p>}
+          <p className="text-xs text-gray-400 mt-1 dark:text-gray-500">{new Date(item.occurred_at).toLocaleDateString()}</p>
         </div>
         <ExternalLink className="h-4 w-4 text-gray-300 flex-shrink-0" />
       </div>

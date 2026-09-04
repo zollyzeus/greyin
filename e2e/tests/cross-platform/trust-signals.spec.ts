@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, signUpStackWorksBuilder, login } from '../../utils/auth'
-import { getJobIdByTitle } from '../../utils/admin'
+import { getJobIdByTitle, grantActiveSubscriptionTier, getUserIdByEmail } from '../../utils/admin'
 
 /**
  * The actual payoff of surfacing verified_outcomes across apps: a
@@ -20,6 +20,7 @@ test("a candidate's StackWorks verified outcome shows up when a deepedge employe
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(employerPage, employer, '/employer/dashboard')
 
   const jobTitle = `E2E Trust Signal Role ${Date.now()}`

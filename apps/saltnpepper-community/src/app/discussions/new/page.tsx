@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Users, ArrowLeft } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const CATEGORIES = ['Architecture Reviews', 'Career Transitions', 'Tool Evaluations', 'War Stories', 'Referrals & Intros']
 
@@ -19,65 +20,66 @@ export default async function NewDiscussionPage({
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Users className="h-8 w-8 text-purple-600" />
+              <Users className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               <span className="ml-2 text-2xl font-bold">Salt & Pepper</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/discussions" className="flex items-center text-gray-600 hover:text-purple-600 mb-6">
+        <Link href="/discussions" className="flex items-center text-gray-600 hover:text-purple-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to discussions
         </Link>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Start a Discussion</h1>
+        <div className="bg-white rounded-lg shadow-md p-8 dark:bg-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 mb-6 dark:text-gray-50">Start a Discussion</h1>
 
           {error && (
-            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
               {decodeURIComponent(error)}
             </div>
           )}
 
           <form action="/api/discussions/create" method="POST" className="space-y-6">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
               <input id="title" name="title" type="text" required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="What's on your mind?" />
             </div>
 
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category</label>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
               <select id="category" name="category" defaultValue={CATEGORIES[0]}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
                 {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
 
             <div>
-              <label htmlFor="body" className="block text-sm font-medium text-gray-700">Details</label>
+              <label htmlFor="body" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Details</label>
               <textarea id="body" name="body" rows={8} required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="Share the context..." />
             </div>
 
-            <label className="flex items-center gap-2 text-sm text-gray-700">
-              <input type="checkbox" name="is_anonymous" value="true" className="rounded text-purple-600" />
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input type="checkbox" name="is_anonymous" value="true" className="rounded text-purple-600 dark:text-purple-400 dark:bg-gray-950 dark:text-gray-100" />
               Post anonymously (your identity stays visible to admins for moderation, but other members will see &ldquo;Anonymous Member&rdquo;)
             </label>
 
             <div>
-              <label htmlFor="feed_visibility" className="block text-sm font-medium text-gray-700">Show in followers&rsquo; feed</label>
+              <label htmlFor="feed_visibility" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Show in followers&rsquo; feed</label>
               <select id="feed_visibility" name="feed_visibility" defaultValue="public"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
                 <option value="public">Public</option>
                 <option value="followers">Followers only</option>
                 <option value="private">Don&rsquo;t include</option>

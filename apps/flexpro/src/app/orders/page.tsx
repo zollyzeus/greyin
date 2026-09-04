@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Package, Clock, CheckCircle, XCircle, TrendingUp } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function OrdersPage() {
   const supabase = await createClient()
@@ -27,26 +28,26 @@ export default async function OrdersPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="w-5 h-5 text-green-500" />
+        return <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />
       case 'cancelled':
       case 'refunded':
-        return <XCircle className="w-5 h-5 text-red-500" />
+        return <XCircle className="w-5 h-5 text-red-500 dark:text-red-400" />
       case 'in_progress':
-        return <TrendingUp className="w-5 h-5 text-blue-500" />
+        return <TrendingUp className="w-5 h-5 text-blue-500 dark:text-blue-400" />
       default:
-        return <Clock className="w-5 h-5 text-yellow-500" />
+        return <Clock className="w-5 h-5 text-yellow-500 dark:text-yellow-400" />
     }
   }
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { bg: string; text: string }> = {
-      pending: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
-      paid: { bg: 'bg-green-100', text: 'text-green-800' },
-      in_progress: { bg: 'bg-blue-100', text: 'text-blue-800' },
-      delivered: { bg: 'bg-purple-100', text: 'text-purple-800' },
-      completed: { bg: 'bg-green-100', text: 'text-green-800' },
-      cancelled: { bg: 'bg-red-100', text: 'text-red-800' },
-      refunded: { bg: 'bg-gray-100', text: 'text-gray-800' },
+      pending: { bg: 'bg-yellow-100 dark:bg-yellow-950/40', text: 'text-yellow-800 dark:text-yellow-400' },
+      paid: { bg: 'bg-green-100 dark:bg-green-950/40', text: 'text-green-800 dark:text-green-400' },
+      in_progress: { bg: 'bg-blue-100 dark:bg-blue-950/40', text: 'text-blue-800 dark:text-blue-400' },
+      delivered: { bg: 'bg-purple-100 dark:bg-purple-950/40', text: 'text-purple-800 dark:text-purple-400' },
+      completed: { bg: 'bg-green-100 dark:bg-green-950/40', text: 'text-green-800 dark:text-green-400' },
+      cancelled: { bg: 'bg-red-100 dark:bg-red-950/40', text: 'text-red-800 dark:text-red-400' },
+      refunded: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-800 dark:text-gray-100' },
     }
 
     const config = statusConfig[status] || statusConfig.pending
@@ -58,17 +59,18 @@ export default async function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
             ← Back to Dashboard
           </Link>
-        </div>
+            <ThemeToggle />
+          </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Orders</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8 dark:text-gray-50">My Orders</h1>
 
         {/* Purchases */}
         <div className="mb-12">
@@ -83,7 +85,7 @@ export default async function OrdersPage() {
                 <Link
                   key={order.id}
                   href={`/orders/${order.id}`}
-                  className="block bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+                  className="block bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 dark:bg-gray-900"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex gap-4 flex-1">
@@ -98,21 +100,21 @@ export default async function OrdersPage() {
                         <div className="flex items-start justify-between">
                           <div>
                             <h3 className="font-semibold text-lg mb-1">{order.gig?.title}</h3>
-                            <p className="text-sm text-gray-600 mb-2">
+                            <p className="text-sm text-gray-600 mb-2 dark:text-gray-400">
                               Seller: {order.seller?.full_name}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
                               Package: <span className="capitalize">{order.package_type}</span>
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-lg text-indigo-600 mb-2">
+                            <p className="font-bold text-lg text-indigo-600 mb-2 dark:text-indigo-400">
                               ₹{order.amount?.toLocaleString()}
                             </p>
                             {getStatusBadge(order.status)}
                           </div>
                         </div>
-                        <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
+                        <div className="mt-3 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                           <span>Ordered: {new Date(order.created_at).toLocaleDateString()}</span>
                           {order.delivered_at && (
                             <span>Delivered: {new Date(order.delivered_at).toLocaleDateString()}</span>
@@ -125,10 +127,10 @@ export default async function OrdersPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow p-12 text-center">
-              <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No purchases yet</h3>
-              <p className="text-gray-600 mb-6">Browse gigs and place your first order</p>
+            <div className="bg-white rounded-lg shadow p-12 text-center dark:bg-gray-900">
+              <Package className="w-16 h-16 text-gray-400 mx-auto mb-4 dark:text-gray-500" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 dark:text-gray-50">No purchases yet</h3>
+              <p className="text-gray-600 mb-6 dark:text-gray-400">Browse gigs and place your first order</p>
               <Link
                 href="/gigs"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
@@ -152,7 +154,7 @@ export default async function OrdersPage() {
                 <Link
                   key={order.id}
                   href={`/orders/${order.id}`}
-                  className="block bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+                  className="block bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 dark:bg-gray-900"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex gap-4 flex-1">
@@ -167,21 +169,21 @@ export default async function OrdersPage() {
                         <div className="flex items-start justify-between">
                           <div>
                             <h3 className="font-semibold text-lg mb-1">{order.gig?.title}</h3>
-                            <p className="text-sm text-gray-600 mb-2">
+                            <p className="text-sm text-gray-600 mb-2 dark:text-gray-400">
                               Buyer: {order.buyer?.full_name}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
                               Package: <span className="capitalize">{order.package_type}</span>
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-lg text-green-600 mb-2">
+                            <p className="font-bold text-lg text-green-600 mb-2 dark:text-green-400">
                               ₹{order.amount?.toLocaleString()}
                             </p>
                             {getStatusBadge(order.status)}
                           </div>
                         </div>
-                        <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
+                        <div className="mt-3 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                           <span>Ordered: {new Date(order.created_at).toLocaleDateString()}</span>
                           {order.delivered_at && (
                             <span>Delivered: {new Date(order.delivered_at).toLocaleDateString()}</span>
@@ -194,10 +196,10 @@ export default async function OrdersPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow p-12 text-center">
-              <TrendingUp className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No sales yet</h3>
-              <p className="text-gray-600">Orders from buyers will appear here</p>
+            <div className="bg-white rounded-lg shadow p-12 text-center dark:bg-gray-900">
+              <TrendingUp className="w-16 h-16 text-gray-400 mx-auto mb-4 dark:text-gray-500" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 dark:text-gray-50">No sales yet</h3>
+              <p className="text-gray-600 dark:text-gray-400">Orders from buyers will appear here</p>
             </div>
           )}
         </div>

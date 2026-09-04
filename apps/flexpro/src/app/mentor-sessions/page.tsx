@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Briefcase, ArrowLeft, GraduationCap } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function MentorSessionsPage({
   searchParams,
@@ -22,27 +23,28 @@ export default async function MentorSessionsPage({
   const { data: gigs } = await query
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-indigo-600" />
+              <Briefcase className="h-8 w-8 text-orange-600 dark:text-orange-400" />
               <span className="ml-2 text-2xl font-bold">FlexPro</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6">
+        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to dashboard
         </Link>
 
         <div className="flex items-center gap-2 mb-6">
-          <GraduationCap className="h-6 w-6 text-indigo-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Mentor Sessions</h1>
+          <GraduationCap className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Mentor Sessions</h1>
         </div>
 
         {gigs && gigs.length > 0 ? (
@@ -51,13 +53,13 @@ export default async function MentorSessionsPage({
               <Link
                 key={gig.id}
                 href={`/mentor-sessions/${gig.id}`}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition"
+                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition dark:bg-gray-900"
               >
-                <h3 className="font-semibold text-gray-900 mb-1">{gig.title}</h3>
-                <p className="text-sm text-gray-600 line-clamp-2 mb-3">{gig.description}</p>
+                <h3 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">{gig.title}</h3>
+                <p className="text-sm text-gray-600 line-clamp-2 mb-3 dark:text-gray-400">{gig.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">with {gig.seller?.full_name || 'a mentor'}</span>
-                  <span className="font-semibold text-indigo-600">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">with {gig.seller?.full_name || 'a mentor'}</span>
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">
                     {gig.price_min > 0 ? `₹${gig.price_min.toLocaleString()}` : 'Free'}
                   </span>
                 </div>
@@ -65,9 +67,9 @@ export default async function MentorSessionsPage({
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="bg-white rounded-lg shadow-md p-12 text-center dark:bg-gray-900">
             <GraduationCap className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No mentor sessions available yet</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 dark:text-gray-50">No mentor sessions available yet</h3>
           </div>
         )}
       </div>

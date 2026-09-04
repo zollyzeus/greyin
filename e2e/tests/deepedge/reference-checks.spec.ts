@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
-import { getUserIdByEmail, getJobIdByTitle, createTestGig, createCompletedOrder } from '../../utils/admin'
+import { getUserIdByEmail, getJobIdByTitle, createTestGig, createCompletedOrder, grantActiveSubscriptionTier } from '../../utils/admin'
 
 /**
  * Employer-initiated private reference checks (065/066_reference_checks*.sql).
@@ -69,6 +69,7 @@ test('a candidate can list references, an employer can request one tied to a rea
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(employerPage, employer, '/employer/dashboard')
 
   const jobTitle = `E2E Reference Check Role ${Date.now()}`

@@ -26,7 +26,13 @@ test('an author can upload a cover image when writing a post', async ({ page, cl
   await page.waitForURL(/\/posts\/.+\/edit/)
   // posts.author_id is ON DELETE SET NULL, not CASCADE — track explicitly.
   cleanup.trackEntity('posts', await getPostIdBySlug(page.url().split('/posts/')[1].replace('/edit', '')))
+  // ImageUploader.tsx nests uploads under the uploader's own user.id
+  // before the folder name (`${user.id}/${folder}/...`), so the real
+  // storage path is public-images/<userId>/post-covers/<file> -- not
+  // public-images/post-covers/<file> adjacent, which this regex
+  // incorrectly assumed and could never match regardless of whether the
+  // upload itself worked.
   const coverImage = page.locator('img[alt=""]').first()
   await expect(coverImage).toBeVisible()
-  await expect(coverImage).toHaveAttribute('src', /public-images\/post-covers\//)
+  await expect(coverImage).toHaveAttribute('src', /\/post-covers\//)
 })

@@ -33,7 +33,7 @@ test('a member can message another member from the directory and get a reply', a
 
   // The recipient should be notified and able to see + reply to the message.
   await recipientPage.goto('/dashboard')
-  await expect(recipientPage.getByTitle('Notifications')).toContainText('1')
+  await expect(recipientPage.getByLabel('Notifications')).toContainText('1')
 
   await recipientPage.goto('/messages')
   await expect(recipientPage.getByText(sender.firstName, { exact: false })).toBeVisible()

@@ -1,6 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpFlexPro, signUpStackWorksBuilder, login } from '../../utils/auth'
-import { createCompletedOrder, getUserIdByEmail } from '../../utils/admin'
+import { createCompletedOrder, getUserIdByEmail, grantFreeagentSubscription } from '../../utils/admin'
 
 /**
  * cross-platform/trust-signals.spec.ts already proves StackWorks verified
@@ -41,6 +41,11 @@ test("a seller's FlexPro rating/review count shows up when a StackWorks ask owne
   const sellerCtx = await browser.newContext()
   const sellerPage = await sellerCtx.newPage()
   const seller = await signUpFlexPro(sellerPage, 'freelancer', cleanup, 15, flexproBase)
+  // Publishing a gig requires an active subscription (093/094/096's own
+  // gate) -- this test never granted one, so the seller was always
+  // silently redirected to /subscribe on "Publish Gig", never reaching
+  // a real gig at all. A known, previously-flagged-but-unfixed gap.
+  await grantFreeagentSubscription(await getUserIdByEmail(seller.email))
   await login(sellerPage, seller, `${flexproBase}/dashboard`, flexproBase)
 
   const gigTitle = `E2E Trust Signal Gig ${Date.now()}`

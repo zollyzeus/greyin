@@ -52,14 +52,14 @@ export function GigQualityAssist() {
         type="button"
         onClick={handleClick}
         disabled={loading}
-        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 border border-blue-200 bg-blue-50 rounded-lg px-3 py-2 hover:bg-blue-100 disabled:opacity-60"
+        className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 border border-blue-200 bg-blue-50 rounded-lg px-3 py-2 hover:bg-blue-100 disabled:opacity-60 dark:text-blue-400 dark:border-blue-900 dark:bg-blue-950/40"
       >
         <Sparkles className="w-4 h-4" />
         {loading ? 'Thinking…' : 'Get AI suggestions'}
       </button>
-      {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
+      {error && <p className="text-xs text-red-600 mt-2 dark:text-red-400">{error}</p>}
       {suggestions && (
-        <p className="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 mt-2">
+        <p className="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 mt-2 dark:text-gray-300 dark:bg-gray-950 dark:border-gray-800">
           {suggestions}
         </p>
       )}

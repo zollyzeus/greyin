@@ -22,8 +22,8 @@ export function FollowButton({
         type="submit"
         className={
           isFollowing
-            ? 'flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-red-600'
-            : 'flex items-center gap-1.5 text-sm font-medium text-orange-600 hover:text-orange-700'
+            ? 'flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-red-600 dark:text-gray-400'
+            : 'flex items-center gap-1.5 text-sm font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300'
         }
       >
         {isFollowing ? <UserMinus className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}

@@ -8,6 +8,9 @@ const OTHER_PILLARS = PILLARS.filter((p) => p.key !== 'longlist')
 // before this. Mounted once in layout.tsx so it's on every route. Same
 // shape as every other pillar app's own new footer: brand + tagline,
 // app-specific nav links, a cross-pillar row, copyright.
+// Deliberately theme-invariant -- see apps/greyin-hub/src/components/
+// SiteFooter.tsx's own comment: already a dark surface before light/dark
+// mode existed, and stays that way in both themes.
 export function SiteFooter() {
   return (
     <footer className="bg-gray-900 text-gray-300 py-12">

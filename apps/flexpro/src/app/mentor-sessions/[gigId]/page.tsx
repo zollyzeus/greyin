@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Briefcase, ArrowLeft, Clock } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function MentorSessionDetailPage({
   params,
@@ -89,53 +90,54 @@ export default async function MentorSessionDetailPage({
   const seller = gig.seller as unknown as { full_name: string | null } | null
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white border-b dark:bg-gray-900">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-indigo-600" />
+              <Briefcase className="h-8 w-8 text-orange-600 dark:text-orange-400" />
               <span className="ml-2 text-2xl font-bold">FlexPro</span>
             </a>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/mentor-sessions" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6">
+        <Link href="/mentor-sessions" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to mentor sessions
         </Link>
 
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
             {decodeURIComponent(error)}
           </div>
         )}
         {success && (
-          <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+          <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
             Booked using a session credit.
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{gig.title}</h1>
-          <p className="text-sm text-gray-500 mb-4">with {seller?.full_name || 'a mentor'}</p>
-          <p className="text-gray-700 whitespace-pre-wrap mb-4">{gig.description}</p>
-          <p className="font-semibold text-indigo-600">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1 dark:text-gray-50">{gig.title}</h1>
+          <p className="text-sm text-gray-500 mb-4 dark:text-gray-400">with {seller?.full_name || 'a mentor'}</p>
+          <p className="text-gray-700 whitespace-pre-wrap mb-4 dark:text-gray-300">{gig.description}</p>
+          <p className="font-semibold text-indigo-600 dark:text-indigo-400">
             {gig.price_min > 0 ? `₹${gig.price_min.toLocaleString()} per session` : 'Free'}
           </p>
         </div>
 
         {packages && packages.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Session packages</h2>
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-50">Session packages</h2>
             <div className="space-y-3">
               {packages.map((pkg) => (
-                <div key={pkg.id} className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
+                <div key={pkg.id} className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3 dark:border-gray-800">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{pkg.title}</p>
-                    <p className="text-xs text-gray-500">{pkg.session_count} sessions &middot; ₹{pkg.price.toLocaleString()}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-50">{pkg.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{pkg.session_count} sessions &middot; ₹{pkg.price.toLocaleString()}</p>
                   </div>
                   {user && user.id !== gig.freelancer_id ? (
                     <form action={`/api/mentor-sessions/packages/${pkg.id}/purchase`} method="POST">
@@ -144,7 +146,7 @@ export default async function MentorSessionDetailPage({
                       </button>
                     </form>
                   ) : !user ? (
-                    <Link href={`/login?next=/mentor-sessions/${gig.id}`} className="text-indigo-600 text-sm font-semibold hover:text-indigo-700">
+                    <Link href={`/login?next=/mentor-sessions/${gig.id}`} className="text-indigo-600 text-sm font-semibold hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
                       Sign in
                     </Link>
                   ) : null}
@@ -154,8 +156,8 @@ export default async function MentorSessionDetailPage({
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-gray-900">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2 dark:text-gray-50">
             <Clock className="h-5 w-5" />
             Available times
           </h2>
@@ -165,17 +167,17 @@ export default async function MentorSessionDetailPage({
                 const isCohort = slot.capacity > 1
                 const seatsLeft = slot.capacity - slot.booked_count
                 return (
-                  <div key={slot.id} className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
-                    <span className="text-sm text-gray-700">
+                  <div key={slot.id} className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3 dark:border-gray-800">
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
                       {new Date(slot.starts_at).toLocaleString()} &ndash; {new Date(slot.ends_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      {isCohort && <span className="ml-2 text-xs text-purple-600 font-medium">{seatsLeft} seat{seatsLeft === 1 ? '' : 's'} left</span>}
+                      {isCohort && <span className="ml-2 text-xs text-purple-600 font-medium dark:text-purple-400">{seatsLeft} seat{seatsLeft === 1 ? '' : 's'} left</span>}
                     </span>
                     {user ? (
                       user.id === gig.freelancer_id ? (
-                        <span className="text-xs text-gray-400">This is your own slot</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">This is your own slot</span>
                       ) : myCredits.length > 0 ? (
                         <form action={`/api/mentor-sessions/slots/${slot.id}/book-with-credit`} method="POST" className="flex items-center gap-2">
-                          <select name="package_purchase_id" className="border border-gray-300 rounded-lg px-2 py-1 text-xs">
+                          <select name="package_purchase_id" className="border border-gray-300 rounded-lg px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
                             {myCredits.map((c) => (
                               <option key={c.id} value={c.id}>{c.title} ({c.sessions_remaining} left)</option>
                             ))}
@@ -194,7 +196,7 @@ export default async function MentorSessionDetailPage({
                         </form>
                       )
                     ) : (
-                      <Link href={`/login?next=/mentor-sessions/${gig.id}`} className="text-indigo-600 text-sm font-semibold hover:text-indigo-700">
+                      <Link href={`/login?next=/mentor-sessions/${gig.id}`} className="text-indigo-600 text-sm font-semibold hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
                         Sign in to book
                       </Link>
                     )}
@@ -203,19 +205,19 @@ export default async function MentorSessionDetailPage({
               })}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">No open times right now.</p>
+            <p className="text-gray-500 text-sm dark:text-gray-400">No open times right now.</p>
           )}
         </div>
 
         {recordings && recordings.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Past session replays</h2>
+          <div className="bg-white rounded-lg shadow-md p-6 dark:bg-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-50">Past session replays</h2>
             <div className="space-y-3">
               {recordings.map((rec) => (
-                <div key={rec.id} className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3">
-                  <p className="text-sm text-gray-700">{new Date(rec.starts_at).toLocaleDateString()} &middot; ₹{rec.recording_price?.toLocaleString()}</p>
+                <div key={rec.id} className="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-3 dark:border-gray-800">
+                  <p className="text-sm text-gray-700 dark:text-gray-300">{new Date(rec.starts_at).toLocaleDateString()} &middot; ₹{rec.recording_price?.toLocaleString()}</p>
                   {user && recordingIdsOwned.has(rec.id) && visibleRecordingUrls.has(rec.id) ? (
-                    <a href={visibleRecordingUrls.get(rec.id)!} target="_blank" rel="noreferrer" className="text-indigo-600 text-sm font-semibold hover:text-indigo-700">
+                    <a href={visibleRecordingUrls.get(rec.id)!} target="_blank" rel="noreferrer" className="text-indigo-600 text-sm font-semibold hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
                       Watch
                     </a>
                   ) : user && user.id !== gig.freelancer_id ? (
@@ -225,7 +227,7 @@ export default async function MentorSessionDetailPage({
                       </button>
                     </form>
                   ) : !user ? (
-                    <Link href={`/login?next=/mentor-sessions/${gig.id}`} className="text-indigo-600 text-sm font-semibold hover:text-indigo-700">
+                    <Link href={`/login?next=/mentor-sessions/${gig.id}`} className="text-indigo-600 text-sm font-semibold hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
                       Sign in
                     </Link>
                   ) : null}

@@ -1,5 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
+import { grantActiveSubscriptionTier, getUserIdByEmail } from '../../utils/admin'
 
 test('a candidate is notified when a job matching their saved alert is posted', async ({ browser, cleanup }) => {
   const candidateCtx = await browser.newContext()
@@ -16,6 +17,7 @@ test('a candidate is notified when a job matching their saved alert is posted', 
   const employerCtx = await browser.newContext()
   const employerPage = await employerCtx.newPage()
   const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer.email), 'basic')
   await login(employerPage, employer, '/employer/dashboard')
 
   const jobTitle = `${keyword} Staff Engineer`
@@ -29,7 +31,7 @@ test('a candidate is notified when a job matching their saved alert is posted', 
   await employerCtx.close()
 
   await candidatePage.goto('/dashboard')
-  await expect(candidatePage.getByTitle('Notifications')).toContainText('1')
+  await expect(candidatePage.getByLabel('Notifications')).toContainText('1')
   await candidatePage.goto('/notifications')
   await expect(candidatePage.getByText('New job matching your alert')).toBeVisible()
   await expect(candidatePage.getByText(jobTitle, { exact: false })).toBeVisible()
@@ -46,6 +48,7 @@ test('a candidate is notified when a job matching their saved alert is posted', 
   const employerCtx2 = await browser.newContext()
   const employerPage2 = await employerCtx2.newPage()
   const employer2 = await signUpDeepEdge(employerPage2, 'employer', cleanup)
+  await grantActiveSubscriptionTier(await getUserIdByEmail(employer2.email), 'basic')
   await login(employerPage2, employer2, '/employer/dashboard')
 
   const secondJobTitle = `${keyword} Second Role`
@@ -63,7 +66,7 @@ test('a candidate is notified when a job matching their saved alert is posted', 
   // produced a second (the unread badge only renders at all once
   // unreadCount > 0, so its absence here is itself the "zero" signal).
   await candidatePage.goto('/dashboard')
-  await expect(candidatePage.getByTitle('Notifications')).not.toContainText(/\d/)
+  await expect(candidatePage.getByLabel('Notifications')).not.toContainText(/\d/)
   await candidatePage.goto('/notifications')
   await expect(candidatePage.getByText(secondJobTitle, { exact: false })).not.toBeVisible()
 
