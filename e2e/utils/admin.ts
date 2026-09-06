@@ -833,6 +833,42 @@ export async function setSellerRating(userId: string, rating: number, totalRevie
 }
 
 /**
+ * profiles.future_interests/future_interests_note (087) is normally set
+ * through Longlist's own /profile form -- seeded directly here so tests
+ * of other apps' consumers (e.g. FlexPro's AI mentor matching, 118)
+ * don't need a whole second cross-app signup+form flow just to get this
+ * one field populated.
+ */
+export async function setFutureInterests(userId: string, interests: string[], note?: string): Promise<void> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`, {
+    method: 'PATCH',
+    headers: restHeaders(),
+    body: JSON.stringify({ future_interests: interests, future_interests_note: note ?? null }),
+  })
+  if (!res.ok) {
+    throw new Error(`Failed to set future interests: ${res.status} ${await res.text()}`)
+  }
+}
+
+/**
+ * profile_demographics (119, bias/fairness audit) is entirely
+ * self-service through Longlist's own /profile form -- seeded directly
+ * here the same way setFutureInterests() is, so a test of the audit
+ * report itself doesn't need to drive that whole form for every seeded
+ * member.
+ */
+export async function setDemographics(userId: string, fields: { gender?: string; age_range?: string; disability_status?: string }): Promise<void> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/profile_demographics`, {
+    method: 'POST',
+    headers: { ...restHeaders(), Prefer: 'resolution=merge-duplicates' },
+    body: JSON.stringify({ user_id: userId, ...fields }),
+  })
+  if (!res.ok) {
+    throw new Error(`Failed to set demographics: ${res.status} ${await res.text()}`)
+  }
+}
+
+/**
  * Auth signup auto-creates a companies row per employer (auth/signup/
  * route.ts) -- this looks it up rather than assuming a fixed id, since
  * seeding backdated jobs (below) needs a real company_id to satisfy
@@ -894,13 +930,16 @@ export async function createBackdatedJob(opts: {
 /**
  * Directly flips an llm_feature_flags row rather than driving
  * /admin/llm's UI -- that panel is already covered by
- * admin-llm.spec.ts's own test-only flag; a real flag like
- * longlist_candidate_matching is genuinely OFF by default (a real
- * product decision, not an oversight -- it surfaces a member's profile
- * to an employer with no explicit opt-in for that specific role), so a
- * spec exercising the real matching pipeline must flip it on for its
- * own duration and always flip it back off in a finally block,
- * regardless of pass/fail, rather than leaving live behavior changed.
+ * admin-llm.spec.ts's own test-only flag. A flag's "resting" state is a
+ * real product decision (e.g. longlist_candidate_matching was OFF by
+ * default, then turned ON as a standing decision 2026-09-05 while no
+ * real user data is on the platform) and can change independently of
+ * any one spec -- a spec that needs a flag in a specific state for its
+ * own duration should read the current value first with
+ * getLLMFeatureFlagEnabled() and restore *that* in its finally block,
+ * not hardcode true or false, or it will silently fight whatever the
+ * standing decision currently is (this bit longlist-role-lifecycle-
+ * and-matching.spec.ts, which hardcoded false, until 2026-09-06).
  */
 export async function setLLMFeatureFlag(featureKey: string, enabled: boolean): Promise<void> {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/llm_feature_flags?feature_key=eq.${encodeURIComponent(featureKey)}`, {
@@ -911,4 +950,15 @@ export async function setLLMFeatureFlag(featureKey: string, enabled: boolean): P
   if (!res.ok) {
     throw new Error(`Failed to set llm_feature_flags.${featureKey}.enabled=${enabled}: ${res.status} ${await res.text()}`)
   }
+}
+
+export async function getLLMFeatureFlagEnabled(featureKey: string): Promise<boolean> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/llm_feature_flags?feature_key=eq.${encodeURIComponent(featureKey)}&select=enabled`, {
+    headers: restHeaders(),
+  })
+  if (!res.ok) {
+    throw new Error(`Failed to read llm_feature_flags.${featureKey}: ${res.status} ${await res.text()}`)
+  }
+  const [row] = await res.json()
+  return !!row?.enabled
 }

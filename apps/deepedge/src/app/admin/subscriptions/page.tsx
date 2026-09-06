@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Building2, ArrowLeft } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { ArrowLeft } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 const SERVICE_LABELS: Record<string, { label: string; className: string }> = {
   subscription: { label: 'Candidate Search', className: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400' },
@@ -24,10 +24,12 @@ export default async function AdminSubscriptionsPage({
     redirect('/login?next=/admin/subscriptions')
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('role, full_name').eq('id', user.id).single()
   if (profile?.role !== 'admin') {
     redirect('/dashboard')
   }
+
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   const { data: leads } = await supabase
     .from('enterprise_leads')
@@ -42,19 +44,12 @@ export default async function AdminSubscriptionsPage({
     .limit(50)
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
-              <span className="ml-2 text-2xl font-bold">DeepEdge</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Admin · Subscriptions"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <Link href="/admin" className="flex items-center text-gray-600 hover:text-indigo-600 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -162,6 +157,6 @@ export default async function AdminSubscriptionsPage({
           )}
         </div>
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

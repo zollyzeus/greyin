@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { FlaskConical, ArrowLeft, ShieldCheck, Bot } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { ShieldCheck, Bot } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
+import { isBuilder } from '@/lib/stackworks-role'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -12,10 +13,11 @@ export default async function AdminPage() {
     redirect('/login?next=/admin')
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('full_name, role, years_experience, stackworks_role').eq('id', user.id).single()
   if (profile?.role !== 'admin') {
     redirect('/dashboard')
   }
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   // No cron in this deployment -- catch up any outcome whose 14-day
   // review window lapsed with nobody reviewing it before this page reads
@@ -50,25 +52,16 @@ export default async function AdminPage() {
     .limit(50)
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <FlaskConical className="h-8 w-8 text-teal-600 dark:text-teal-400" />
-              <span className="ml-2 text-2xl font-bold">StackWorks</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      activeSection="admin"
+      builder={profile ? isBuilder(profile) : false}
+      isAdmin={true}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Admin"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-teal-600 mb-6 dark:text-gray-400">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to dashboard
-        </Link>
-
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-teal-600 dark:text-teal-400" />
@@ -199,6 +192,6 @@ export default async function AdminPage() {
           </div>
         </div>
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

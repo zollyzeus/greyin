@@ -1,11 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { Package, Clock, CheckCircle, MessageSquare, Download, AlertCircle } from 'lucide-react'
 import OrderChat from '@/components/OrderChat'
 import OrderReview from '@/components/OrderReview'
 import SkillRatingForm from '@/components/SkillRatingForm'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function OrderDetailPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -14,6 +13,9 @@ export default async function OrderDetailPage({ params }: { params: { id: string
   if (!user) {
     redirect(`/login?next=/orders/${params.id}`)
   }
+
+  const { data: viewerProfile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle()
+  const { data: viewerScoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   // Get order details
   const { data: order } = await supabase
@@ -59,16 +61,14 @@ export default async function OrderDetailPage({ params }: { params: { id: string
   const StatusIcon = statusInfo.icon
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/orders" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
-            ← Back to Orders
-          </Link>
-            <ThemeToggle />
-          </div>
-      </header>
-
+    <WorkspaceShell
+      activeSection="orders"
+      role={viewerProfile?.role}
+      userName={viewerProfile?.full_name || 'User'}
+      verified={!!viewerScoreRow?.is_verified_expert}
+      greyinScore={viewerScoreRow?.greyin_score ?? null}
+      pageTitle="Order Detail"
+    >
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Order Header */}
         <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
@@ -447,6 +447,6 @@ export default async function OrderDetailPage({ params }: { params: { id: string
           </div>
         </div>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

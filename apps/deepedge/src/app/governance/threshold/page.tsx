@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { SiteHeader } from '@/components/SiteHeader'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 import { Vote, BadgeCheck } from 'lucide-react'
 
 export default async function ThresholdGovernancePage({
@@ -17,16 +17,20 @@ export default async function ThresholdGovernancePage({
     redirect('/login?next=/governance/threshold')
   }
 
-  const [{ data: settings }, { data: myVote }, { data: myScore }] = await Promise.all([
+  const [{ data: settings }, { data: myVote }, { data: myScore }, { data: profile }] = await Promise.all([
     supabase.from('platform_gate_settings').select('*').eq('id', 1).single(),
     supabase.from('threshold_votes').select('*').eq('user_id', user.id).maybeSingle(),
     supabase.from('greyin_scores').select('is_verified_expert, greyin_score').eq('user_id', user.id).maybeSingle(),
+    supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle(),
   ])
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <SiteHeader />
-
+    <WorkspaceShell
+      userName={profile?.full_name || 'User'}
+      verified={!!myScore?.is_verified_expert}
+      greyinScore={myScore?.greyin_score ?? null}
+      pageTitle="Governance"
+    >
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center gap-2 mb-2">
           <Vote className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
@@ -116,6 +120,6 @@ export default async function ThresholdGovernancePage({
           <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Back to dashboard</Link>
         </p>
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

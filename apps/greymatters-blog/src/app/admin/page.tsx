@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/app/lib/supabase/server'
-import { BookOpen, ArrowLeft, ShieldCheck, Send, Sparkles } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { ShieldCheck, Send, Sparkles } from 'lucide-react'
+import { WorkspaceShell } from '@/app/components/WorkspaceShell'
 
 export default async function AdminPage({
   searchParams,
@@ -17,10 +16,11 @@ export default async function AdminPage({
     redirect('/login?next=/admin')
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).single()
   if (profile?.role !== 'admin') {
     redirect('/dashboard')
   }
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   const { data: posts } = await supabase
     .from('posts')
@@ -63,25 +63,15 @@ export default async function AdminPage({
     .maybeSingle()
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <BookOpen className="h-8 w-8 text-sky-600 dark:text-sky-400" />
-              <span className="ml-2 text-2xl font-bold">GreyMatters</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      activeSection="admin"
+      isAdmin={true}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Admin"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to dashboard
-        </Link>
-
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -224,6 +214,6 @@ export default async function AdminPage({
           </div>
         </div>
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

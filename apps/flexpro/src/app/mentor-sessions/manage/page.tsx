@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Briefcase, ArrowLeft, Plus } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { Plus } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function ManageMentorSessionsPage({
   searchParams,
@@ -21,10 +20,11 @@ export default async function ManageMentorSessionsPage({
   // same "check a shared profiles column, no cross-app call needed"
   // pattern already used elsewhere (e.g. greyin_scores/reputation_scores
   // reads).
-  const { data: profile } = await supabase.from('profiles').select('is_mentor').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('full_name, role, is_mentor').eq('id', user.id).single()
   if (!profile?.is_mentor) {
     redirect('/dashboard')
   }
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   const { data: gigs } = await supabase
     .from('gigs')
@@ -62,25 +62,14 @@ export default async function ManageMentorSessionsPage({
     : { data: [] }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-orange-600 dark:text-orange-400" />
-              <span className="ml-2 text-2xl font-bold">FlexPro</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      role={profile?.role}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Manage Mentor Sessions"
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to dashboard
-        </Link>
-
         <h1 className="text-2xl font-bold text-gray-900 mb-6 dark:text-gray-50">Manage Mentor Sessions</h1>
 
         {error && (
@@ -207,6 +196,6 @@ export default async function ManageMentorSessionsPage({
           </div>
         )}
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

@@ -1,8 +1,16 @@
 import Link from 'next/link'
-import { BookOpen } from 'lucide-react'
+import { Building2, BookOpen, Users, Briefcase, FlaskConical, Telescope, Shuffle, RotateCcw } from 'lucide-react'
+import { SharePage } from '@/app/components/SharePage'
 import { PILLARS } from '@/app/components/EcosystemWidget'
 
-const OTHER_PILLARS = PILLARS.filter((p) => p.key !== 'greymatters')
+const PILLAR_ICONS: Record<string, typeof Building2> = {
+  deepedge: Building2,
+  greymatters: BookOpen,
+  saltnpepper: Users,
+  flexpro: Briefcase,
+  stackworks: FlaskConical,
+  longlist: Telescope,
+}
 
 // Common footer (2026-09-03) -- previously only the homepage had one (a
 // bare copyright + RSS line); every other page (post detail, categories,
@@ -43,16 +51,43 @@ export function SiteFooter() {
             </ul>
           </div>
         </div>
-        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm border-t border-gray-800 pt-8">
-          {OTHER_PILLARS.map((p) => (
-            <a key={p.key} href={p.url} className="flex items-center gap-1.5 hover:text-white transition">
-              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} aria-hidden="true" />
-              {p.label}
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 text-sm border-t border-gray-800 mt-8 pt-8">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            {PILLARS.map((p) => {
+              const Icon = PILLAR_ICONS[p.key]
+              return (
+                <a key={p.key} href={p.url} className="flex items-center gap-1.5 hover:text-white transition">
+                  <Icon className="h-3.5 w-3.5 flex-shrink-0" style={{ color: p.color }} aria-hidden="true" />
+                  {p.label}
+                </a>
+              )
+            })}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <a href="https://greyin.net/pivoting" className="flex items-center gap-1.5 hover:text-white transition">
+              <Shuffle className="h-3.5 w-3.5 flex-shrink-0" style={{ color: '#EA580C' }} aria-hidden="true" />
+              Pivoting
             </a>
-          ))}
+            <a href="https://greyin.net/reentry" className="flex items-center gap-1.5 hover:text-white transition">
+              <RotateCcw className="h-3.5 w-3.5 flex-shrink-0" style={{ color: '#2563EB' }} aria-hidden="true" />
+              Returning to Work
+            </a>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <a href="https://greyin.net/wishlist" className="hover:text-white transition">Wishlist</a>
+            <a href="https://greyin.net/feedback?app=greymatters" className="hover:text-white transition">Feedback</a>
+          </div>
         </div>
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} GreyMatters by Greyin. All rights reserved.</p>
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 text-sm border-t border-gray-800 mt-8 pt-8">
+          <SharePage />
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 text-sm border-t border-gray-800 mt-6 pt-6">
+          <a href="https://greyin.net" className="flex items-center gap-2 hover:text-white transition">
+            <img src="/logo.png" alt="" className="h-5 w-5 flex-shrink-0" style={{ filter: 'brightness(0) invert(1)' }} aria-hidden="true" />
+            <span className="font-bold text-white">Greyin</span>
+          </a>
+          <p>&copy; {new Date().getFullYear()} Greyin. All rights reserved.</p>
+          <a href="https://greyin.net/feedback?app=greymatters" className="hover:text-white transition">Contact</a>
         </div>
       </div>
     </footer>

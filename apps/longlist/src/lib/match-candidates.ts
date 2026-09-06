@@ -60,9 +60,29 @@ export async function matchCandidatesForRole(
     const parsed = JSON.parse(result.text.trim().replace(/^```json/, '').replace(/^```/, '').replace(/```$/, ''))
     const matches: { id: string; reason: string }[] = parsed.matches || []
     const byId = new Map(people.map((p) => [p.user_id, p.full_name]))
-    return matches
+    const filtered = matches
       .filter((m) => byId.has(m.id))
       .map((m) => ({ user_id: m.id, full_name: byId.get(m.id) ?? null, reason: m.reason }))
+
+    // Bias/fairness audit (119) needs a history of who actually got
+    // surfaced -- this call itself is live/ephemeral (no other
+    // persistence), so without this log get_bias_audit_report() would
+    // have nothing to measure. Best-effort: never blocks returning the
+    // real matches to the caller on a logging failure.
+    if (filtered.length > 0) {
+      try {
+        await service.from('ai_match_audit_log').insert(
+          filtered.map((m) => ({
+            feature_key: 'longlist_candidate_matching',
+            subject_user_id: m.user_id,
+          }))
+        )
+      } catch (logError) {
+        console.error('Failed to write ai_match_audit_log:', logError)
+      }
+    }
+
+    return filtered
   } catch {
     return []
   }

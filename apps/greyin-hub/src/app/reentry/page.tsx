@@ -6,13 +6,17 @@ export default function ReentryPage() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center dark:bg-blue-950/40">
-            <RotateCcw className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">Returning to work</h1>
+      <div className="bg-gradient-to-r from-blue-600 to-sky-600 dark:from-blue-800 dark:to-sky-800 text-white py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <RotateCcw className="h-10 w-10 mx-auto mb-4" aria-hidden="true" />
+          <h1 className="font-display text-5xl font-semibold mb-6">Returning to Work</h1>
+          <p className="text-xl text-blue-50 max-w-2xl mx-auto">
+            A gap in your timeline — caregiving, health, a layoff, a sabbatical — shouldn&rsquo;t cost you a real hiring conversation.
+          </p>
         </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <p className="text-lg text-gray-600 mb-10 dark:text-gray-400">
           Support for professionals returning to work after an employment gap — caregiving, health, a
           layoff, a sabbatical. Unlike a domain switch, there&apos;s no mismatch to route around here:

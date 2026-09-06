@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { User, Mail, Phone, MapPin, Users, Save, BadgeCheck } from 'lucide-react'
+import { User, Save, BadgeCheck } from 'lucide-react'
 import Link from 'next/link'
 import { EcosystemWidget } from '@/components/EcosystemWidget'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
+import { isBuilder } from '@/lib/stackworks-role'
 
 const OUTCOME_STATUS_STYLES: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-400',
@@ -45,7 +46,7 @@ export default async function ProfilePage() {
   // and career experience (036).
   const { data: greyinScoreRow } = await supabase
     .from('greyin_scores')
-    .select('greyin_score, stackworks_score, stackworks_evidence, flexpro_score, flexpro_evidence, saltnpepper_score, saltnpepper_evidence, greymatters_score, greymatters_evidence, platform_composite, years_experience')
+    .select('greyin_score, is_verified_expert, stackworks_score, stackworks_evidence, flexpro_score, flexpro_evidence, saltnpepper_score, saltnpepper_evidence, greymatters_score, greymatters_evidence, platform_composite, years_experience')
     .eq('user_id', user.id)
     .maybeSingle()
 
@@ -60,19 +61,15 @@ export default async function ProfilePage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
-              ← Back to Dashboard
-            </Link>
-            <h1 className="text-xl font-semibold">Community Profile</h1>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      activeSection="profile"
+      builder={profile ? isBuilder(profile) : false}
+      isAdmin={profile?.role === 'admin'}
+      userName={profile?.full_name || 'User'}
+      verified={!!greyinScoreRow?.is_verified_expert}
+      greyinScore={greyinScoreRow?.greyin_score ?? null}
+      pageTitle="Profile"
+    >
       <div className="max-w-4xl mx-auto px-4 py-8">
         <EcosystemWidget activePillars={(memberships || []).map((m) => m.pillar)} />
 
@@ -339,6 +336,6 @@ export default async function ProfilePage() {
           </div>
         </form>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

@@ -1,7 +1,6 @@
-import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
-import { ArrowLeft, UserCheck, Sparkles } from 'lucide-react'
-import { SiteHeader } from '@/components/SiteHeader'
+import { UserCheck, Sparkles } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 import { createClient } from '@/lib/supabase/server'
 import { matchCandidatesForRole } from '@/lib/match-candidates'
 
@@ -39,13 +38,19 @@ export default async function RoleCandidatesPage({ params }: { params: Promise<{
     subscriberIds
   )
 
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <SiteHeader />
+    <WorkspaceShell
+      activeSection="employer-roles"
+      hasCompany={true}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle={role.title}
+    >
       <div className="max-w-3xl mx-auto px-4 py-10">
-        <Link href="/employer/roles" className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-amber-700 mb-6 dark:text-gray-400 dark:hover:text-amber-300">
-          <ArrowLeft className="h-4 w-4" /> Back to Your Future Roles
-        </Link>
         <h1 className="text-2xl font-bold text-gray-900 mb-1 dark:text-gray-50">{role.title}</h1>
         <p className="text-gray-500 mb-8 dark:text-gray-400">Candidates for this role — never shown together on a public page, only here.</p>
 
@@ -88,6 +93,6 @@ export default async function RoleCandidatesPage({ params }: { params: Promise<{
           )}
         </div>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

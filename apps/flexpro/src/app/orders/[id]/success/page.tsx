@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle, Download, MessageSquare, Package } from 'lucide-react'
+import { CheckCircle, Package } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function OrderSuccessPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -10,6 +11,9 @@ export default async function OrderSuccessPage({ params }: { params: { id: strin
   if (!user) {
     redirect(`/login?next=/orders/${params.id}/success`)
   }
+
+  const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   // Get order details
   const { data: order } = await supabase
@@ -24,7 +28,14 @@ export default async function OrderSuccessPage({ params }: { params: { id: strin
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <WorkspaceShell
+      activeSection="orders"
+      role={profile?.role}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Order Confirmed"
+    >
       <div className="max-w-3xl mx-auto px-4 py-12">
         <div className="bg-white rounded-lg shadow-lg p-8 text-center dark:bg-gray-900">
           <div className="mb-6">
@@ -106,6 +117,6 @@ export default async function OrderSuccessPage({ params }: { params: { id: strin
           </div>
         </div>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

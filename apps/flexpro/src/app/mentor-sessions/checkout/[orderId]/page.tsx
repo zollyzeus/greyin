@@ -1,8 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { GraduationCap, ArrowLeft, CreditCard } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { GraduationCap, CreditCard } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 /**
  * Trimmed-down variant of checkout/[id]/page.tsx -- no package-tier
@@ -33,20 +32,17 @@ export default async function MentorSessionCheckoutPage({ params }: { params: { 
     redirect(`/orders/${order.id}`)
   }
 
-  const { data: buyerProfile } = await supabase.from('profiles').select('phone').eq('id', user.id).single()
+  const { data: buyerProfile } = await supabase.from('profiles').select('full_name, role, phone').eq('id', user.id).single()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href={`/mentor-sessions`} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to mentor sessions</span>
-          </Link>
-            <ThemeToggle />
-          </div>
-      </header>
-
+    <WorkspaceShell
+      role={buyerProfile?.role}
+      userName={buyerProfile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Confirm Booking"
+    >
       <div className="max-w-md mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
           <div className="flex items-center gap-2 mb-4">
@@ -130,6 +126,6 @@ export default async function MentorSessionCheckoutPage({ params }: { params: { 
           }
         });
       ` }} />
-    </div>
+    </WorkspaceShell>
   )
 }

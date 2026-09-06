@@ -1,15 +1,21 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { Telescope, Compass, Send, Briefcase, ArrowRight, Settings, LogOut } from 'lucide-react'
-import { NotificationBell } from '@/components/NotificationBell'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { Telescope, Compass, Send, Briefcase, ArrowRight } from 'lucide-react'
 import { EcosystemWidget } from '@/components/EcosystemWidget'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/dashboard')
+
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase
+    .from('greyin_scores')
+    .select('greyin_score, is_verified_expert')
+    .eq('user_id', user.id)
+    .maybeSingle()
 
   const [{ count: openRoleCount }, { count: subscriptionCount }, { data: company }, { data: memberships }] = await Promise.all([
     supabase.from('future_roles_public').select('id', { count: 'exact', head: true }),
@@ -25,34 +31,14 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Lean authenticated-utility bar, matching the other 6 apps'
-          dashboard header shape -- no /feed here since Longlist has no
-          feed route (unlike the marketplace apps this pattern originates
-          from). */}
-      <header className="bg-white border-b dark:bg-gray-950 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <a href="https://greyin.net" className="flex items-center gap-2 text-xl font-bold text-amber-700 dark:text-amber-400">
-              <Telescope className="w-6 h-6" />
-              <span>Longlist</span>
-            </a>
-            <div className="flex items-center gap-4">
-              <NotificationBell />
-              <Link href="/profile" className="p-2" title="Profile">
-                <Settings className="w-5 h-5" />
-              </Link>
-              <ThemeToggle />
-              <form action="/auth/logout" method="POST">
-                <button className="flex items-center gap-2 px-4 py-2">
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </header>
+    <WorkspaceShell
+      activeSection="dashboard"
+      hasCompany={!!company}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Dashboard"
+    >
       <div className="max-w-4xl mx-auto px-4 py-10">
         <h1 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-2 dark:text-gray-50">
           <Telescope className="h-7 w-7 text-amber-700 dark:text-amber-400" />
@@ -120,6 +106,6 @@ export default async function DashboardPage() {
           <EcosystemWidget activePillars={(memberships || []).map((m) => m.pillar)} />
         </div>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

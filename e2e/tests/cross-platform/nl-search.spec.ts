@@ -28,7 +28,16 @@ test('a person-intent natural-language query finds a candidate by their seeded s
   await expect(page.getByText('People on Greyin')).toBeVisible({ timeout: 20000 })
   const resultLink = page.locator(`a[href="${greyinB2BBase}/candidates/${candidateId}"]`)
   await expect(resultLink).toBeVisible()
-  await expect(resultLink.getByText(distinctiveSkill)).toBeVisible()
+  // .first(): the skills line and the "Matched:" rationale line below
+  // both legitimately contain this skill's text, so a bare getByText
+  // resolves to 2 elements.
+  await expect(resultLink.getByText(distinctiveSkill).first()).toBeVisible()
+  // Explainable AI match rationale (AI moat roadmap, explainPersonMatch()
+  // in parse-search-query.ts) -- deterministic, not a second LLM call, so
+  // this is exact-text-assertable unlike the AI-generated scores elsewhere
+  // in this suite: the query's extracted keyword is the seeded skill
+  // itself, so the result must explain the match by naming that skill.
+  await expect(resultLink.getByText(`Matched: Skill: ${distinctiveSkill}`)).toBeVisible()
 })
 
 /**

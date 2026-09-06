@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Briefcase, Search as SearchIcon } from 'lucide-react'
 import { EcosystemSearchResults } from '@/components/EcosystemSearchResults'
 import { PeopleSearchResults, PersonResult } from '@/components/PeopleSearchResults'
-import { parseSearchQuery } from '@/lib/parse-search-query'
+import { parseSearchQuery, explainPersonMatch } from '@/lib/parse-search-query'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default async function SearchPage({
@@ -53,7 +53,7 @@ export default async function SearchPage({
       peopleQuery = peopleQuery.ilike('location', `%${parsed.location}%`)
     }
     const { data } = await peopleQuery
-    people = data || []
+    people = (data || []).map((p) => ({ ...p, matchReasons: explainPersonMatch(p, parsed) }))
   }
 
   return (

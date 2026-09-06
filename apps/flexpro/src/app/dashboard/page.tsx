@@ -1,10 +1,9 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Package, Briefcase, ShoppingCart, Settings, LogOut, Wallet, ShieldCheck, Rss } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
-import { NotificationBell } from '@/components/NotificationBell'
+import { Package, ShoppingCart, Wallet, ShieldCheck } from 'lucide-react'
 import { EcosystemWidget } from '@/components/EcosystemWidget'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -13,6 +12,12 @@ export default async function DashboardPage() {
   if (!user) {
     redirect('/login?next=/dashboard')
   }
+
+  const { data: scoreRow } = await supabase
+    .from('greyin_scores')
+    .select('greyin_score, is_verified_expert')
+    .eq('user_id', user.id)
+    .maybeSingle()
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -40,33 +45,14 @@ export default async function DashboardPage() {
   ])
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-950 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <a href="https://greyin.net" className="flex items-center gap-2 text-xl font-bold text-orange-600 dark:text-orange-400">
-              <Briefcase className="w-6 h-6" />
-              <span>FlexPro</span>
-            </a>
-            <div className="flex items-center gap-4">
-              <Link href="/feed" className="p-2" title="Feed">
-                <Rss className="w-5 h-5" />
-              </Link>
-              <NotificationBell />
-              <Link href="/profile" className="p-2" title="Profile">
-                <Settings className="w-5 h-5" />
-              </Link>
-                <ThemeToggle />
-              <form action="/auth/logout" method="POST">
-                <button className="flex items-center gap-2 px-4 py-2">
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </header>
+    <WorkspaceShell
+      activeSection="dashboard"
+      role={profile?.role}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Dashboard"
+    >
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-1">Welcome, {profile?.full_name || 'Seller'}!</h1>
         <p className="text-sm text-gray-600 mb-4 dark:text-gray-400">
@@ -134,6 +120,6 @@ export default async function DashboardPage() {
           <EcosystemWidget activePillars={(memberships || []).map((m) => m.pillar)} />
         </div>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

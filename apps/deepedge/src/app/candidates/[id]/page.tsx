@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Building2, ArrowLeft, BadgeCheck, Lock, RotateCcw, MapPin, ThumbsUp, BookOpen, Users } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 const RELATIONSHIP_LABEL: Record<string, string> = {
   in_platform_task: 'Worked together on a Greyin project/gig',
@@ -26,7 +26,8 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
     redirect(`/login?next=/candidates/${id}`)
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('role, full_name').eq('id', user.id).single()
+  const { data: viewerScoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   // The target person's own profile, fetched independently of `candidates`
   // -- this page is also the profile view for peer-project collaborators
@@ -124,6 +125,7 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
   let referencesForEmployer: any[] = []
   const requestedByReferenceId = new Map<string, { id: string; status: string }>()
   const responseByReferenceId = new Map<string, string>()
+  let referenceReport: { consistency: string; summary: string; notes: string | null; response_count: number } | null = null
   let articles: any[] = []
   // RESTORED (2026-09-04, integrity audit): FR-PW-26's own "Employer
   // view: rating pattern" panel + per-project reciprocity badge shipped
@@ -205,6 +207,18 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
         const req = (reqRows || []).find((r) => r.id === resp.request_id)
         if (req) responseByReferenceId.set(req.reference_id, resp.body)
       }
+
+      // AI-synthesized reference report (117) -- generated server-side
+      // once >=2 responses exist for this (candidate, employer) pair, see
+      // lib/reference-synthesis.ts. Confidential to this employer, same
+      // as the raw responses it summarizes.
+      const { data: report } = await supabase
+        .from('ai_reference_reports')
+        .select('consistency, summary, notes, response_count')
+        .eq('candidate_id', id)
+        .eq('requested_by', user.id)
+        .maybeSingle()
+      referenceReport = report || null
     }
 
     const { data: postRows } = await supabase
@@ -245,19 +259,14 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
-              <span className="ml-2 text-2xl font-bold">DeepEdge</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      variant={profile?.role === 'employer' ? 'employer' : 'candidate'}
+      activeSection="candidates"
+      userName={profile?.full_name || 'User'}
+      verified={!!viewerScoreRow?.is_verified_expert}
+      greyinScore={viewerScoreRow?.greyin_score ?? null}
+      pageTitle="Candidate Profile"
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/candidates" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -428,6 +437,18 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
             {profile?.role === 'employer' && referencesForEmployer.length > 0 && (
               <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-50">References</h2>
+                {referenceReport && (
+                  <div className={`rounded-lg p-4 mb-4 border ${referenceReport.consistency === 'notable_differences' ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-900' : 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-900'}`}>
+                    <p className={`text-xs font-semibold uppercase tracking-wide mb-2 ${referenceReport.consistency === 'notable_differences' ? 'text-amber-700 dark:text-amber-400' : 'text-green-700 dark:text-green-400'}`}>
+                      AI reference summary · {referenceReport.consistency === 'notable_differences' ? 'Notable differences to review' : 'Consistent across references'}
+                    </p>
+                    <p className="text-sm text-gray-800 dark:text-gray-200">{referenceReport.summary}</p>
+                    {referenceReport.notes && referenceReport.notes !== 'None.' && (
+                      <p className="text-sm text-gray-700 mt-2 dark:text-gray-300">{referenceReport.notes}</p>
+                    )}
+                    <p className="text-xs text-gray-500 mt-2 dark:text-gray-400">Based on {referenceReport.response_count} responses. AI-generated — always read the full responses below yourself.</p>
+                  </div>
+                )}
                 <div className="space-y-3">
                   {referencesForEmployer.map((ref) => {
                     const request = requestedByReferenceId.get(ref.id)
@@ -529,6 +550,6 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
           </>
         )}
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

@@ -1,6 +1,7 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpFlexPro, login } from '../../utils/auth'
 import { createCompletedOrder, getUserIdByEmail, grantFreeagentSubscription } from '../../utils/admin'
+import { dismissGuidedTourIfShown } from '../../utils/tour'
 
 /**
  * FlexPro's AI delivery-quality score is additive/informational only
@@ -40,6 +41,11 @@ test('a buyer leaving a review triggers an AI delivery-quality score visible on 
   const order = await createCompletedOrder({ gigId, buyerId, sellerId, amount: 1500 })
 
   await buyerPage.goto(`/orders/${order.id}`)
+  // This is the buyer's first real click after signup, with nothing in
+  // between to burn off GuidedTour's ~600ms auto-start delay -- without
+  // this it intermittently races the tour's full-viewport overlay,
+  // which swallows the click (see e2e/utils/tour.ts).
+  await dismissGuidedTourIfShown(buyerPage)
   await buyerPage.getByRole('button', { name: 'Rate 5 stars' }).click()
   const reviewText = `Delivered exactly what was asked, clean and well-documented — ${Date.now()}`
   await buyerPage.getByPlaceholder('Share your experience with this service...').fill(reviewText)

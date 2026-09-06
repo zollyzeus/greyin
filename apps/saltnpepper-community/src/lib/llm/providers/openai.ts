@@ -6,7 +6,11 @@ export async function completeWithOpenAI(
   prompt: string,
   maxTokens: number
 ): Promise<string> {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  // Honors a custom base_url so any OpenAI-compatible endpoint (e.g.
+  // Gemini's https://generativelanguage.googleapis.com/v1beta/openai/) can
+  // be used via provider='openai' with no new provider type needed.
+  const baseUrl = (config.base_url || 'https://api.openai.com/v1').replace(/\/$/, '')
+  const response = await fetch(`${baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',

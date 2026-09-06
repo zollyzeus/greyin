@@ -1,10 +1,8 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Briefcase, ArrowLeft } from 'lucide-react'
 import { ImageUploader } from '@/components/ImageUploader'
 import { GigQualityAssist } from '@/components/GigQualityAssist'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function NewGigPage() {
   const supabase = await createClient()
@@ -14,31 +12,24 @@ export default async function NewGigPage() {
     redirect('/login?next=/gigs/new')
   }
 
+  const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
+
   const { data: categories } = await supabase
     .from('gig_categories')
     .select('id, name')
     .order('name')
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-orange-600 dark:text-orange-400" />
-              <span className="ml-2 text-2xl font-bold">FlexPro</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      activeSection="gigs"
+      role={profile?.role}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="List a Gig"
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/gigs" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to gigs
-        </Link>
-
         <div className="bg-white rounded-lg shadow-md p-8 dark:bg-gray-900">
           <h1 className="text-2xl font-bold text-gray-900 mb-1 dark:text-gray-50">List a Gig</h1>
           <p className="text-gray-600 mb-6 dark:text-gray-400">A FlexPro Pro subscription unlocks listing — plus a modest service fee when a gig is completed.</p>
@@ -114,6 +105,6 @@ export default async function NewGigPage() {
           </form>
         </div>
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Package, Clock, CheckCircle, XCircle, TrendingUp } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function OrdersPage() {
   const supabase = await createClient()
@@ -11,6 +11,9 @@ export default async function OrdersPage() {
   if (!user) {
     redirect('/login?next=/orders')
   }
+
+  const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   // Get all orders for the user (both as buyer and seller)
   const { data: buyerOrders } = await supabase
@@ -59,16 +62,14 @@ export default async function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
-            ← Back to Dashboard
-          </Link>
-            <ThemeToggle />
-          </div>
-      </header>
-
+    <WorkspaceShell
+      activeSection="orders"
+      role={profile?.role}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Orders"
+    >
       <div className="max-w-7xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8 dark:text-gray-50">My Orders</h1>
 
@@ -204,6 +205,6 @@ export default async function OrdersPage() {
           )}
         </div>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

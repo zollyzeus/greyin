@@ -57,3 +57,48 @@ export async function parseSearchQuery(query: string): Promise<ParsedSearchQuery
     return fallback
   }
 }
+
+export interface PersonMatchInput {
+  full_name: string | null
+  skills: string[]
+  verified_outcomes_count: number
+  availability: string | null
+  location: string | null
+}
+
+/**
+ * AI moat roadmap item: explainable AI match rationale (2026-09-01 pitch-
+ * deck review) for "AI-Verified Search" results. Deliberately deterministic,
+ * not a second LLM call: parseSearchQuery only extracts structured filters,
+ * it doesn't rank or score people, so the honest answer to "why did this
+ * result appear" is exactly which of those filters this person actually
+ * matched -- a transparent, auditable reason beats a fabricated-sounding
+ * LLM narrative layered on top of a plain filter query, and is also the
+ * more defensible answer under regimes like NYC Local Law 144 / the EU AI
+ * Act that push toward mandatory explainability for AI-assisted hiring
+ * search tools.
+ */
+export function explainPersonMatch(person: PersonMatchInput, parsed: ParsedSearchQuery): string[] {
+  const reasons: string[] = []
+  const keyword = parsed.keywords?.trim().toLowerCase()
+
+  if (keyword) {
+    if (person.full_name?.toLowerCase().includes(keyword)) {
+      reasons.push(`Name matches "${parsed.keywords}"`)
+    }
+    const matchedSkill = person.skills.find((s) => s.toLowerCase().includes(keyword))
+    if (matchedSkill) {
+      reasons.push(`Skill: ${matchedSkill}`)
+    }
+  }
+  if (parsed.min_verified_outcomes != null) {
+    reasons.push(`${person.verified_outcomes_count} verified outcome${person.verified_outcomes_count === 1 ? '' : 's'} (you asked for ${parsed.min_verified_outcomes}+)`)
+  }
+  if (parsed.availability && person.availability) {
+    reasons.push(`Availability: ${person.availability}`)
+  }
+  if (parsed.location && person.location) {
+    reasons.push(`Location: ${person.location}`)
+  }
+  return reasons
+}

@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Briefcase, ArrowLeft, Wallet } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { Wallet } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 const PLATFORM_FEE_RATE = 0.02
 
@@ -16,7 +15,7 @@ export default async function EarningsPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, is_mentor')
+    .select('full_name, role, is_mentor')
     .eq('id', user.id)
     .single()
 
@@ -27,6 +26,8 @@ export default async function EarningsPage() {
   if (profile?.role !== 'freelancer' && !profile?.is_mentor) {
     redirect('/dashboard')
   }
+
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   const { data: completedOrders } = await supabase
     .from('gig_orders')
@@ -48,25 +49,15 @@ export default async function EarningsPage() {
   const available = Math.max(0, netEarned - alreadyClaimed)
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <Briefcase className="h-8 w-8 text-orange-600 dark:text-orange-400" />
-              <span className="ml-2 text-2xl font-bold">FlexPro</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      activeSection="earnings"
+      role={profile?.role}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Earnings"
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to dashboard
-        </Link>
-
         <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
           <div className="flex items-center gap-2 mb-6">
             <Wallet className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -181,6 +172,6 @@ export default async function EarningsPage() {
           )}
         </div>
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

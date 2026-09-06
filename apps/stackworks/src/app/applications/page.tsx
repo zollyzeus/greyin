@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { FlaskConical, ArrowLeft } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
+import { isBuilder } from '@/lib/stackworks-role'
 
 const STATUS_STYLES: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-400',
@@ -18,6 +18,9 @@ export default async function ApplicationsPage() {
     redirect('/login?next=/applications')
   }
 
+  const { data: profile } = await supabase.from('profiles').select('full_name, role, years_experience, stackworks_role').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
+
   const { data: applications } = await supabase
     .from('project_applications')
     .select('id, pitch, status, created_at, project_asks:ask_id ( id, role_title, builder_projects:project_id ( id, title ) )')
@@ -25,25 +28,16 @@ export default async function ApplicationsPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <FlaskConical className="h-8 w-8 text-teal-600 dark:text-teal-400" />
-              <span className="ml-2 text-2xl font-bold">StackWorks</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      activeSection="applications"
+      builder={profile ? isBuilder(profile) : false}
+      isAdmin={profile?.role === 'admin'}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="My Applications"
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-teal-600 mb-6 dark:text-gray-400">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to dashboard
-        </Link>
-
         <h1 className="text-2xl font-bold text-gray-900 mb-6 dark:text-gray-50">My Applications</h1>
 
         <div className="space-y-4">
@@ -80,6 +74,6 @@ export default async function ApplicationsPage() {
           )}
         </div>
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

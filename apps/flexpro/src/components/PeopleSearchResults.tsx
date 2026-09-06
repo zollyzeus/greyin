@@ -12,6 +12,7 @@ export interface PersonResult {
   current_title: string | null
   is_mentor: boolean | null
   mentor_domain: string | null
+  matchReasons?: string[]
 }
 
 /**
@@ -51,6 +52,9 @@ export function PeopleSearchResults({ results }: { results: PersonResult[] }) {
                   </p>
                   {p.skills.length > 0 && (
                     <p className="text-xs text-gray-400 truncate dark:text-gray-500">{p.skills.slice(0, 5).join(', ')}</p>
+                  )}
+                  {p.matchReasons && p.matchReasons.length > 0 && (
+                    <p className="text-xs text-teal-700 mt-1 dark:text-teal-400">Matched: {p.matchReasons.join(' · ')}</p>
                   )}
                 </div>
               </div>

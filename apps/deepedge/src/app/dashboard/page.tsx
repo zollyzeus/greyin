@@ -1,10 +1,9 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { Briefcase, Building2, Users, FileText, Settings, LogOut, MessageCircle, BellPlus, BadgeCheck, ArrowUpRight, Vote, Rss } from 'lucide-react'
-import { NotificationBell } from '@/components/NotificationBell'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { Briefcase, Users, FileText, Settings, LogOut, MessageCircle, BellPlus, BadgeCheck, ArrowUpRight, Vote } from 'lucide-react'
 import { EcosystemWidget } from '@/components/EcosystemWidget'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -73,36 +72,13 @@ export default async function DashboardPage() {
     : { count: 0 }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 dark:bg-gray-950 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <a href="https://greyin.net" className="flex items-center gap-2 text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                <Building2 className="w-6 h-6" />
-                DeepEdge
-              </a>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/feed" className="relative text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" title="Feed">
-                <Rss className="h-5 w-5" />
-              </Link>
-              <NotificationBell />
-              <Link href="/profile" className="relative text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" title="Profile">
-                <Settings className="h-5 w-5" />
-              </Link>
-              <ThemeToggle />
-              <form action="/auth/logout" method="post">
-                <button className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
-                  <LogOut className="h-5 w-5" />
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </nav>
-
+    <WorkspaceShell
+      activeSection="dashboard"
+      userName={profile?.full_name || 'User'}
+      verified={isVerifiedExpert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Dashboard"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
@@ -344,6 +320,6 @@ export default async function DashboardPage() {
           <EcosystemWidget activePillars={(memberships || []).map((m) => m.pillar)} />
         </div>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

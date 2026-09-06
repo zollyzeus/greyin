@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Briefcase, ShoppingBag, Wrench } from 'lucide-react'
+import { ShoppingBag, Wrench } from 'lucide-react'
+import { AuthLayout } from '@/components/AuthLayout'
 
 export default async function SignupPage({
   searchParams,
@@ -18,18 +19,11 @@ export default async function SignupPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:from-gray-950 dark:to-gray-900">
-      <div className="max-w-2xl w-full">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-orange-600 dark:text-orange-400">
-            <Briefcase className="w-8 h-8" />
-            <span>FlexPro</span>
-          </a>
-          <h2 className="font-display mt-4 text-2xl font-semibold text-gray-900 dark:text-gray-50">Create your account</h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Freelance marketplace for verified experts, by and for the community</p>
-        </div>
-
+    <AuthLayout
+      title="Create your account"
+      subtitle="Freelance marketplace for verified experts, by and for the community"
+      wide
+    >
         {/* Role Selection */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-6 dark:bg-gray-900">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-50">I want to:</h3>
@@ -220,7 +214,6 @@ export default async function SignupPage({
             </div>
           </div>
         </div>
-      </div>
 
       <script dangerouslySetInnerHTML={{
         __html: `
@@ -231,6 +224,6 @@ export default async function SignupPage({
           });
         `
       }} />
-    </div>
+    </AuthLayout>
   )
 }

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { SiteHeader } from '@/components/SiteHeader'
-import { ShieldCheck, Bot, BadgeCheck, Briefcase, Trash2, Lightbulb, MessageSquareHeart } from 'lucide-react'
+import { ShieldCheck, Bot, BadgeCheck, Briefcase, Trash2, Lightbulb, MessageSquareHeart, Scale } from 'lucide-react'
 
 /**
  * Platform-wide admin lives here, not on any one pillar app -- Greyin
@@ -74,6 +74,11 @@ export default async function AdminPage({
             <MessageSquareHeart className="h-6 w-6 text-indigo-600 mb-2 dark:text-indigo-400" />
             <h2 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">Feedback</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">Reply to member feedback submitted from any pillar app.</p>
+          </Link>
+          <Link href="/admin/bias-audit" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition dark:bg-gray-900">
+            <Scale className="h-6 w-6 text-indigo-600 mb-2 dark:text-indigo-400" />
+            <h2 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">AI Matching Bias Audit</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Aggregate representation check on AI-surfaced matches, from opt-in self-ID data.</p>
           </Link>
         </div>
 

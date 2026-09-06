@@ -34,43 +34,41 @@ export default async function Home() {
     <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
       <SiteHeader />
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center">
-          <p className="inline-block text-sm font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-4 bg-indigo-50 dark:bg-indigo-950 rounded-full px-4 py-1.5">
+      {/* Hero band */}
+      <div className="bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-800 dark:to-violet-800 text-white py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="inline-block text-sm font-semibold uppercase tracking-wide mb-4 bg-white/15 rounded-full px-4 py-1.5">
             Built for senior professionals
           </p>
-          <h1 className="font-display text-5xl md:text-6xl font-semibold text-gray-900 dark:text-gray-50 mb-6">
-            Hire the people ATS bots
-            <span className="text-indigo-600 dark:text-indigo-400"> auto-reject</span>
+          <h1 className="font-display text-5xl md:text-6xl font-semibold mb-6">
+            Hire the people ATS bots auto-reject
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-3xl mx-auto">
-            Greyin exists because senior talent keeps getting filtered out by keyword-matching software,
-            pushed out by restructuring, or made redundant — not because they stopped being good at the
-            work. We built an age-blind hiring platform where senior-level experience is the baseline,
-            not a liability, and where employers pay for access to a verified expert pool instead of
-            gambling on a resume.
+          <p className="text-xl text-indigo-100 mb-10 max-w-3xl mx-auto">
+            An age-blind hiring platform where senior-level experience is the baseline, not a liability —
+            and employers pay for access to a verified expert pool instead of gambling on a resume.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/signup?type=employer"
-              className="bg-indigo-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-indigo-700 transition flex items-center justify-center"
+              className="bg-white text-indigo-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-indigo-50 transition flex items-center justify-center"
             >
               <Briefcase className="mr-2 h-5 w-5" />
               Post a Job
             </Link>
             <Link
               href="/signup?type=candidate"
-              className="bg-white dark:bg-gray-900 text-indigo-600 dark:text-indigo-400 border-2 border-indigo-600 dark:border-indigo-500 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-indigo-50 dark:hover:bg-indigo-950 transition flex items-center justify-center dark:hover:bg-indigo-950/40"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/10 transition flex items-center justify-center"
             >
               <Users className="mr-2 h-5 w-5" />
               Find Jobs
             </Link>
           </div>
         </div>
+      </div>
 
-        {/* Stats */}
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* Stats */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-md dark:shadow-none dark:border dark:border-gray-800 p-8 text-center">
             <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">{jobCount ?? 0}</div>
             <div className="text-gray-600 dark:text-gray-400">Open Jobs</div>

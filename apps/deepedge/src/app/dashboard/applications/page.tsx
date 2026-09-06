@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Briefcase, ArrowLeft, CheckCircle, MessageCircle } from 'lucide-react'
+import { ArrowLeft, Briefcase, CheckCircle, MessageCircle } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 const STATUS_STYLES: Record<string, string> = {
   submitted: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
@@ -33,6 +34,9 @@ export default async function MyApplicationsPage({
     redirect('/login?next=/dashboard/applications')
   }
 
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
+
   const { data: candidate } = await supabase
     .from('candidates')
     .select('id')
@@ -48,15 +52,13 @@ export default async function MyApplicationsPage({
     : { data: [] }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <nav className="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-800">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">DeepEdge</a>
-          </div>
-        </div>
-      </nav>
-
+    <WorkspaceShell
+      activeSection="applications"
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="My Applications"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -129,6 +131,6 @@ export default async function MyApplicationsPage({
           </div>
         )}
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

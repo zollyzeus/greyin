@@ -30,8 +30,13 @@ test('a candidate is notified when their application status changes', async ({ b
   await candidatePage.waitForURL(/\/dashboard\/applications/)
 
   // The employer should have been notified of the new application too.
+  // getByLabel, not getByTitle: employer/dashboard's own hand-rolled bell
+  // (title="Notifications") was replaced by the shared NotificationBell
+  // component (aria-label="Notifications") in this session's UI/UX
+  // elevation rollout -- same accessible-name change already documented
+  // for the other 6 apps' dashboard bars.
   await employerPage.goto('/employer/dashboard')
-  await expect(employerPage.getByTitle('Notifications')).toContainText('1')
+  await expect(employerPage.getByLabel('Notifications')).toContainText('1')
 
   await employerPage.goto(`/employer/jobs/${jobId}/applications`)
   await employerPage.locator('select[name="status"]').selectOption('shortlisted')

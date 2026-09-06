@@ -26,9 +26,8 @@ e2e/test-results/
 e2e/playwright-report/
 
 # Large binary archives -- not source, and exceed GitHub's 100MB
-# per-file limit anyway.
-/greyin_b1.7z
-/greyin_b2.7z
+# per-file limit anyway. (greyin_b3.7z is 2.3 GB.)
+/greyin_b*.7z
 
 # Database backups -- raw pg_dump output, never belongs in git regardless
 # of repo visibility. These accumulate automatically (nightly rotation)

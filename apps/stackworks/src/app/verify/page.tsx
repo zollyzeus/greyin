@@ -4,7 +4,7 @@ import { Suspense, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { FlaskConical } from 'lucide-react'
+import { AuthLayout } from '@/components/AuthLayout'
 
 function VerifyForm() {
   const router = useRouter()
@@ -36,19 +36,10 @@ function VerifyForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:from-gray-950 dark:to-gray-900">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-teal-600 dark:text-teal-400">
-            <FlaskConical className="w-8 h-8" />
-            <span>StackWorks</span>
-          </a>
-          <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-gray-50">Verify your email</h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            We sent a 6-digit code to <span className="font-medium">{email || 'your email'}</span>
-          </p>
-        </div>
-
+    <AuthLayout
+      title="Verify your email"
+      subtitle={<>We sent a 6-digit code to <span className="font-medium">{email || 'your email'}</span></>}
+    >
         <div className="bg-white rounded-2xl shadow-xl p-8 dark:bg-gray-900">
           {error && (
             <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
@@ -93,8 +84,7 @@ function VerifyForm() {
             to get a new one.
           </p>
         </div>
-      </div>
-    </div>
+    </AuthLayout>
   )
 }
 

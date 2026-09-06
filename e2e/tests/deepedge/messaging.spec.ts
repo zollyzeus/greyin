@@ -47,7 +47,13 @@ test('an employer can message a candidate from the applications review page', as
   await candidatePage.goto('/dashboard')
   await expect(candidatePage.getByLabel('Notifications')).toContainText('1')
   await candidatePage.goto('/messages')
-  await expect(candidatePage.getByText(employer.firstName, { exact: false })).toBeVisible()
+  // Scoped to <main> -- the persistent rail's own footer identity block
+  // shows the *viewer's* name, and every e2e test user's name shares the
+  // "E2E" fixture prefix, so an unscoped locator also matches the
+  // candidate's own name in the rail, not just the employer's name in
+  // the conversation list. Same fix already used for Salt & Pepper's
+  // identical collision (messaging.spec.ts there).
+  await expect(candidatePage.locator('main').getByText(employer.firstName, { exact: false })).toBeVisible()
 
   await candidateCtx.close()
 })

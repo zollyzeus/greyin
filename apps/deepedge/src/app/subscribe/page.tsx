@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, CreditCard, Check } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 const CREDIT_LABELS: Record<string, string> = {
   job_post: 'job posts',
@@ -26,10 +26,12 @@ export default async function SubscribePage() {
     redirect('/login?next=/subscribe')
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  const { data: profile } = await supabase.from('profiles').select('role, full_name').eq('id', user.id).single()
   if (profile?.role !== 'employer') {
     redirect('/dashboard')
   }
+
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   const { data: tiers } = await supabase
     .from('subscription_tiers')
@@ -39,18 +41,18 @@ export default async function SubscribePage() {
     .order('sort_order')
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/pricing" className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Pricing</span>
-          </Link>
-          <ThemeToggle />
-        </div>
-      </header>
-
+    <WorkspaceShell
+      variant="employer"
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Subscribe"
+    >
       <div className="max-w-4xl mx-auto px-4 py-12">
+        <Link href="/pricing" className="flex items-center gap-2 mb-6 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Pricing</span>
+        </Link>
         <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center dark:text-gray-50">Subscribe to search the Verified Expert pool</h1>
         <p className="text-gray-600 mb-8 text-center max-w-xl mx-auto dark:text-gray-400">
           Reviewing applicants to your own job postings stays free. Choose a tier for proactive candidate
@@ -172,6 +174,6 @@ export default async function SubscribePage() {
           });
         });
       ` }} />
-    </div>
+    </WorkspaceShell>
   )
 }

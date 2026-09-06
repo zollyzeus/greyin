@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { ArrowLeft, Building2 } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function EmployerSettingsPage({
   searchParams,
@@ -21,20 +22,18 @@ export default async function EmployerSettingsPage({
     .select('*')
     .eq('user_id', user.id)
     .maybeSingle()
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <nav className="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-800">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center gap-2 text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              <Building2 className="w-6 h-6" />
-              DeepEdge
-            </a>
-          </div>
-        </div>
-      </nav>
-
+    <WorkspaceShell
+      variant="employer"
+      activeSection="employer-settings"
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Company Settings"
+    >
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/employer/dashboard" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -90,6 +89,6 @@ export default async function EmployerSettingsPage({
           </form>
         </div>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

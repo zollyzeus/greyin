@@ -8,15 +8,20 @@ test.describe('StackWorks auth and the two tracks', () => {
     const user = await signUpStackWorksBuilder(page, cleanup)
     await login(page, user, '/dashboard')
     await expect(page.getByText(`Welcome, ${user.firstName} ${user.lastName}`)).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Post a Project' })).toBeVisible()
+    // Scoped to <main> -- the persistent rail (UI/UX elevation rollout,
+    // 2026-09-05) added its own "Post a Project" nav link outside <main>,
+    // with the same accessible name as this dashboard card, so an
+    // unscoped locator is a strict-mode violation. Same fix pattern
+    // mobile-nav.spec.ts already uses for the header/footer link overlap.
+    await expect(page.locator('main').getByRole('link', { name: 'Post a Project' })).toBeVisible()
   })
 
   test('a Supporter can sign up with no experience gate', async ({ page, cleanup }) => {
     const user = await signUpStackWorksSupporter(page, cleanup)
     await login(page, user, '/dashboard')
     await expect(page.getByText(`Welcome, ${user.firstName} ${user.lastName}`)).toBeVisible()
-    // Supporters don't get the Builder-only "Post a Project" card.
-    await expect(page.getByRole('link', { name: 'Post a Project' })).toHaveCount(0)
+    // Supporters don't get the Builder-only "Post a Project" card (or nav link).
+    await expect(page.locator('main').getByRole('link', { name: 'Post a Project' })).toHaveCount(0)
   })
 
   test('signup on the Builder track is rejected for under 12 years of experience', async ({ page, cleanup }) => {

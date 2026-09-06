@@ -1,14 +1,14 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Briefcase, Building2, TrendingUp, Users, FileText, Settings, LogOut, PlusCircle, Bell, MessageCircle, Rss } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { Briefcase, Building2, TrendingUp, FileText, PlusCircle } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function EmployerDashboardPage() {
   const supabase = await createClient()
-  
+
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   if (!user) {
     redirect('/login?next=/employer/dashboard')
   }
@@ -23,6 +23,8 @@ export default async function EmployerDashboardPage() {
   if (profile?.role !== 'employer') {
     redirect('/dashboard')
   }
+
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   // Get company data
   const { data: company } = await supabase
@@ -45,60 +47,15 @@ export default async function EmployerDashboardPage() {
     .select('*', { count: 'exact', head: true })
     .in('job_id', jobs?.map(j => j.id) || [])
 
-  const { count: unreadCount } = await supabase
-    .from('notifications')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .eq('read', false)
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <a href="https://greyin.net" className="flex items-center gap-2 text-xl font-bold text-indigo-600 dark:text-indigo-400">
-              <Building2 className="w-6 h-6" />
-              <span>DeepEdge</span>
-            </a>
-            
-            <div className="flex items-center gap-4">
-              <Link href="/employer/post-job" className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                <PlusCircle className="w-4 h-4" />
-                <span>Post Job</span>
-              </Link>
-              <Link href="/candidates" className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-50">
-                <Users className="w-4 h-4" />
-                <span>Browse Candidates</span>
-              </Link>
-              <Link href="/feed" className="relative p-2 text-gray-400 hover:text-gray-500 dark:text-gray-500" title="Feed">
-                <Rss className="w-5 h-5" />
-              </Link>
-              <Link href="/messages" className="relative p-2 text-gray-400 hover:text-gray-500 dark:text-gray-500" title="Messages">
-                <MessageCircle className="w-5 h-5" />
-              </Link>
-              <Link href="/notifications" className="relative p-2 text-gray-400 hover:text-gray-500 dark:text-gray-500" title="Notifications">
-                <Bell className="w-5 h-5" />
-                {!!unreadCount && (
-                  <span className="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </Link>
-              <Link href="/employer/settings" className="p-2 text-gray-400 hover:text-gray-500 dark:text-gray-500">
-                <Settings className="w-5 h-5" />
-              </Link>
-              <ThemeToggle />
-              <form action="/auth/logout" method="POST">
-                <button type="submit" className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-50">
-                  <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </header>
+    <WorkspaceShell
+      variant="employer"
+      activeSection="employer-dashboard"
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Dashboard"
+    >
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
@@ -267,6 +224,6 @@ export default async function EmployerDashboardPage() {
           </div>
         </div>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

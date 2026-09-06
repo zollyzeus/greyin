@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { MapPin, Clock } from 'lucide-react'
-import { SiteHeader } from '@/components/SiteHeader'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 import { createClient } from '@/lib/supabase/server'
 
 const TIMEFRAME_LABEL: Record<string, string> = {
@@ -16,19 +16,28 @@ export default async function RolesPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/roles')
 
-  const [{ data: roles }, { data: mySubs }] = await Promise.all([
+  const [{ data: roles }, { data: mySubs }, { data: profile }, { data: scoreRow }, { data: company }] = await Promise.all([
     supabase
       .from('future_roles_public')
       .select('id, title, function_area, seniority_level, target_timeframe, description, skills, location, is_remote, created_at')
       .order('created_at', { ascending: false }),
     supabase.from('future_role_subscriptions').select('future_role_id').eq('user_id', user.id),
+    supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle(),
+    supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle(),
+    supabase.from('companies').select('id').eq('user_id', user.id).maybeSingle(),
   ])
 
   const subscribedIds = new Set((mySubs || []).map((s) => s.future_role_id))
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <SiteHeader />
+    <WorkspaceShell
+      activeSection="roles"
+      hasCompany={!!company}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Future Roles"
+    >
       <div className="max-w-4xl mx-auto px-4 py-10">
         <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-gray-50">Future Roles</h1>
         <p className="text-gray-600 mb-8 dark:text-gray-400">
@@ -91,6 +100,6 @@ export default async function RolesPage() {
           <p className="text-gray-500 dark:text-gray-400">No future roles posted yet. Check back soon.</p>
         )}
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

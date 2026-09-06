@@ -8,6 +8,14 @@ import { test, expect } from '../../utils/fixtures'
  * now; every prior check was a one-off manual Playwright script run
  * against prod and discarded.
  *
+ * A third "color" (navy+gold) state was added and then reverted the same
+ * day, 2026-09-05 -- shipped, screenshotted live on prod, found to clash
+ * with the 5 pillar apps' own saturated hero bands (only DeepEdge and
+ * Greyin Hub looked finished), and rolled back at user direction in
+ * favor of focusing on the existing light/dark pair. See
+ * docs/ui_ux_elevation_plan.md's dated update for the full account and
+ * screenshots. This spec is back to the original binary check.
+ *
  * Lives here, not under a single app's own tests/<app>/, because it
  * exercises all 7 domains -- matching this suite's own established
  * convention for cross-app specs. No signup/login needed: every page

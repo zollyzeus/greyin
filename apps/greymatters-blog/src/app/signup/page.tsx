@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/app/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { BookOpen } from 'lucide-react'
+import { AuthLayout } from '@/app/components/AuthLayout'
 
 export default async function SignupPage() {
   const supabase = await createClient()
@@ -13,23 +13,18 @@ export default async function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-cyan-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:from-gray-950 dark:to-gray-900">
-      <div className="max-w-md w-full">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-sky-600 dark:text-sky-400">
-            <BookOpen className="w-8 h-8" />
-            <span>GreyMatters</span>
-          </a>
-          <h2 className="font-display mt-4 text-2xl font-semibold text-gray-900 dark:text-gray-50">Create your account</h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Join the discussion and comment on articles</p>
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+    <AuthLayout
+      title="Create your account"
+      subtitle={
+        <>
+          Join the discussion and comment on articles
+          <span className="block mt-1 text-xs text-gray-500 dark:text-gray-400">
             Senior-level experience unlocks authorship. Anyone can sign up to follow and comment.
-          </p>
-        </div>
-
-        {/* Signup Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 dark:bg-gray-900">
+          </span>
+        </>
+      }
+    >
+      <div className="bg-white rounded-2xl shadow-xl p-8 dark:bg-gray-900">
           <form action="/auth/signup" method="POST" className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -173,7 +168,6 @@ export default async function SignupPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </AuthLayout>
   )
 }

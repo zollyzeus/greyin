@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { SiteHeader } from '@/components/SiteHeader'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function PostFutureRolePage({
@@ -12,12 +12,19 @@ export default async function PostFutureRolePage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/post')
 
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
   const { data: company } = await supabase.from('companies').select('id, name').eq('user_id', user.id).maybeSingle()
 
   if (!company) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-        <SiteHeader />
+      <WorkspaceShell
+        hasCompany={false}
+        userName={profile?.full_name || 'User'}
+        verified={!!scoreRow?.is_verified_expert}
+        greyinScore={scoreRow?.greyin_score ?? null}
+        pageTitle="Post a Future Role"
+      >
         <div className="max-w-lg mx-auto px-4 py-16 text-center">
           <h1 className="text-xl font-bold text-gray-900 mb-3 dark:text-gray-50">Set up your company first</h1>
           <p className="text-gray-600 mb-6 dark:text-gray-400">
@@ -28,13 +35,19 @@ export default async function PostFutureRolePage({
             Set Up Your Company on DeepEdge
           </a>
         </div>
-      </div>
+      </WorkspaceShell>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <SiteHeader />
+    <WorkspaceShell
+      activeSection="post"
+      hasCompany={true}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Post a Future Role"
+    >
       <div className="max-w-2xl mx-auto px-4 py-10">
         <h1 className="text-2xl font-bold text-gray-900 mb-1 dark:text-gray-50">Post a Future Role</h1>
         <p className="text-gray-600 mb-8 dark:text-gray-400">
@@ -111,6 +124,6 @@ export default async function PostFutureRolePage({
           </button>
         </form>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

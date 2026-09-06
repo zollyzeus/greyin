@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { EcosystemWidget } from '@/components/EcosystemWidget'
 import { ResumeSkillsUploader } from '@/components/ResumeSkillsUploader'
 import { EmploymentHistoryEditor } from '@/components/EmploymentHistoryEditor'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -124,19 +124,14 @@ export default async function ProfilePage() {
     : { data: [] }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
-              ← Back to Dashboard
-            </Link>
-            <h1 className="text-xl font-semibold">My Profile</h1>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      variant={profile?.role === 'employer' ? 'employer' : 'candidate'}
+      activeSection="profile"
+      userName={profile?.full_name || 'User'}
+      verified={!!greyinScoreRow?.is_verified_expert}
+      greyinScore={greyinScoreRow?.greyin_score ?? null}
+      pageTitle="My Profile"
+    >
       <div className="max-w-4xl mx-auto px-4 py-8">
         <EcosystemWidget activePillars={(memberships || []).map((m) => m.pillar)} />
 
@@ -756,6 +751,6 @@ export default async function ProfilePage() {
           </div>
         )}
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

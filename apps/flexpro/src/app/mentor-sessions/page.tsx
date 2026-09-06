@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Briefcase, ArrowLeft, GraduationCap } from 'lucide-react'
+import { Briefcase, ArrowLeft, GraduationCap, Sparkles } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { rankMentorGigs, type MentorPick } from '@/lib/mentor-match'
 
 export default async function MentorSessionsPage({
   searchParams,
@@ -13,7 +14,7 @@ export default async function MentorSessionsPage({
 
   let query = supabase
     .from('gigs')
-    .select('id, title, description, price_min, seller:profiles!freelancer_id(full_name)')
+    .select('id, title, description, price_min, seller:profiles!freelancer_id(full_name, seller_rating, total_reviews)')
     .eq('is_mentor_session', true)
     .eq('status', 'active')
     .order('created_at', { ascending: false })
@@ -21,6 +22,37 @@ export default async function MentorSessionsPage({
     query = query.eq('freelancer_id', mentor)
   }
   const { data: gigs } = await query
+
+  // AI moat roadmap item: AI-powered mentor matching (118). Purely
+  // additive -- the full listing below is always shown unchanged; this
+  // only adds an optional "Recommended for you" section above it when
+  // the viewer is logged in with stated future_interests (087) and
+  // there's more than one gig to choose among.
+  let picks: MentorPick[] | null = null
+  if (!mentor && gigs && gigs.length >= 2) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: viewerProfile } = await supabase
+        .from('profiles')
+        .select('future_interests, future_interests_note')
+        .eq('id', user.id)
+        .maybeSingle()
+      if (viewerProfile?.future_interests?.length) {
+        picks = await rankMentorGigs(
+          gigs.map((g: any) => ({
+            id: g.id,
+            title: g.title,
+            description: g.description,
+            mentorName: g.seller?.full_name || 'a mentor',
+            sellerRating: g.seller?.seller_rating || 0,
+            totalReviews: g.seller?.total_reviews || 0,
+          })),
+          viewerProfile.future_interests,
+          viewerProfile.future_interests_note
+        )
+      }
+    }
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -46,6 +78,28 @@ export default async function MentorSessionsPage({
           <GraduationCap className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Mentor Sessions</h1>
         </div>
+
+        {picks && picks.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Recommended for you</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {picks.map(({ gig, reason }) => (
+                <Link
+                  key={gig.id}
+                  href={`/mentor-sessions/${gig.id}`}
+                  className="bg-indigo-50 border border-indigo-200 rounded-lg shadow-md p-6 hover:shadow-lg transition dark:bg-indigo-950/30 dark:border-indigo-900"
+                >
+                  <h3 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">{gig.title}</h3>
+                  <p className="text-sm text-indigo-700 mb-2 dark:text-indigo-300">{reason}</p>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">with {gig.mentorName}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {gigs && gigs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

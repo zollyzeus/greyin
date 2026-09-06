@@ -1,8 +1,6 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Users, ArrowLeft } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function NewEventPage({
   searchParams,
@@ -17,26 +15,18 @@ export default async function NewEventPage({
     redirect('/login?next=/events/new')
   }
 
+  const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
+
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <Users className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-              <span className="ml-2 text-2xl font-bold">Salt & Pepper</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      isAdmin={profile?.role === 'admin'}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Host an Event"
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/events" className="flex items-center text-gray-600 hover:text-purple-600 mb-6 dark:text-gray-400">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to events
-        </Link>
-
         <div className="bg-white rounded-lg shadow-md p-8 dark:bg-gray-900">
           <h1 className="text-2xl font-bold text-gray-900 mb-6 dark:text-gray-50">Host an Event</h1>
 
@@ -98,6 +88,6 @@ export default async function NewEventPage({
           </form>
         </div>
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

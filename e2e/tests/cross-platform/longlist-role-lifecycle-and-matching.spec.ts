@@ -2,6 +2,7 @@ import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, signUpLongList, login } from '../../utils/auth'
 import {
   getFutureRoleIdByTitle,
+  getLLMFeatureFlagEnabled,
   getUserIdByEmail,
   grantActiveSubscriptionTier,
   setLLMFeatureFlag,
@@ -114,10 +115,14 @@ test('a role marked filled, and one marked expired, both notify their subscriber
 })
 
 test('an admin-enabled AI-surfaced candidate list ranks a member by their stated future interest', async ({ browser, cleanup }) => {
-  // longlist_candidate_matching is genuinely OFF by default (a real
-  // product decision -- see match-candidates.ts's own comment: it
-  // surfaces a profile to an employer with no explicit per-role opt-in),
-  // so this flips it on for the duration of the test only.
+  // longlist_candidate_matching's resting state is a real product
+  // decision that can change independently of this spec (see
+  // match-candidates.ts's own comment on why it was off by default, and
+  // getLLMFeatureFlagEnabled()'s comment on the standing decision to
+  // turn it on 2026-09-05) -- save whatever it is, force it on for this
+  // test's duration, then restore exactly what was there before, rather
+  // than assuming this spec owns the flag's long-term state.
+  const priorEnabled = await getLLMFeatureFlagEnabled('longlist_candidate_matching')
   await setLLMFeatureFlag('longlist_candidate_matching', true)
   try {
     const memberCtx = await browser.newContext()
@@ -174,6 +179,6 @@ test('an admin-enabled AI-surfaced candidate list ranks a member by their stated
     await memberCtx.close()
     await employerCtx.close()
   } finally {
-    await setLLMFeatureFlag('longlist_candidate_matching', false)
+    await setLLMFeatureFlag('longlist_candidate_matching', priorEnabled)
   }
 })

@@ -36,7 +36,14 @@ test('a member can message another member from the directory and get a reply', a
   await expect(recipientPage.getByLabel('Notifications')).toContainText('1')
 
   await recipientPage.goto('/messages')
-  await expect(recipientPage.getByText(sender.firstName, { exact: false })).toBeVisible()
+  // Scoped to <main> -- the persistent rail (UI/UX elevation rollout,
+  // 2026-09-05) always shows the logged-in user's own name in its footer
+  // identity block, and every e2e test user's name starts with the same
+  // "E2E" fixture prefix, so an unscoped getByText(sender.firstName)
+  // matches the *recipient's own* rail identity too, not just the
+  // conversation-list entry for the sender. Same container-scoping fix
+  // already used for StackWorks's rail/content label collision.
+  await expect(recipientPage.locator('main').getByText(sender.firstName, { exact: false })).toBeVisible()
   await recipientPage.goto(conversationUrl)
   await expect(recipientPage.getByText(messageText)).toBeVisible()
 

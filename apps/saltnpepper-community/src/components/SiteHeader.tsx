@@ -57,7 +57,7 @@ export function SiteHeader() {
   }, [])
 
   return (
-    <header className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800">
+    <header className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <a href="https://greyin.net" className="flex items-center min-w-0">
@@ -109,7 +109,6 @@ export function SiteHeader() {
             </div>
             {isLoggedIn === true ? (
               <>
-                <NotificationBell />
                 <Link href="/dashboard" className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400">Dashboard</Link>
                 <form action="/auth/logout" method="POST">
                   <button type="submit" className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 whitespace-nowrap">Sign Out</button>
@@ -123,14 +122,21 @@ export function SiteHeader() {
                 </Link>
               </>
             ) : null}
-            <ThemeToggle />
           </nav>
 
-          <div className="flex items-center gap-1 md:hidden flex-shrink-0">
+          {/* Single shared mount point, visible at every breakpoint --
+              NotificationBell used to be mounted separately inside the
+              desktop nav (CSS-hidden but still mounted on mobile) and
+              again inside the mobileOpen panel, each opening its own
+              Realtime channel (the instanceId hack existed to keep those
+              two channel topics from colliding). One mount here removes
+              the collision at the source instead of papering over it. */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {isLoggedIn === true && <NotificationBell />}
             <ThemeToggle />
             <button
               type="button"
-              className="p-2 -mr-2 text-gray-700 dark:text-gray-300"
+              className="p-2 -mr-2 text-gray-700 dark:text-gray-300 md:hidden"
               onClick={() => setMobileOpen((v) => !v)}
               aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileOpen}
@@ -197,9 +203,6 @@ export function SiteHeader() {
           <div className="pt-3 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-2">
             {isLoggedIn === true ? (
               <>
-                <div className="flex justify-center">
-                  <NotificationBell />
-                </div>
                 <Link href="/dashboard" className="text-center py-2.5 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg" onClick={() => setMobileOpen(false)}>
                   Dashboard
                 </Link>

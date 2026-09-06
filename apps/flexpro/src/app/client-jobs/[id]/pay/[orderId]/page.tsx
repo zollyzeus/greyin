@@ -1,8 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { ArrowLeft, CreditCard } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { CreditCard } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 // The job-engagement equivalent of /checkout/[id] -- no package
 // selection (the accepted application already fixed a single price),
@@ -27,22 +26,19 @@ export default async function ClientJobPayPage({ params }: { params: Promise<{ i
     redirect(`/client-jobs/${jobId}`)
   }
 
-  const { data: buyerProfile } = await supabase.from('profiles').select('phone').eq('id', user.id).single()
+  const { data: buyerProfile } = await supabase.from('profiles').select('full_name, role, phone').eq('id', user.id).single()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   const total = order.amount + order.service_fee_buyer
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href={`/client-jobs/${jobId}`} className="flex items-center gap-2 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300">
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to job</span>
-          </Link>
-            <ThemeToggle />
-          </div>
-      </header>
-
+    <WorkspaceShell
+      role={buyerProfile?.role}
+      userName={buyerProfile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Complete Payment"
+    >
       <div className="max-w-lg mx-auto px-4 py-12">
         <div className="bg-white rounded-lg shadow p-8 dark:bg-gray-900">
           <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-gray-50">Complete payment</h1>
@@ -135,6 +131,6 @@ export default async function ClientJobPayPage({ params }: { params: Promise<{ i
           }
         });
       ` }} />
-    </div>
+    </WorkspaceShell>
   )
 }

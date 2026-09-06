@@ -6,13 +6,17 @@ export default function PivotingPage() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center dark:bg-orange-950/40">
-            <Shuffle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">Pivoting</h1>
+      <div className="bg-gradient-to-r from-orange-600 to-amber-500 dark:from-orange-800 dark:to-amber-700 text-white py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Shuffle className="h-10 w-10 mx-auto mb-4" aria-hidden="true" />
+          <h1 className="font-display text-5xl font-semibold mb-6">Pivoting</h1>
+          <p className="text-xl text-orange-50 max-w-2xl mx-auto">
+            A career change shouldn&rsquo;t mean starting over. Get matched to employers who want it — and a place to build a track record in the new domain.
+          </p>
         </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <p className="text-lg text-gray-600 mb-10 dark:text-gray-400">
           Support for senior professionals changing careers — out of passion or market necessity, not
           just staying in their existing lane. A pivoter isn&apos;t folded into the normal Verified

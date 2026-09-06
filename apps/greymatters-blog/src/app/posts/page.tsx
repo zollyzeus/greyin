@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/app/lib/supabase/server'
-import { BookOpen, ArrowLeft, PenTool } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { PenTool } from 'lucide-react'
+import { WorkspaceShell } from '@/app/components/WorkspaceShell'
 
 export default async function MyPostsPage() {
   const supabase = await createClient()
@@ -12,6 +12,9 @@ export default async function MyPostsPage() {
     redirect('/login?next=/posts')
   }
 
+  const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
+
   const { data: posts } = await supabase
     .from('posts')
     .select('id, title, slug, status, created_at, updated_at')
@@ -19,25 +22,15 @@ export default async function MyPostsPage() {
     .order('updated_at', { ascending: false })
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <BookOpen className="h-8 w-8 text-sky-600 dark:text-sky-400" />
-              <span className="ml-2 text-2xl font-bold">GreyMatters</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      activeSection="posts"
+      isAdmin={profile?.role === 'admin'}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="My Posts"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard" className="flex items-center text-gray-600 hover:text-blue-600 mb-6 dark:text-gray-400">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to dashboard
-        </Link>
-
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">My Posts</h1>
           <Link
@@ -80,6 +73,6 @@ export default async function MyPostsPage() {
           </div>
         )}
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

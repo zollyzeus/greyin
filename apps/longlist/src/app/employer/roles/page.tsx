@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { Users, Clock } from 'lucide-react'
-import { SiteHeader } from '@/components/SiteHeader'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 import { createClient } from '@/lib/supabase/server'
 
 const STATUS_STYLES: Record<string, string> = {
@@ -18,6 +18,9 @@ export default async function EmployerRolesPage() {
   const { data: company } = await supabase.from('companies').select('id, name').eq('user_id', user.id).maybeSingle()
   if (!company) redirect('/post')
 
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
+
   const { data: roles } = await supabase
     .from('future_roles')
     .select('id, title, status, target_timeframe, created_at, future_role_subscriptions(count)')
@@ -25,8 +28,14 @@ export default async function EmployerRolesPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <SiteHeader />
+    <WorkspaceShell
+      activeSection="employer-roles"
+      hasCompany={true}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Your Future Roles"
+    >
       <div className="max-w-3xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Your Future Roles</h1>
@@ -83,6 +92,6 @@ export default async function EmployerRolesPage() {
           <p className="text-gray-500 dark:text-gray-400">You haven&rsquo;t posted a future role yet.</p>
         )}
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

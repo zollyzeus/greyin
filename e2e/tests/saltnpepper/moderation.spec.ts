@@ -48,9 +48,25 @@ test('a flagged discussion appears in the admin review queue, and can be cleared
   const title = `E2E Moderation Flagged Post ${Date.now()}`
   await authorPage.goto('/discussions/new')
   await authorPage.locator('#title').fill(title)
-  await authorPage.locator('#body').fill('This post will be manually flagged to exercise the admin review queue.')
+  // Genuine, benign content -- same shape as the "normal post" test above.
+  // A previous version of this body described itself as a test post ("will
+  // be manually flagged to exercise the admin review queue"), which is
+  // exactly the kind of self-referential, low-substance text the live LLM
+  // moderation check sometimes (non-deterministically) rejects on its own
+  // merits -- the flow this test cares about (admin review queue: visible,
+  // clearable, deletable) manufactures the flagged_on_retry state directly
+  // via REST regardless, so the post content itself doesn't need to
+  // describe the test at all.
+  await authorPage.locator('#body').fill('Sharing a debugging technique that saved us a full day chasing a race condition in a distributed job queue.')
   await authorPage.getByRole('button', { name: 'Post Discussion' }).click()
-  await authorPage.waitForURL(/\/discussions\/[^/]+$/)
+  // Anchored to a real UUID rather than the looser [^/]+$ -- a live
+  // moderation rejection redirects to /discussions/new?error=... instead,
+  // and [^/]+$ was loose enough to match that whole query string as if it
+  // were a valid discussion id (no literal "/" in an encoded error
+  // message), turning a clear "moderation rejected this content" failure
+  // into a confusing "invalid input syntax for type uuid" one two steps
+  // later instead.
+  await authorPage.waitForURL(/\/discussions\/[0-9a-f-]{36}$/)
   const discussionId = authorPage.url().split('/discussions/')[1]
   await authorCtx.close()
 

@@ -1,8 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { Package, ArrowLeft, ShoppingCart, CreditCard } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { ShoppingCart, CreditCard } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function CheckoutPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -23,7 +22,8 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
     redirect('/gigs')
   }
 
-  const { data: buyerProfile } = await supabase.from('profiles').select('phone').eq('id', user.id).single()
+  const { data: buyerProfile } = await supabase.from('profiles').select('full_name, role, phone').eq('id', user.id).single()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   const basePrice = gig.price_min || 1000
   const packages = {
@@ -33,17 +33,13 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href={`/gigs/${params.id}`} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Gig</span>
-          </Link>
-            <ThemeToggle />
-          </div>
-      </header>
-
+    <WorkspaceShell
+      role={buyerProfile?.role}
+      userName={buyerProfile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Checkout"
+    >
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 dark:text-gray-50">Checkout</h1>
@@ -241,6 +237,6 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
           }
         });
       ` }} />
-    </div>
+    </WorkspaceShell>
   )
 }

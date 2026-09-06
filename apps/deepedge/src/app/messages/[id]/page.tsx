@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Building2, ArrowLeft } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { ArrowLeft } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function MessageThreadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -12,6 +12,9 @@ export default async function MessageThreadPage({ params }: { params: Promise<{ 
   if (!user) {
     redirect(`/login?next=/messages/${id}`)
   }
+
+  const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   // RLS already scopes this to conversations the user participates in — an
   // empty result here means either it doesn't exist or they're not in it,
@@ -42,19 +45,13 @@ export default async function MessageThreadPage({ params }: { params: Promise<{ 
     .is('read_at', null)
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
-              <span className="ml-2 text-2xl font-bold">DeepEdge</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      variant={profile?.role === 'employer' ? 'employer' : 'candidate'}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle="Messages"
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
         <Link href="/messages" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -95,6 +92,6 @@ export default async function MessageThreadPage({ params }: { params: Promise<{ 
           </button>
         </form>
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

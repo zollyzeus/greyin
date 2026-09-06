@@ -1,9 +1,7 @@
-import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { isBuilder } from '@/lib/stackworks-role'
-import { FlaskConical, ArrowLeft } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function NewAskPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -26,34 +24,25 @@ export default async function NewAskPage({ params }: { params: Promise<{ id: str
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('years_experience, stackworks_role')
+    .select('full_name, role, years_experience, stackworks_role')
     .eq('id', user.id)
     .single()
 
   if (project.user_id !== user.id || !profile || !isBuilder(profile)) {
     redirect(`/projects/${id}`)
   }
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <a href="https://greyin.net" className="flex items-center">
-              <FlaskConical className="h-8 w-8 text-teal-600 dark:text-teal-400" />
-              <span className="ml-2 text-2xl font-bold">StackWorks</span>
-            </a>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
+    <WorkspaceShell
+      builder={true}
+      isAdmin={profile?.role === 'admin'}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle={`Post an Ask — ${project.title}`}
+    >
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href={`/projects/${id}`} className="flex items-center text-gray-600 hover:text-teal-600 mb-6 dark:text-gray-400">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to {project.title}
-        </Link>
-
         <div className="bg-white rounded-lg shadow-md p-8 dark:bg-gray-900">
           <h1 className="text-2xl font-bold text-gray-900 mb-6 dark:text-gray-50">Post an Ask</h1>
 
@@ -96,6 +85,6 @@ export default async function NewAskPage({ params }: { params: Promise<{ id: str
           </form>
         </div>
       </div>
-    </main>
+    </WorkspaceShell>
   )
 }

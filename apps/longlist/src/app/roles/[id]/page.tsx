@@ -1,7 +1,6 @@
-import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
-import { ArrowLeft, MapPin, Clock } from 'lucide-react'
-import { SiteHeader } from '@/components/SiteHeader'
+import { MapPin, Clock } from 'lucide-react'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 import { createClient } from '@/lib/supabase/server'
 
 const TIMEFRAME_LABEL: Record<string, string> = {
@@ -34,14 +33,20 @@ export default async function RoleDetailPage({ params }: { params: Promise<{ id:
 
   const subscribed = !!sub
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <SiteHeader />
-      <div className="max-w-2xl mx-auto px-4 py-10">
-        <Link href="/roles" className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-amber-700 mb-6 dark:text-gray-400 dark:hover:text-amber-300">
-          <ArrowLeft className="h-4 w-4" /> Back to Future Roles
-        </Link>
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
+  const { data: company } = await supabase.from('companies').select('id').eq('user_id', user.id).maybeSingle()
 
+  return (
+    <WorkspaceShell
+      activeSection="roles"
+      hasCompany={!!company}
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle={role.title}
+    >
+      <div className="max-w-2xl mx-auto px-4 py-10">
         <div className="bg-white rounded-xl border border-gray-200 p-7 dark:bg-gray-900 dark:border-gray-800">
           <span className="text-xs font-semibold px-3 py-1 rounded-full bg-amber-50 text-amber-700 inline-flex items-center gap-1 dark:bg-amber-950/40 dark:text-amber-400">
             <Clock className="h-3 w-3" />
@@ -82,6 +87,6 @@ export default async function RoleDetailPage({ params }: { params: Promise<{ id:
           </form>
         </div>
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

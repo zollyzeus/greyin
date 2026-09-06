@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Telescope } from 'lucide-react'
+import { AuthLayout } from '@/components/AuthLayout'
 
 export default async function SignupPage({
   searchParams,
@@ -18,18 +18,8 @@ export default async function SignupPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-stone-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 dark:from-gray-950 dark:to-gray-900">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <a href="https://greyin.net" className="inline-flex items-center gap-2 text-3xl font-bold text-amber-700 dark:text-amber-400">
-            <Telescope className="w-8 h-8" />
-            <span>Longlist</span>
-          </a>
-          <h2 className="font-display mt-4 text-2xl font-semibold text-gray-900 dark:text-gray-50">Create your account</h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Future roles, quietly explored — no company sees your name unless you say so.</p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-xl p-8 dark:bg-gray-900">
+    <AuthLayout title="Create your account" subtitle="Future roles, quietly explored — no company sees your name unless you say so.">
+      <div className="bg-white rounded-2xl shadow-xl p-8 dark:bg-gray-900">
           {error && (
             <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
               {decodeURIComponent(error)}
@@ -99,7 +89,6 @@ export default async function SignupPage({
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </AuthLayout>
   )
 }

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ArrowLeft, CheckCircle } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 const SERVICE_COPY: Record<string, { heading: string; blurb: string; backHref: string; backLabel: string }> = {
   subscription: {
@@ -53,20 +53,21 @@ export default async function EnterpriseContactPage({
   }
 
   const { data: company } = await supabase.from('companies').select('id, name').eq('user_id', user.id).maybeSingle()
+  const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <header className="bg-white border-b dark:bg-gray-900">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href={copy.backHref} className="flex items-center gap-2 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
-            <ArrowLeft className="w-4 h-4" />
-            <span>{copy.backLabel}</span>
-          </Link>
-          <ThemeToggle />
-        </div>
-      </header>
-
+    <WorkspaceShell
+      variant="employer"
+      userName={profile?.full_name || 'User'}
+      verified={!!scoreRow?.is_verified_expert}
+      greyinScore={scoreRow?.greyin_score ?? null}
+      pageTitle={copy.heading}
+    >
       <div className="max-w-lg mx-auto px-4 py-12">
+        <Link href={copy.backHref} className="flex items-center gap-2 mb-6 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
+          <ArrowLeft className="w-4 h-4" />
+          <span>{copy.backLabel}</span>
+        </Link>
         {success ? (
           <div className="bg-white rounded-lg shadow p-8 text-center dark:bg-gray-900">
             <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4 dark:text-green-400" />
@@ -145,6 +146,6 @@ export default async function EnterpriseContactPage({
           </div>
         )}
       </div>
-    </div>
+    </WorkspaceShell>
   )
 }

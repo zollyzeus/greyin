@@ -18,33 +18,35 @@ export default async function Home() {
     <main className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-stone-100 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
       <SiteHeader />
 
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
-        <p className="inline-block text-sm font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wide mb-4 bg-amber-50 dark:bg-amber-950/40 rounded-full px-4 py-1.5">
-          A new Greyin pillar
-        </p>
-        <h1 className="font-display text-5xl md:text-6xl font-semibold text-gray-900 dark:text-gray-50 mb-6">Future roles, quietly explored.</h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-2">
-          Companies post roles they expect to open 3&ndash;12 months from now — anonymously. Browse them
-          without anyone knowing you looked. Subscribe to one and your profile reaches that company; say
-          nothing, and AI can still surface you if what you&rsquo;re after matches what they&rsquo;ll need.
-        </p>
-        <p className="text-sm text-gray-500 dark:text-gray-500 mb-10">{openRoleCount ?? 0} future roles open right now.</p>
-        {!user && (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup" className="bg-amber-700 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-amber-800 transition">
-              Join Longlist
+      <div className="bg-gradient-to-r from-amber-600 to-orange-600 dark:from-amber-800 dark:to-orange-800 text-white py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="inline-block text-sm font-semibold uppercase tracking-wide mb-4 bg-white/15 rounded-full px-4 py-1.5">
+            A new Greyin pillar
+          </p>
+          <h1 className="font-display text-5xl md:text-6xl font-semibold mb-6">Future roles, quietly explored.</h1>
+          <p className="text-xl text-amber-50 max-w-2xl mx-auto mb-2">
+            Companies post roles they expect to open 3&ndash;12 months from now — anonymously. Browse them
+            without anyone knowing you looked. Subscribe to one and your profile reaches that company; say
+            nothing, and AI can still surface you if what you&rsquo;re after matches what they&rsquo;ll need.
+          </p>
+          <p className="text-sm text-amber-100/80 mb-10">{openRoleCount ?? 0} future roles open right now.</p>
+          {!user && (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/signup" className="bg-white text-amber-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-amber-50 transition">
+                Join Longlist
+              </Link>
+              <Link href="/roles" className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/10 transition">
+                Browse Future Roles
+              </Link>
+            </div>
+          )}
+          {user && (
+            <Link href="/roles" className="inline-flex items-center gap-2 bg-white text-amber-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-amber-50 transition">
+              Browse Future Roles <ArrowRight className="h-5 w-5" />
             </Link>
-            <Link href="/roles" className="bg-white dark:bg-gray-900 text-amber-700 dark:text-amber-400 border-2 border-amber-700 dark:border-amber-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-amber-50 dark:hover:bg-amber-950/40 transition">
-              Browse Future Roles
-            </Link>
-          </div>
-        )}
-        {user && (
-          <Link href="/roles" className="inline-flex items-center gap-2 bg-amber-700 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-amber-800 transition">
-            Browse Future Roles <ArrowRight className="h-5 w-5" />
-          </Link>
-        )}
-      </section>
+          )}
+        </div>
+      </div>
 
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
