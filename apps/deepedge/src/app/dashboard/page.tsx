@@ -103,7 +103,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="mb-8 rounded-lg bg-amber-50 border border-amber-200 px-6 py-5 dark:bg-amber-950/40 dark:border-amber-900">
-            <p className="text-sm font-semibold text-amber-900">
+            <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">
               Applying to jobs requires Verified Expert status
             </p>
             <p className="text-sm text-amber-800 mt-1 dark:text-amber-400">
@@ -148,7 +148,7 @@ export default async function DashboardPage() {
         {/* Pivoter nudge */}
         {profile?.is_pivoter && (
           <div className="mb-8 rounded-lg bg-orange-50 border border-orange-200 px-6 py-5 dark:bg-orange-950/40 dark:border-orange-900">
-            <p className="text-sm font-semibold text-orange-900">
+            <p className="text-sm font-semibold text-orange-900 dark:text-orange-300">
               Pivoting from {profile.pivot_from_domain || 'your current domain'} to {profile.pivot_to_domain || 'a new one'}
             </p>
             <p className="text-sm text-orange-800 mt-1 dark:text-orange-400">
@@ -173,7 +173,7 @@ export default async function DashboardPage() {
             explaining a limitation. */}
         {profile?.is_reentry && (
           <div className="mb-8 rounded-lg bg-blue-50 border border-blue-200 px-6 py-5 dark:bg-blue-950/40 dark:border-blue-900">
-            <p className="text-sm font-semibold text-blue-900">
+            <p className="text-sm font-semibold text-blue-900 dark:text-blue-300">
               Your profile notes your return to work
             </p>
             <p className="text-sm text-blue-800 mt-1 dark:text-blue-400">

@@ -87,7 +87,7 @@ export function SiteFooter() {
             <span className="font-bold text-white">Greyin</span>
           </a>
           <p>&copy; {new Date().getFullYear()} Greyin. All rights reserved.</p>
-          <a href="https://greyin.net/feedback?app=greymatters" className="hover:text-white transition">Contact</a>
+          <a href="https://greyin.net/contact?app=greymatters" className="hover:text-white transition">Contact</a>
         </div>
       </div>
     </footer>

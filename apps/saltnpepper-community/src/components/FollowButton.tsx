@@ -23,7 +23,7 @@ export function FollowButton({
         type="submit"
         className={
           isFollowing
-            ? 'flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-red-600 dark:text-gray-400'
+            ? 'flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400'
             : 'flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300'
         }
       >

@@ -69,6 +69,8 @@ export default async function SubscribePage({
           </div>
         )}
 
+        <div id="subscribe-error" hidden className="max-w-md mx-auto rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 mb-6 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-400"></div>
+
         {!showTierPicker ? (
           <div className="max-w-md mx-auto rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
             You already have an active {existingTierName || ''} subscription.
@@ -87,7 +89,7 @@ export default async function SubscribePage({
                 return (
                   <div
                     key={tier.id}
-                    className={`bg-white rounded-lg shadow p-6 border-2 flex flex-col ${isPro ? 'border-orange-500' : 'border-transparent'}`}
+                    className={`bg-white dark:bg-gray-900 rounded-lg shadow p-6 border-2 flex flex-col ${isPro ? 'border-orange-500' : 'border-transparent'}`}
                   >
                     {isPro && (
                       <span className="self-start mb-2 text-xs font-semibold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full dark:text-orange-400 dark:bg-orange-950/40">
@@ -127,7 +129,14 @@ export default async function SubscribePage({
       <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       <script dangerouslySetInnerHTML={{ __html: `
         document.querySelectorAll('.subscribe-button').forEach(function(subscribeButton) {
+          function showSubscribeError(msg) {
+            const el = document.getElementById('subscribe-error');
+            el.textContent = msg;
+            el.hidden = false;
+          }
+
           subscribeButton.addEventListener('click', async () => {
+            document.getElementById('subscribe-error').hidden = true;
             const button = subscribeButton;
             const tierKey = button.getAttribute('data-tier-key');
             const originalText = button.textContent;
@@ -142,7 +151,7 @@ export default async function SubscribePage({
               const data = await response.json();
 
               if (!response.ok) {
-                alert('Failed to start subscription: ' + data.error);
+                showSubscribeError('Failed to start subscription: ' + (data.error || 'Please try again.'));
                 button.disabled = false;
                 button.textContent = originalText;
                 return;
@@ -168,7 +177,7 @@ export default async function SubscribePage({
                   if (verifyResponse.ok) {
                     window.location.href = '/gigs/new?subscribed=1';
                   } else {
-                    alert('Payment succeeded but activation is still confirming -- this can take a minute.');
+                    showSubscribeError('Payment succeeded but activation is still confirming -- this can take a minute.');
                   }
                 },
                 prefill: {
@@ -185,7 +194,7 @@ export default async function SubscribePage({
               button.textContent = originalText;
             } catch (error) {
               console.error('Subscription error:', error);
-              alert('Something went wrong. Please try again.');
+              showSubscribeError('Something went wrong. Please try again.');
               button.disabled = false;
               button.textContent = originalText;
             }

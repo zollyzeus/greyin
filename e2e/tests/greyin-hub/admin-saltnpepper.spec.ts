@@ -50,6 +50,7 @@ test('an admin can delete a discussion from the Hub-hosted Salt & Pepper tab', a
   await adminPage.goto('/admin/saltnpepper')
   await expect(adminPage.getByText(discussion.title)).toBeVisible()
 
+  adminPage.once('dialog', (d) => d.accept())
   await adminPage
     .locator(`input[name="discussion_id"][value="${discussion.id}"]`)
     .first()

@@ -129,7 +129,7 @@ export default function GigReviews({ gigId }: GigReviewsProps) {
                 {/* Seller Response */}
                 {review.response && (
                   <div className="mt-4 ml-4 pl-4 border-l-2 border-indigo-200 bg-indigo-50 p-4 rounded-r-lg dark:border-indigo-900 dark:bg-indigo-950/40">
-                    <p className="text-sm font-semibold text-indigo-900 mb-2">Seller Response:</p>
+                    <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-300 mb-2">Seller Response:</p>
                     <p className="text-sm text-gray-700 dark:text-gray-300">{review.response}</p>
                     {review.response_at && (
                       <span className="text-xs text-gray-500 mt-2 block dark:text-gray-400">

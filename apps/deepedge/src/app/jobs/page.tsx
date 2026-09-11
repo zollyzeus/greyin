@@ -262,7 +262,7 @@ export default async function JobsPage({
               form="" attribute -- keeps the sidebar visually separate
               while still submitting as part of this one GET request, so
               a filter change doesn't drop whatever's typed in search. */}
-          <form id="job-filters" action="/jobs" method="GET" className="bg-white rounded-lg p-4 flex gap-4 dark:bg-gray-900">
+          <form id="job-filters" action="/jobs" method="GET" className="bg-white rounded-lg p-4 flex gap-4 dark:bg-gray-900 focus-within:ring-2 focus-within:ring-indigo-500">
             <div className="flex-1 flex items-center gap-3">
               <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               <input

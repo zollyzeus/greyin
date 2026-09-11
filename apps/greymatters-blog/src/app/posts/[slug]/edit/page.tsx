@@ -3,6 +3,7 @@ import { createClient } from '@/app/lib/supabase/server'
 import { ImageUploader } from '@/app/components/ImageUploader'
 import { MarkdownEditor } from '@/app/components/MarkdownEditor'
 import { WorkspaceShell } from '@/app/components/WorkspaceShell'
+import { ConfirmSubmitButton } from '@/components/ConfirmSubmitButton'
 
 export default async function EditPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -126,10 +127,10 @@ export default async function EditPostPage({ params }: { params: Promise<{ slug:
           </form>
 
           <form action={`/api/posts/${post.slug}/delete`} method="POST" className="mt-4">
-            <button type="submit"
+            <ConfirmSubmitButton confirmMessage="Delete this post permanently? This cannot be undone."
               className="w-full border border-red-300 text-red-600 px-6 py-3 rounded-lg hover:bg-red-50 font-semibold dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/40">
               Delete Post
-            </button>
+            </ConfirmSubmitButton>
           </form>
         </div>
       </div>

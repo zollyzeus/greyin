@@ -64,7 +64,7 @@ export function TeammateTagPicker({ currentUserId }: { currentUserId: string }) 
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search by name..."
-        className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700"
+        className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
         autoComplete="off"
       />
       {results.length > 0 && (

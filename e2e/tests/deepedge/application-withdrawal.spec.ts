@@ -40,6 +40,7 @@ test('a candidate can withdraw their own application, and the employer is notifi
   const applicationRow = candidatePage.locator('div.bg-white.rounded-lg.shadow.p-6').filter({ hasText: jobTitle })
   await expect(applicationRow).toHaveCount(1)
   await expect(applicationRow.getByText('submitted')).toBeVisible()
+  candidatePage.once('dialog', (d) => d.accept())
   await applicationRow.getByRole('button', { name: 'Withdraw' }).click()
   await candidatePage.waitForURL(/\/dashboard\/applications/)
 

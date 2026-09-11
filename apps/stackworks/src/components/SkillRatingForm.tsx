@@ -91,6 +91,7 @@ export default function SkillRatingForm({
                     disabled={!!locked || submitting === skill}
                     onClick={() => rate(skill, n, !!canRevise)}
                     aria-label={`Rate ${skill} ${n} out of 5`}
+                    className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     <Star className={`w-4 h-4 ${n <= current ? 'fill-amber-400 text-amber-400' : 'text-gray-300'}`} />
                   </button>

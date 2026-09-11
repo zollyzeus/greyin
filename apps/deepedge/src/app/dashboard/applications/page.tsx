@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ArrowLeft, Briefcase, CheckCircle, MessageCircle } from 'lucide-react'
 import { WorkspaceShell } from '@/components/WorkspaceShell'
+import { ConfirmSubmitButton } from '@/components/ConfirmSubmitButton'
 import { InterviewPrepAssist } from '@/components/InterviewPrepAssist'
 
 const STATUS_STYLES: Record<string, string> = {
@@ -109,9 +110,9 @@ export default async function MyApplicationsPage({
                   )}
                   {WITHDRAWABLE_STATUSES.has(app.status) && (
                     <form action={`/api/applications/${app.id}/withdraw`} method="POST">
-                      <button type="submit" className="text-xs text-gray-500 hover:text-red-600 dark:text-gray-400">
+                      <ConfirmSubmitButton confirmMessage="Withdraw this application? This cannot be undone." className="text-xs text-gray-500 hover:text-red-600 dark:text-gray-400">
                         Withdraw
-                      </button>
+                      </ConfirmSubmitButton>
                     </form>
                   )}
                 </div>

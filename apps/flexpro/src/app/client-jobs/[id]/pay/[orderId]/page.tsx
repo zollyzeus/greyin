@@ -62,6 +62,8 @@ export default async function ClientJobPayPage({ params }: { params: Promise<{ i
             </div>
           </div>
 
+          <div id="checkout-error" hidden className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400"></div>
+
           <button
             id="pay-button"
             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium"
@@ -76,7 +78,14 @@ export default async function ClientJobPayPage({ params }: { params: Promise<{ i
 
       <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       <script dangerouslySetInnerHTML={{ __html: `
+        function showCheckoutError(msg) {
+          const el = document.getElementById('checkout-error');
+          el.textContent = msg;
+          el.hidden = false;
+        }
+
         document.getElementById('pay-button').addEventListener('click', async () => {
+          document.getElementById('checkout-error').hidden = true;
           try {
             const response = await fetch('/api/orders/create', {
               method: 'POST',
@@ -88,7 +97,7 @@ export default async function ClientJobPayPage({ params }: { params: Promise<{ i
             });
             const data = await response.json();
             if (!response.ok) {
-              alert('Failed to start payment: ' + data.error);
+              showCheckoutError('Failed to start payment: ' + (data.error || 'Please try again.'));
               return;
             }
 
@@ -113,7 +122,7 @@ export default async function ClientJobPayPage({ params }: { params: Promise<{ i
                 if (verifyResponse.ok) {
                   window.location.href = '/orders/' + data.orderId + '/success';
                 } else {
-                  alert('Payment verification failed');
+                  showCheckoutError('Payment verification failed. If money was deducted, contact support before trying again.');
                 }
               },
               prefill: {
@@ -127,7 +136,7 @@ export default async function ClientJobPayPage({ params }: { params: Promise<{ i
             razorpay.open();
           } catch (error) {
             console.error('Payment error:', error);
-            alert('Payment failed. Please try again.');
+            showCheckoutError('Payment failed. Please try again.');
           }
         });
       ` }} />

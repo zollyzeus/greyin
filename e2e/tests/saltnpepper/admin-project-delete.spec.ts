@@ -34,6 +34,7 @@ test('an admin can delete a builder project from Salt & Pepper\'s own admin pane
   await adminPage.goto('/admin')
   await expect(adminPage.getByText(title)).toBeVisible()
 
+  adminPage.once('dialog', (d) => d.accept())
   await adminPage
     .locator(`input[name="project_id"][value="${project.id}"]`)
     .locator('xpath=..')

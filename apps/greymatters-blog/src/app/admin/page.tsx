@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { ConfirmSubmitButton } from '@/components/ConfirmSubmitButton'
 import { createClient } from '@/app/lib/supabase/server'
 import { ShieldCheck, Send, Sparkles } from 'lucide-react'
 import { WorkspaceShell } from '@/app/components/WorkspaceShell'
@@ -179,9 +180,9 @@ export default async function AdminPage({
                   <p className="text-sm text-gray-700 line-clamp-2 dark:text-gray-300">{comment.content}</p>
                   <form action="/api/admin/comments/delete" method="POST">
                     <input type="hidden" name="comment_id" value={comment.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 whitespace-nowrap dark:text-red-400 dark:hover:text-red-300">
-                      Delete
-                    </button>
+                    <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 whitespace-nowrap dark:text-red-400 dark:hover:text-red-300">
+                    Delete
+                  </ConfirmSubmitButton>
                   </form>
                 </div>
               ))}

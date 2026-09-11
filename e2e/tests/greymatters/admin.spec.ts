@@ -45,6 +45,7 @@ test('an admin can unpublish a post and delete a comment', async ({ browser, cle
   await expect(adminPage.getByText(title)).toBeVisible()
   await expect(adminPage.getByText(commentText)).toBeVisible()
 
+  adminPage.once('dialog', (d) => d.accept())
   await adminPage.getByText(commentText).locator('xpath=ancestor::div[contains(@class, "justify-between")][1]').getByRole('button', { name: 'Delete' }).click()
   await adminPage.waitForURL('/admin')
   await expect(adminPage.getByText(commentText)).not.toBeVisible()

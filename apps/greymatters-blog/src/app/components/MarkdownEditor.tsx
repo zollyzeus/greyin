@@ -47,7 +47,7 @@ export function MarkdownEditor({ defaultValue }: { defaultValue?: string }) {
           required
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono text-sm dark:border-gray-700"
+          className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono text-sm dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
         />
       )}
     </div>

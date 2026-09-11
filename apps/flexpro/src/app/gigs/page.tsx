@@ -148,7 +148,7 @@ export default async function GigsPage({
           {/* id referenced by the Filters sidebar's inputs below via the
               form="" attribute -- keeps the sidebar visually separate
               while still submitting as part of this one GET request. */}
-          <form id="gig-filters" action="/gigs" method="GET" className="bg-white rounded-lg p-4 flex gap-4 max-w-3xl dark:bg-gray-900">
+          <form id="gig-filters" action="/gigs" method="GET" className="bg-white rounded-lg p-4 flex gap-4 max-w-3xl dark:bg-gray-900 focus-within:ring-2 focus-within:ring-orange-500">
             <div className="flex-1 flex items-center gap-3">
               <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               <input

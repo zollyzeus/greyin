@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { ConfirmSubmitButton } from '@/components/ConfirmSubmitButton'
 import { createClient } from '@/lib/supabase/server'
 import { ShieldCheck, Sparkles, Flag } from 'lucide-react'
 import { WorkspaceShell } from '@/components/WorkspaceShell'
@@ -167,7 +168,7 @@ export default async function AdminPage({
                     </form>
                     <form action="/api/admin/discussions/delete" method="POST">
                       <input type="hidden" name="discussion_id" value={d.id} />
-                      <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                      <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Delete</ConfirmSubmitButton>
                     </form>
                   </div>
                 </div>
@@ -187,7 +188,7 @@ export default async function AdminPage({
                     </form>
                     <form action="/api/admin/discussion-replies/delete" method="POST">
                       <input type="hidden" name="reply_id" value={r.id} />
-                      <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                      <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Delete</ConfirmSubmitButton>
                     </form>
                   </div>
                 </div>
@@ -207,9 +208,7 @@ export default async function AdminPage({
                   <p className="font-medium">{d.title}</p>
                   <form action="/api/admin/discussions/delete" method="POST">
                     <input type="hidden" name="discussion_id" value={d.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-                      Delete
-                    </button>
+                    <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Delete</ConfirmSubmitButton>
                   </form>
                 </div>
               ))}
@@ -228,9 +227,7 @@ export default async function AdminPage({
                   <p className="font-medium">{p.title}</p>
                   <form action="/api/admin/projects/delete" method="POST">
                     <input type="hidden" name="project_id" value={p.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-                      Delete
-                    </button>
+                    <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Delete</ConfirmSubmitButton>
                   </form>
                 </div>
               ))}

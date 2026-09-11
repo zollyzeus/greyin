@@ -26,6 +26,7 @@ test('an admin can delete a project from the Hub-hosted StackWorks tab', async (
   await adminPage.goto('/admin/stackworks')
   await expect(adminPage.getByText(project.title)).toBeVisible()
 
+  adminPage.once('dialog', (d) => d.accept())
   await adminPage
     .locator(`input[name="project_id"][value="${project.id}"]`)
     .locator('xpath=..')

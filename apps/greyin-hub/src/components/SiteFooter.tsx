@@ -108,7 +108,7 @@ export function SiteFooter() {
             <span className="font-bold text-white">Greyin</span>
           </Link>
           <p>&copy; {new Date().getFullYear()} Greyin. All rights reserved.</p>
-          <Link href="/feedback" className="hover:text-white transition">Contact</Link>
+          <Link href="/contact" className="hover:text-white transition">Contact</Link>
         </div>
       </div>
     </footer>

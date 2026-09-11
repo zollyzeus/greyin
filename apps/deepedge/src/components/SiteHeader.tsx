@@ -60,9 +60,9 @@ export function SiteHeader() {
     <header className="bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <a href="https://greyin.net" className="flex items-center flex-shrink-0">
-            <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-500" />
-            <span className="ml-2 text-2xl font-bold text-gray-900 dark:text-gray-50">DeepEdge</span>
+          <a href="https://greyin.net" className="flex items-center min-w-0">
+            <Building2 className="h-8 w-8 text-indigo-600 dark:text-indigo-500 flex-shrink-0" />
+            <span className="ml-2 text-2xl font-bold text-gray-900 dark:text-gray-50 truncate">DeepEdge</span>
           </a>
 
           <nav className="hidden md:flex items-center gap-8">

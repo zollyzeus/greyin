@@ -66,6 +66,7 @@ test('an admin can unpublish a post and delete a comment from the Hub-hosted Gre
   await adminPage.waitForURL(/\/admin\/greymatters/)
   expect(await getPostStatus(post.id)).toBe('archived')
 
+  adminPage.once('dialog', (d) => d.accept())
   await adminPage
     .locator(`input[name="comment_id"][value="${comment.id}"]`)
     .locator('xpath=..')

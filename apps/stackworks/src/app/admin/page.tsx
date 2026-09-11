@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ConfirmSubmitButton } from '@/components/ConfirmSubmitButton'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ShieldCheck, Bot } from 'lucide-react'
@@ -82,9 +83,9 @@ export default async function AdminPage() {
                   <p className="font-medium">{p.title}</p>
                   <form action="/api/admin/projects/delete" method="POST">
                     <input type="hidden" name="project_id" value={p.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-                      Delete
-                    </button>
+                    <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                    Delete
+                  </ConfirmSubmitButton>
                   </form>
                 </div>
               ))}
@@ -103,9 +104,9 @@ export default async function AdminPage() {
                   <p className="font-medium">{a.role_title}</p>
                   <form action="/api/admin/asks/delete" method="POST">
                     <input type="hidden" name="ask_id" value={a.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-                      Delete
-                    </button>
+                    <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                    Delete
+                  </ConfirmSubmitButton>
                   </form>
                 </div>
               ))}

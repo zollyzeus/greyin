@@ -226,7 +226,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
               value={response}
               onChange={(e) => setResponse(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:border-gray-700"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
               placeholder="Thank the customer and address their feedback..."
               required
             />
@@ -234,7 +234,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
               >
                 {submitting ? 'Submitting...' : 'Submit Response'}
               </button>
@@ -269,7 +269,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
                 onClick={() => setRating(star)}
                 onMouseEnter={() => setHoverRating(star)}
                 onMouseLeave={() => setHoverRating(0)}
-                className="focus:outline-none"
+                className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
               >
                 <Star
                   className={`w-8 h-8 transition-colors ${
@@ -300,7 +300,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
             value={reviewText}
             onChange={(e) => setReviewText(e.target.value)}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:border-gray-700"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
             placeholder="Share your experience with this service..."
           />
         </div>
@@ -309,7 +309,7 @@ export default function OrderReview({ orderId, isBuyer, isSeller, orderStatus }:
           <button
             type="submit"
             disabled={submitting || rating === 0}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed"
           >
             {submitting ? 'Submitting...' : review ? 'Update Review' : 'Submit Review'}
           </button>

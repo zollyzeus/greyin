@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ConfirmSubmitButton } from '@/components/ConfirmSubmitButton'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ArrowLeft, Briefcase } from 'lucide-react'
@@ -64,7 +65,7 @@ export default async function PeerProjectsAdminPage() {
             {sorted.map((p: any) => {
               const flagged = flaggedProjectIds.has(p.id)
               return (
-                <div key={p.id} className={`bg-white rounded-lg shadow-sm border p-4 flex items-center justify-between ${flagged ? 'border-amber-300 dark:border-amber-800' : 'border-gray-200 dark:border-gray-800'}`}>
+                <div key={p.id} className={`bg-white dark:bg-gray-900 rounded-lg shadow-sm border p-4 flex items-center justify-between ${flagged ? 'border-amber-300 dark:border-amber-800' : 'border-gray-200 dark:border-gray-800'}`}>
                   <div>
                     <p className="font-medium text-gray-900 dark:text-gray-50">
                       {p.title}
@@ -80,9 +81,9 @@ export default async function PeerProjectsAdminPage() {
                   </div>
                   <form action="/api/admin/peer-projects/delete" method="POST">
                     <input type="hidden" name="project_id" value={p.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 flex-shrink-0 ml-4 dark:text-red-400 dark:hover:text-red-300">
-                      Delete
-                    </button>
+                    <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 flex-shrink-0 ml-4 dark:text-red-400 dark:hover:text-red-300">
+                    Delete
+                  </ConfirmSubmitButton>
                   </form>
                 </div>
               )

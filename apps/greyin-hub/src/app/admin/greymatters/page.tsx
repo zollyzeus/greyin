@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { ConfirmSubmitButton } from '@/components/ConfirmSubmitButton'
 import { BookOpen, ExternalLink } from 'lucide-react'
 
 // Ported from apps/greymatters-blog/src/app/admin/page.tsx (Phase 3,
@@ -76,9 +77,9 @@ export default async function GreyMattersAdminPage() {
                 <p className="text-sm text-gray-700 line-clamp-2 dark:text-gray-300">{comment.content}</p>
                 <form action="/api/admin/greymatters/comments/delete" method="POST">
                   <input type="hidden" name="comment_id" value={comment.id} />
-                  <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 whitespace-nowrap dark:text-red-400 dark:hover:text-red-300">
+                  <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 whitespace-nowrap dark:text-red-400 dark:hover:text-red-300">
                     Delete
-                  </button>
+                  </ConfirmSubmitButton>
                 </form>
               </div>
             ))}

@@ -63,7 +63,7 @@ export function ResumeSkillsUploader({ defaultResumeUrl, defaultSkills }: { defa
 
       {suggested.length > 0 && (
         <div className="bg-indigo-50 rounded-lg p-3 dark:bg-indigo-950/40">
-          <p className="text-xs font-medium text-indigo-900 mb-2 flex items-center gap-1">
+          <p className="text-xs font-medium text-indigo-900 dark:text-indigo-300 mb-2 flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5" />
             Found these in your resume — click to add
           </p>
@@ -91,7 +91,7 @@ export function ResumeSkillsUploader({ defaultResumeUrl, defaultSkills }: { defa
           value={skills}
           onChange={(e) => setSkills(e.target.value)}
           placeholder="e.g., JavaScript, React, Node.js"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
         />
         <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">Separate skills with commas</p>
       </div>

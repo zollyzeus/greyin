@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Plus } from 'lucide-react'
 import { WorkspaceShell } from '@/components/WorkspaceShell'
+import { ConfirmSubmitButton } from '@/components/ConfirmSubmitButton'
 
 export default async function ManageMentorSessionsPage({
   searchParams,
@@ -152,7 +153,7 @@ export default async function ManageMentorSessionsPage({
                             </span>
                             {slot.status === 'open' && (
                               <form action={`/api/mentor-sessions/slots/${slot.id}/cancel`} method="POST">
-                                <button type="submit" className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Cancel</button>
+                                <ConfirmSubmitButton confirmMessage="Cancel this mentor session slot? Anyone already booked will need to be notified separately. This cannot be undone." className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Cancel</ConfirmSubmitButton>
                               </form>
                             )}
                           </div>

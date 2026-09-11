@@ -27,6 +27,7 @@ test('an admin can delete a discussion', async ({ browser, cleanup }) => {
   await adminPage.goto('/admin')
   await expect(adminPage.getByText(title)).toBeVisible()
 
+  adminPage.once('dialog', (d) => d.accept())
   await adminPage
     .locator(`input[name="discussion_id"][value="${discussionId}"]`)
     .locator('xpath=..')

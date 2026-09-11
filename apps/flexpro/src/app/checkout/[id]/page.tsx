@@ -132,6 +132,8 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
                 </div>
               </div>
 
+              <div id="checkout-error" hidden className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400"></div>
+
               <button
                 id="pay-button"
                 className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
@@ -168,8 +170,21 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
           });
         });
 
+        // Inline error banner replaces alert() -- a blocking browser
+        // alert on a payment flow is jarring and inconsistent with
+        // every other form on this platform, which shows errors inline.
+        function showCheckoutError(msg) {
+          const el = document.getElementById('checkout-error');
+          el.textContent = msg;
+          el.hidden = false;
+        }
+        function hideCheckoutError() {
+          document.getElementById('checkout-error').hidden = true;
+        }
+
         // Payment button handler
         document.getElementById('pay-button').addEventListener('click', async () => {
+          hideCheckoutError();
           const selectedPackage = document.querySelector('input[name="package"]:checked').value;
           const price = packages[selectedPackage];
           const total = price + Math.round(price * 0.02);
@@ -189,7 +204,7 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
             const data = await response.json();
 
             if (!response.ok) {
-              alert('Failed to create order: ' + data.error);
+              showCheckoutError('Failed to create order: ' + (data.error || 'Please try again.'));
               return;
             }
 
@@ -217,7 +232,7 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
                 if (verifyResponse.ok) {
                   window.location.href = '/orders/' + data.orderId + '/success';
                 } else {
-                  alert('Payment verification failed');
+                  showCheckoutError('Payment verification failed. If money was deducted, contact support before trying again.');
                 }
               },
               prefill: {
@@ -233,7 +248,7 @@ export default async function CheckoutPage({ params }: { params: { id: string } 
             razorpay.open();
           } catch (error) {
             console.error('Payment error:', error);
-            alert('Payment failed. Please try again.');
+            showCheckoutError('Payment failed. Please try again.');
           }
         });
       ` }} />

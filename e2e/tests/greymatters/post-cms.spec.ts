@@ -36,6 +36,7 @@ test('an author can write, edit, publish and delete their own post', async ({ pa
   await page.goto('/posts')
   await page.getByRole('link', { name: 'Edit' }).first().click()
   await page.waitForURL(/\/posts\/.+\/edit/)
+  page.once('dialog', (d) => d.accept())
   await page.getByRole('button', { name: 'Delete Post' }).click()
   await page.waitForURL('/posts')
   await expect(page.getByText(updatedTitle)).not.toBeVisible()

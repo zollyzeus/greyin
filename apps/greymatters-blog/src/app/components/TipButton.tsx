@@ -34,12 +34,14 @@ export function TipButton({
   const [loading, setLoading] = useState(false)
   const [amount, setAmount] = useState(100)
   const [done, setDone] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleTip = async () => {
     setLoading(true)
+    setError(null)
     const loaded = await loadRazorpayScript()
     if (!loaded) {
-      alert('Could not load the payment widget. Please try again.')
+      setError('Could not load the payment widget. Please try again.')
       setLoading(false)
       return
     }
@@ -51,7 +53,7 @@ export function TipButton({
     })
     const data = await createRes.json()
     if (!createRes.ok) {
-      alert(data.error || 'Could not start payment')
+      setError(data.error || 'Could not start payment')
       setLoading(false)
       return
     }
@@ -77,7 +79,7 @@ export function TipButton({
         if (verifyRes.ok) {
           setDone(true)
         } else {
-          alert('Payment verification failed')
+          setError('Payment verification failed. If money was deducted, contact support before trying again.')
         }
       },
       prefill: {
@@ -96,25 +98,30 @@ export function TipButton({
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <select
-        value={amount}
-        onChange={(e) => setAmount(Number(e.target.value))}
-        className="text-sm border border-gray-300 rounded-lg px-2 py-1.5 dark:border-gray-700"
-      >
-        <option value={50}>₹50</option>
-        <option value={100}>₹100</option>
-        <option value={250}>₹250</option>
-        <option value={500}>₹500</option>
-      </select>
-      <button
-        onClick={handleTip}
-        disabled={loading}
-        className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-50"
-      >
-        <Heart className="w-4 h-4" />
-        {loading ? 'Loading...' : `Tip ${authorName}`}
-      </button>
+    <div>
+      <div className="flex items-center gap-3">
+        <select
+          value={amount}
+          onChange={(e) => setAmount(Number(e.target.value))}
+          className="text-sm border border-gray-300 rounded-lg px-2 py-1.5 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+        >
+          <option value={50}>₹50</option>
+          <option value={100}>₹100</option>
+          <option value={250}>₹250</option>
+          <option value={500}>₹500</option>
+        </select>
+        <button
+          onClick={handleTip}
+          disabled={loading}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-50"
+        >
+          <Heart className="w-4 h-4" />
+          {loading ? 'Loading...' : `Tip ${authorName}`}
+        </button>
+      </div>
+      {error && (
+        <p className="text-sm text-red-600 mt-2 dark:text-red-400">{error}</p>
+      )}
     </div>
   )
 }

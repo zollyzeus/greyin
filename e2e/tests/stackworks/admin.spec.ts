@@ -35,6 +35,7 @@ test('an admin can delete a project and an ask', async ({ browser, cleanup }) =>
   await expect(adminPage.getByText(title)).toBeVisible()
   await expect(adminPage.getByText('E2E Moderation Ask')).toBeVisible()
 
+  adminPage.once('dialog', (d) => d.accept())
   await adminPage
     .locator(`input[name="ask_id"][value="${askId}"]`)
     .locator('xpath=..')
@@ -43,6 +44,7 @@ test('an admin can delete a project and an ask', async ({ browser, cleanup }) =>
   await adminPage.waitForURL('/admin')
   await expect(adminPage.getByText('E2E Moderation Ask')).not.toBeVisible()
 
+  adminPage.once('dialog', (d) => d.accept())
   await adminPage
     .locator(`input[name="project_id"][value="${projectId}"]`)
     .locator('xpath=..')

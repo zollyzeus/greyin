@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { ConfirmSubmitButton } from '@/components/ConfirmSubmitButton'
 import { Hammer } from 'lucide-react'
 
 // Ported from apps/stackworks/src/app/admin/page.tsx (Phase 3, pitch-
@@ -53,9 +54,9 @@ export default async function StackWorksAdminPage() {
                 <p className="font-medium">{p.title}</p>
                 <form action="/api/admin/stackworks/projects/delete" method="POST">
                   <input type="hidden" name="project_id" value={p.id} />
-                  <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                  <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
                     Delete
-                  </button>
+                  </ConfirmSubmitButton>
                 </form>
               </div>
             ))}
@@ -74,9 +75,9 @@ export default async function StackWorksAdminPage() {
                 <p className="font-medium">{a.role_title}</p>
                 <form action="/api/admin/stackworks/asks/delete" method="POST">
                   <input type="hidden" name="ask_id" value={a.id} />
-                  <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                  <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
                     Delete
-                  </button>
+                  </ConfirmSubmitButton>
                 </form>
               </div>
             ))}

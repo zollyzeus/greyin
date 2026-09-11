@@ -74,7 +74,7 @@ export default async function SearchPage({
         <h1 className="text-3xl font-bold text-gray-900 mb-6 dark:text-gray-50">Search the Greyin Ecosystem</h1>
 
         <form className="mb-8 flex gap-3">
-          <div className="flex-1 flex items-center gap-3 bg-white border border-gray-300 rounded-lg px-4 dark:bg-gray-900 dark:border-gray-700">
+          <div className="flex-1 flex items-center gap-3 bg-white border border-gray-300 rounded-lg px-4 dark:bg-gray-900 dark:border-gray-700 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500">
             <SearchIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
             <input
               type="text"

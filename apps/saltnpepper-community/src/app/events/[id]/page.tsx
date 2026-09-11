@@ -72,7 +72,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                       isGoing
                         ? 'border-2 border-purple-600 text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-950/40'
                         : full
-                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed dark:text-gray-400'
+                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-800 dark:text-gray-400'
                           : 'bg-purple-600 text-white hover:bg-purple-700'
                     }`}
                   >

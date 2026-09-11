@@ -72,7 +72,7 @@ function ConfirmForm() {
                 maxLength={6}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-center text-2xl tracking-[0.5em] focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:border-gray-700"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm text-center text-2xl tracking-[0.5em] focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="000000"
               />
             </div>
@@ -89,7 +89,7 @@ function ConfirmForm() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:border-gray-700"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="••••••••"
               />
             </div>
@@ -106,7 +106,7 @@ function ConfirmForm() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:border-gray-700"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                 placeholder="••••••••"
               />
             </div>

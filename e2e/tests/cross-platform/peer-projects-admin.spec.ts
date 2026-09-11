@@ -86,6 +86,7 @@ test('an admin sees a flagged reciprocal-rating project and can delete it', asyn
   const projectRow = adminPage.locator('div.bg-white.rounded-lg.shadow-sm.border').filter({ hasText: projectTitle })
   await expect(projectRow).toHaveCount(1)
   await expect(projectRow.getByText('⚠ Possible reciprocal rating')).toBeVisible()
+  adminPage.once('dialog', (d) => d.accept())
   await projectRow.getByRole('button', { name: 'Delete' }).click()
   await adminPage.waitForURL(`${hubBase}/admin/peer-projects`)
   await expect(adminPage.getByText(projectTitle)).not.toBeVisible()

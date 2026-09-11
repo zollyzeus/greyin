@@ -52,6 +52,8 @@ export default async function MentorSessionCheckoutPage({ params }: { params: { 
           <p className="text-gray-600 mb-1 dark:text-gray-400">{order.gig?.title}</p>
           <p className="text-2xl font-bold text-indigo-600 mb-6 dark:text-indigo-400">₹{order.amount.toLocaleString()}</p>
 
+          <div id="checkout-error" hidden className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400"></div>
+
           <button
             id="pay-button"
             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
@@ -66,7 +68,14 @@ export default async function MentorSessionCheckoutPage({ params }: { params: { 
 
       <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       <script dangerouslySetInnerHTML={{ __html: `
+        function showCheckoutError(msg) {
+          const el = document.getElementById('checkout-error');
+          el.textContent = msg;
+          el.hidden = false;
+        }
+
         document.getElementById('pay-button').addEventListener('click', async () => {
+          document.getElementById('checkout-error').hidden = true;
           try {
             const response = await fetch('/api/orders/create', {
               method: 'POST',
@@ -82,7 +91,7 @@ export default async function MentorSessionCheckoutPage({ params }: { params: { 
             const data = await response.json();
 
             if (!response.ok) {
-              alert('Failed to start payment: ' + data.error);
+              showCheckoutError('Failed to start payment: ' + (data.error || 'Please try again.'));
               return;
             }
 
@@ -108,7 +117,7 @@ export default async function MentorSessionCheckoutPage({ params }: { params: { 
                 if (verifyResponse.ok) {
                   window.location.href = '/orders/' + data.orderId;
                 } else {
-                  alert('Payment verification failed');
+                  showCheckoutError('Payment verification failed. If money was deducted, contact support before trying again.');
                 }
               },
               prefill: {
@@ -122,7 +131,7 @@ export default async function MentorSessionCheckoutPage({ params }: { params: { 
             razorpay.open();
           } catch (error) {
             console.error('Payment error:', error);
-            alert('Payment failed. Please try again.');
+            showCheckoutError('Payment failed. Please try again.');
           }
         });
       ` }} />

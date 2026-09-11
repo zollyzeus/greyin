@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { ConfirmSubmitButton } from '@/components/ConfirmSubmitButton'
 import { MessagesSquare, Flag, ExternalLink } from 'lucide-react'
 
 // Ported from apps/saltnpepper-community/src/app/admin/page.tsx (Phase
@@ -82,7 +83,9 @@ export default async function SaltNPepperAdminPage() {
                   </form>
                   <form action="/api/admin/saltnpepper/discussions/delete" method="POST">
                     <input type="hidden" name="discussion_id" value={d.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                    <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                    Delete
+                  </ConfirmSubmitButton>
                   </form>
                 </div>
               </div>
@@ -102,7 +105,9 @@ export default async function SaltNPepperAdminPage() {
                   </form>
                   <form action="/api/admin/saltnpepper/discussion-replies/delete" method="POST">
                     <input type="hidden" name="reply_id" value={r.id} />
-                    <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                    <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                    Delete
+                  </ConfirmSubmitButton>
                   </form>
                 </div>
               </div>
@@ -122,9 +127,9 @@ export default async function SaltNPepperAdminPage() {
                 <p className="font-medium">{d.title}</p>
                 <form action="/api/admin/saltnpepper/discussions/delete" method="POST">
                   <input type="hidden" name="discussion_id" value={d.id} />
-                  <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                  <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
                     Delete
-                  </button>
+                  </ConfirmSubmitButton>
                 </form>
               </div>
             ))}
@@ -143,9 +148,9 @@ export default async function SaltNPepperAdminPage() {
                 <p className="font-medium">{p.title}</p>
                 <form action="/api/admin/saltnpepper/projects/delete" method="POST">
                   <input type="hidden" name="project_id" value={p.id} />
-                  <button type="submit" className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                  <ConfirmSubmitButton confirmMessage="Delete this permanently? This cannot be undone." className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
                     Delete
-                  </button>
+                  </ConfirmSubmitButton>
                 </form>
               </div>
             ))}

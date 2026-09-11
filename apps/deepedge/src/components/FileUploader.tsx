@@ -81,7 +81,7 @@ export function FileUploader({
     <div>
       <input type="hidden" name={name} value={url} />
       {url && <p className="text-xs text-green-700 mb-2 dark:text-green-400">File uploaded ✓</p>}
-      <label className="inline-flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-50 dark:text-gray-400 dark:border-gray-700 dark:hover:bg-gray-800">
+      <label className={`inline-flex items-center gap-2 text-sm text-gray-600 border border-gray-300 rounded-lg px-3 py-2 dark:text-gray-400 dark:border-gray-700 ${uploading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
         <Upload className="w-4 h-4" />
         <span>{uploading ? 'Uploading...' : url ? 'Replace file' : 'Upload file'}</span>
         <input type="file" accept={accept} onChange={handleFile} className="hidden dark:bg-gray-950 dark:text-gray-100" disabled={uploading} />
