@@ -72,6 +72,9 @@ export function FeedbackWishlistModal({ open, onClose }: { open: boolean; onClos
       setUserId(user.id)
 
       await supabase.from('notifications').update({ read: true }).eq('user_id', user.id).eq('type', 'feedback_replied').eq('read', false)
+      // SectionBadge's Realtime subscription only sees INSERTs, so tell
+      // it (and any other listener) to re-count now that these are read.
+      if (typeof window !== 'undefined') window.dispatchEvent(new Event('greyin:notifications-read'))
 
       const { data: feedback } = await supabase
         .from('platform_feedback')

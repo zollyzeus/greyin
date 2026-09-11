@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ArrowLeft, Briefcase, CheckCircle, MessageCircle } from 'lucide-react'
 import { WorkspaceShell } from '@/components/WorkspaceShell'
+import { InterviewPrepAssist } from '@/components/InterviewPrepAssist'
 
 const STATUS_STYLES: Record<string, string> = {
   submitted: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
@@ -77,7 +78,7 @@ export default async function MyApplicationsPage({
         {applications && applications.length > 0 ? (
           <div className="space-y-4">
             {applications.map((app: any) => (
-              <div key={app.id} className="bg-white rounded-lg shadow p-6 flex items-start justify-between dark:bg-gray-900">
+              <div key={app.id} className="bg-white rounded-lg shadow p-6 flex flex-wrap items-start justify-between dark:bg-gray-900">
                 <div>
                   {app.jobs?.id ? (
                     <Link href={`/jobs/${app.jobs.id}`} className="font-semibold text-gray-900 hover:text-blue-600 dark:text-gray-50">
@@ -114,6 +115,11 @@ export default async function MyApplicationsPage({
                     </form>
                   )}
                 </div>
+                {app.status === 'interview' && (
+                  <div className="w-full basis-full">
+                    <InterviewPrepAssist applicationId={app.id} />
+                  </div>
+                )}
               </div>
             ))}
           </div>

@@ -1,7 +1,68 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Briefcase, MapPin, DollarSign, Clock, Building2, Search, Filter, BellPlus } from 'lucide-react'
+import { Briefcase, MapPin, DollarSign, Clock, Building2, Search, Filter, BellPlus, Sparkles, History, ListChecks, Trophy } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
+import { RecommendationFeedback } from '@/components/RecommendationFeedback'
+import {
+  recommendJobsFromProfile,
+  recommendJobsFromApplicationHistory,
+  matchJobsToPreferences,
+  findTopCandidateJobs,
+  buildFeedbackHint,
+  type JobOption,
+  type JobPick,
+} from '@/lib/job-recommendations'
+
+const ACCENT_CLASSES = {
+  indigo: { border: 'border-indigo-200 dark:border-indigo-900', bg: 'bg-indigo-50 dark:bg-indigo-950/30', text: 'text-indigo-700 dark:text-indigo-300' },
+  purple: { border: 'border-purple-200 dark:border-purple-900', bg: 'bg-purple-50 dark:bg-purple-950/30', text: 'text-purple-700 dark:text-purple-300' },
+  teal: { border: 'border-teal-200 dark:border-teal-900', bg: 'bg-teal-50 dark:bg-teal-950/30', text: 'text-teal-700 dark:text-teal-300' },
+  amber: { border: 'border-amber-200 dark:border-amber-900', bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-300' },
+} as const
+
+function RecommendationSection({
+  icon,
+  title,
+  picks,
+  accent,
+  testId,
+  recommendationType,
+}: {
+  icon: React.ReactNode
+  title: string
+  picks: JobPick[]
+  accent: keyof typeof ACCENT_CLASSES
+  testId: string
+  recommendationType: string
+}) {
+  const cls = ACCENT_CLASSES[accent]
+  return (
+    <div data-testid={testId}>
+      <div className="flex items-center gap-2 mb-3">
+        {icon}
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">{title}</h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {picks.map(({ job, reason }) => (
+          // Feedback controls are a sibling of the Link, not nested
+          // inside it -- same "separate control, not nested inside the
+          // card's own Link" rule already established for the plain
+          // listing's "Apply Now" button below (a <button>/<textarea>
+          // inside an <a> is invalid HTML, and would fire navigation on
+          // every feedback click besides).
+          <div key={job.id} data-testid={`rec-card-${job.id}`} className={`rounded-lg shadow p-5 hover:shadow-md transition border ${cls.border} ${cls.bg}`}>
+            <Link href={`/jobs/${job.id}`} className="block">
+              <h3 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">{job.title}</h3>
+              <p className="text-sm text-gray-600 mb-2 dark:text-gray-400">{job.company_name || 'A company on DeepEdge'}</p>
+              <p className={`text-sm ${cls.text}`}>{reason}</p>
+            </Link>
+            <RecommendationFeedback jobId={job.id} recommendationType={recommendationType} initialFeedback={null} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default async function JobsPage({
   searchParams,
@@ -91,8 +152,103 @@ export default async function JobsPage({
     .from('jobs')
     .select('category')
     .eq('status', 'open')
-  
+
   const uniqueCategories = Array.from(new Set(categories?.map(j => j.category).filter(Boolean)))
+
+  // Candidate-side AI job recommendations (121, lib/job-recommendations.ts)
+  // -- the mirror of the employer-side AI-Verified Search/Longlist
+  // matching that already existed, nothing equivalent existed on the
+  // candidate's own side of job discovery. Only computed on the
+  // unfiltered default browse view (an active search/filter already is
+  // the candidate telling us what they want) and only for an actual
+  // logged-in candidate with a real candidates row.
+  const isDefaultView = !q && !location && employmentTypes.length === 0 && remoteTypes.length === 0
+    && selectedCategories.length === 0 && !min_experience && open_to_career_changers !== 'true' && open_to_reentry !== 'true'
+
+  let profilePicks: JobPick[] | null = null
+  let historyPicks: JobPick[] | null = null
+  let preferencePicks: JobPick[] = []
+  let topCandidatePicks: JobPick[] = []
+  let feedbackByJobId = new Map<string, string>()
+
+  if (isDefaultView && user && jobs && jobs.length >= 2) {
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
+    if (profile?.role === 'candidate') {
+      const { data: candidate } = await supabase
+        .from('candidates')
+        .select('id, current_title, skills, education, experience_years, expected_salary_min, expected_salary_max, remote_preference, willing_to_relocate, availability')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (candidate) {
+        const { data: applications } = await supabase
+          .from('applications')
+          .select('job_id, jobs ( title, skills_required )')
+          .eq('candidate_id', candidate.id)
+
+        // Recommendation-feedback loop (125) -- a job the candidate has
+        // already given feedback on (any value, including 'helpful')
+        // is excluded from every list below: 'helpful' means they've
+        // already seen and acted on it, anything else means they don't
+        // want to see it again. Also feeds buildFeedbackHint() (Phase 2).
+        const { data: feedbackRows } = await supabase
+          .from('job_recommendation_feedback')
+          .select('job_id, feedback')
+          .eq('user_id', user.id)
+        feedbackByJobId = new Map((feedbackRows || []).map((f) => [f.job_id, f.feedback]))
+        const feedbackHint = buildFeedbackHint((feedbackRows || []).map((f) => ({ feedback: f.feedback })))
+
+        const appliedJobIds = new Set((applications || []).map((a) => a.job_id))
+        const appliedJobs = (applications || [])
+          .map((a: any) => a.jobs)
+          .filter(Boolean)
+          .map((j: any) => ({ title: j.title as string, skills_required: (j.skills_required || []) as string[] }))
+
+        const { data: scoreRow } = await supabase
+          .from('greyin_scores')
+          .select('is_verified_expert')
+          .eq('user_id', user.id)
+          .maybeSingle()
+
+        const jobOptions: JobOption[] = (jobs as any[])
+          .filter((j) => !appliedJobIds.has(j.id) && !feedbackByJobId.has(j.id))
+          .map((j) => ({
+            id: j.id,
+            title: j.title,
+            description: j.description,
+            skills_required: j.skills_required || [],
+            experience_min: j.experience_min,
+            experience_max: j.experience_max,
+            remote_type: j.remote_type,
+            location: j.location,
+            salary_min: j.salary_min,
+            salary_max: j.salary_max,
+            currency: j.currency,
+            applications_count: j.applications_count,
+            company_name: j.companies?.name ?? null,
+          }))
+
+        const candidateProfile = {
+          current_title: candidate.current_title,
+          skills: candidate.skills || [],
+          education: candidate.education,
+          experience_years: candidate.experience_years,
+          expected_salary_min: candidate.expected_salary_min,
+          expected_salary_max: candidate.expected_salary_max,
+          remote_preference: candidate.remote_preference,
+          willing_to_relocate: candidate.willing_to_relocate,
+          availability: candidate.availability,
+        }
+
+        ;[profilePicks, historyPicks] = await Promise.all([
+          recommendJobsFromProfile(candidateProfile, jobOptions, feedbackHint),
+          recommendJobsFromApplicationHistory(appliedJobs, jobOptions, feedbackHint),
+        ])
+        preferencePicks = matchJobsToPreferences(candidateProfile, jobOptions)
+        topCandidatePicks = findTopCandidateJobs(candidateProfile, !!scoreRow?.is_verified_expert, jobOptions)
+      }
+    }
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -143,6 +299,51 @@ export default async function JobsPage({
           )}
         </div>
       </div>
+
+      {(profilePicks || historyPicks || preferencePicks.length > 0 || topCandidatePicks.length > 0) && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
+          {profilePicks && (
+            <RecommendationSection
+              icon={<Sparkles className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />}
+              title="Recommended based on your profile"
+              picks={profilePicks}
+              accent="indigo"
+              testId="rec-section-profile"
+              recommendationType="profile"
+            />
+          )}
+          {historyPicks && (
+            <RecommendationSection
+              icon={<History className="h-5 w-5 text-purple-600 dark:text-purple-400" />}
+              title="More like jobs you've applied to"
+              picks={historyPicks}
+              accent="purple"
+              testId="rec-section-history"
+              recommendationType="history"
+            />
+          )}
+          {preferencePicks.length > 0 && (
+            <RecommendationSection
+              icon={<ListChecks className="h-5 w-5 text-teal-600 dark:text-teal-400" />}
+              title="Matches your job search preferences"
+              picks={preferencePicks}
+              accent="teal"
+              testId="rec-section-preferences"
+              recommendationType="preferences"
+            />
+          )}
+          {topCandidatePicks.length > 0 && (
+            <RecommendationSection
+              icon={<Trophy className="h-5 w-5 text-amber-600 dark:text-amber-400" />}
+              title="Jobs where you'd be a strong candidate"
+              picks={topCandidatePicks}
+              accent="amber"
+              testId="rec-section-top-candidate"
+              recommendationType="top_candidate"
+            />
+          )}
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">

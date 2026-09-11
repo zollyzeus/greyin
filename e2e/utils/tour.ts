@@ -14,8 +14,13 @@ import type { Page } from '@playwright/test'
 export async function dismissGuidedTourIfShown(page: Page) {
   const skip = page.getByTestId('guided-tour-skip')
   try {
-    await skip.waitFor({ state: 'visible', timeout: 1500 })
+    // A fresh signup always auto-starts the tour, but on a loaded parallel
+    // run the auth.getUser() call it waits on before the 600ms timer can
+    // push its appearance out several seconds -- wait long enough to
+    // actually catch it, then confirm it's gone before returning.
+    await skip.waitFor({ state: 'visible', timeout: 6000 })
     await skip.click()
+    await page.getByTestId('guided-tour-tooltip').waitFor({ state: 'hidden', timeout: 5000 })
   } catch {
     // Never appeared in the window -- nothing to dismiss.
   }

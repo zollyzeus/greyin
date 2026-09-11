@@ -20,6 +20,7 @@ export function SectionBadge({ types }: { types: string[] }) {
   useEffect(() => {
     let active = true
     let pollId: ReturnType<typeof setInterval> | undefined
+    let onNotificationsRead: (() => void) | undefined
     const typeList = typesKey.split(',')
 
     const refetch = (uid: string) => {
@@ -52,6 +53,14 @@ export function SectionBadge({ types }: { types: string[] }) {
 
       pollId = setInterval(() => refetch(user.id), 45000)
 
+      // The Realtime subscription above only catches new INSERTs -- a
+      // notification transitioning to read (e.g. opening the feedback
+      // modal marks the whole feedback_replied type read at once) would
+      // otherwise not clear the badge until the 45s poll. Listen for the
+      // app-wide signal those actions fire and refetch immediately.
+      onNotificationsRead = () => refetch(user.id)
+      window.addEventListener('greyin:notifications-read', onNotificationsRead)
+
       return () => {
         supabase.removeChannel(channel)
       }
@@ -60,6 +69,7 @@ export function SectionBadge({ types }: { types: string[] }) {
     return () => {
       active = false
       if (pollId) clearInterval(pollId)
+      if (onNotificationsRead) window.removeEventListener('greyin:notifications-read', onNotificationsRead)
     }
   }, [supabase, typesKey])
 

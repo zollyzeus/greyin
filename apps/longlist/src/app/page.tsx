@@ -45,6 +45,9 @@ export default async function Home() {
               Browse Future Roles <ArrowRight className="h-5 w-5" />
             </Link>
           )}
+          <a href="https://greyin.net/#demo" className="block mt-6 text-sm text-amber-50 underline hover:text-white transition">
+            Or explore as a demo user — no signup needed
+          </a>
         </div>
       </div>
 

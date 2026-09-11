@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ArrowLeft } from 'lucide-react'
 import { WorkspaceShell } from '@/components/WorkspaceShell'
+import { JobPostAssist } from '@/components/JobPostAssist'
 
 export default async function PostJobPage({
   searchParams,
@@ -65,6 +66,9 @@ export default async function PostJobPage({
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
               <textarea id="description" name="description" rows={6} required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100" />
+              <div className="mt-2">
+                <JobPostAssist />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

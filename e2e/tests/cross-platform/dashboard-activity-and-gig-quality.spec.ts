@@ -11,7 +11,7 @@ import {
 /**
  * Gap-audit item #10: personalized "your activity" dashboard lines,
  * extended from Longlist's existing pattern into the other 5 apps
- * (docs/emergent_deployment_gap.md, 2026-09-02 recheck). One spec per
+ * (docs/audits/competitive-analysis/emergent_deployment_gap.md, 2026-09-02 recheck). One spec per
  * app -- each needs its own real signup/post/dashboard-load round trip,
  * not shareable setup -- but kept in this one cross-platform file since
  * they're all the same shape and belong to the same phase.

@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Building2, ArrowLeft, BadgeCheck, Lock, RotateCcw, MapPin, ThumbsUp, BookOpen, Users } from 'lucide-react'
+import { Building2, ArrowLeft, BadgeCheck, Lock, RotateCcw, MapPin, ThumbsUp, BookOpen, Users, Sparkles } from 'lucide-react'
 import { WorkspaceShell } from '@/components/WorkspaceShell'
+import { buildSkillDossier } from '@/lib/skill-dossier'
 
 const RELATIONSHIP_LABEL: Record<string, string> = {
   in_platform_task: 'Worked together on a Greyin project/gig',
@@ -95,6 +96,11 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
     .select('greyin_score')
     .eq('user_id', id)
     .maybeSingle()
+
+  // AI-Synthesized Verified Profile (Phase C1, "11 new AI enhancements"
+  // plan) -- reads the same real evidence greyin_scores aggregates to
+  // produce a narrative synthesis. Live/on-demand, no new table.
+  const skillDossier = await buildSkillDossier(id)
 
   // Credit metering (096) is the same "genuine proactive search" concept
   // as the subscription gate above -- an own-applicant view and any
@@ -334,6 +340,16 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
                   <p><span className="text-gray-500 dark:text-gray-400">Portfolio:</span> <a href={candidate.portfolio_url} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline dark:text-indigo-400">{candidate.portfolio_url}</a></p>
                 )}
               </div>
+              )}
+
+              {skillDossier && (
+                <details className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6 dark:bg-indigo-950/30 dark:border-indigo-900">
+                  <summary className="flex items-center gap-2 text-sm font-semibold text-indigo-700 cursor-pointer select-none dark:text-indigo-400">
+                    <Sparkles className="h-4 w-4" />
+                    AI-Synthesized Verified Profile
+                  </summary>
+                  <p className="text-sm text-gray-700 mt-3 whitespace-pre-line dark:text-gray-300">{skillDossier}</p>
+                </details>
               )}
 
               {candidate?.skills && candidate.skills.length > 0 && (

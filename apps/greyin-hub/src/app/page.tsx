@@ -5,6 +5,8 @@ import { SiteHeader } from '@/components/SiteHeader'
 import { PILLARS } from '@/components/EcosystemWidget'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { DEMO_PERSONAS } from '@/lib/demo-personas'
+import { VisitTracker } from '@/components/VisitTracker'
 
 const PILLAR_ICONS: Record<string, typeof Building2> = {
   deepedge: Building2,
@@ -69,6 +71,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+      <VisitTracker />
       <SiteHeader />
 
       {/* Hero -- common ecosystem copy, not marketplace-flavored (the
@@ -94,6 +97,31 @@ export default async function Home() {
           work. Hire, write, freelance, build, connect with peers, and get seen for roles that don't
           exist yet — one login, one Greyin Score earned through real work across all six.
         </p>
+      </section>
+
+      {/* One-click demo access -- signs a visitor straight into a real,
+          populated account (no signup, no password) so a pitch reviewer
+          or first-time visitor can explore immediately. See
+          lib/demo-personas.ts and api/demo-login/route.ts. */}
+      <section id="demo" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 dark:border-indigo-900 dark:bg-indigo-950/30 p-6 sm:p-8">
+          <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-1">
+            Try it now
+          </p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50 mb-5">Explore as a demo user</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {DEMO_PERSONAS.map((persona) => (
+              <a
+                key={persona.key}
+                href={`/api/demo-login?persona=${persona.key}`}
+                className="block rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 hover:border-indigo-400 dark:hover:border-indigo-600 hover:shadow-md transition"
+              >
+                <div className="font-semibold text-gray-900 dark:text-gray-50">{persona.label}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{persona.tagline}</div>
+              </a>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* The six pillars -- shown once, prominently, right after the

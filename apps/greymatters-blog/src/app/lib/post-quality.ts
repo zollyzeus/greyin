@@ -28,8 +28,11 @@ If technical: score mainly on completeness, accuracy/rigor, and its "technical m
 
 If non-technical: score mainly on the engagement/sentiment evidence provided (view count relative to a typical post, and the tone/substance of any reader comments) as a proxy for how much value the audience actually got from it, alongside basic writing quality.
 
+Separately, note whether the writing itself reads as likely AI-generated (generic phrasing, no specific detail or personal voice, structurally formulaic) or likely original human writing (specific, concrete detail; a consistent personal voice; the kind of nuance a generic AI summary of the topic wouldn't produce). This is informational for moderators only -- it never affects the score above.
+
 Respond in exactly this format:
 SCORE: <integer 0-100>
+AUTHENTICITY: <likely_original|possibly_ai_generated>
 NOTES: <2-4 sentence rationale, including which mode (technical vs. engagement-weighted) you judged it under>`
 
   const prompt = [
@@ -50,16 +53,32 @@ NOTES: <2-4 sentence rationale, including which mode (technical vs. engagement-w
   return { system, prompt }
 }
 
-function parseScore(text: string): { score: number; notes: string } | null {
+function parseScore(text: string): { score: number; notes: string; authenticityFlag: string | null } | null {
   const scoreMatch = text.match(/SCORE:\s*(\d+)/i)
   if (!scoreMatch) return null
+  const authenticityMatch = text.match(/AUTHENTICITY:\s*(likely_original|possibly_ai_generated)/i)
   const notesMatch = text.match(/NOTES:\s*([\s\S]*)/i)
   const score = Math.max(0, Math.min(100, parseInt(scoreMatch[1], 10)))
-  return { score, notes: notesMatch ? notesMatch[1].trim() : '' }
+  return {
+    score,
+    notes: notesMatch ? notesMatch[1].trim() : '',
+    authenticityFlag: authenticityMatch ? authenticityMatch[1].toLowerCase() : null,
+  }
 }
 
-/** Returns null when AI review is unavailable (feature disabled, no provider configured, or every provider failed) -- callers must just skip showing/storing a score rather than fail the publish. */
-export async function runPostQualityCheck(input: PostQualityInput): Promise<{ score: number; notes: string; provider: string } | null> {
+/**
+ * Returns null when AI review is unavailable (feature disabled, no
+ * provider configured, or every provider failed) -- callers must just
+ * skip showing/storing a score rather than fail the publish.
+ *
+ * authenticityFlag (Phase B2, "11 new AI enhancements" plan) reuses this
+ * exact same call/prompt -- no new LLM call, no new cost -- rather than
+ * a separate authenticity-scoring subsystem. Informational/moderation-
+ * queue only: it's stored and surfaced to admins, never auto-rejects or
+ * auto-hides a post, same fail-open posture as Salt & Pepper's
+ * moderation state machine.
+ */
+export async function runPostQualityCheck(input: PostQualityInput): Promise<{ score: number; notes: string; provider: string; authenticityFlag: string | null } | null> {
   const { system, prompt } = buildPrompt(input)
   const result = await complete('greymatters_post_quality', system, prompt)
   if (!result.ok) return null
@@ -135,6 +154,7 @@ export async function sweepUnscoredPosts(limit = 3): Promise<{ swept: number; re
           score: quality.score,
           notes: quality.notes,
           provider: quality.provider,
+          authenticity_flag: quality.authenticityFlag,
           scored_at: new Date().toISOString(),
         },
         { onConflict: 'post_id' }

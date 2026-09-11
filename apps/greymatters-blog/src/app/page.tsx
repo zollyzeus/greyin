@@ -52,6 +52,9 @@ export default async function Home({
           <p className="text-xl opacity-90">
             Insights, stories, and expertise from the Greyin community
           </p>
+          <a href="https://greyin.net/#demo" className="inline-block mt-6 text-sm text-sky-50 underline hover:text-white transition">
+            Or explore as a demo user — no signup needed
+          </a>
         </div>
       </div>
 

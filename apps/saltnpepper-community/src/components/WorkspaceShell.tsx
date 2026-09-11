@@ -10,6 +10,7 @@ import {
   MessageSquare,
   MessageCircle,
   MessageSquareHeart,
+  Home,
   Search,
   Settings,
   ShieldCheck,
@@ -19,7 +20,7 @@ import {
 } from 'lucide-react'
 import { NotificationBell } from './NotificationBell'
 import { ThemeToggle } from './ThemeToggle'
-import { PILLARS } from './EcosystemWidget'
+import { PILLARS, PILLAR_ICONS } from './EcosystemWidget'
 import { SectionBadge } from './SectionBadge'
 import { CommandPalette } from './CommandPalette'
 import { FeedbackWishlistModal } from './FeedbackWishlistModal'
@@ -99,7 +100,7 @@ function RailContents({ isAdmin, activeSection, userName, verified, greyinScore,
   return (
     <>
       <div className="flex items-center gap-2 px-5 h-16 border-b border-gray-200 dark:border-gray-800 shrink-0">
-        <a href="https://greyin.net" className="flex items-center gap-2">
+        <a href="https://greyin.net" className="flex items-center gap-2" title="Go to Greyin Hub">
           <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
           <span className="text-lg font-bold text-gray-900 dark:text-gray-50">Salt&amp;Pepper</span>
         </a>
@@ -148,26 +149,32 @@ function RailContents({ isAdmin, activeSection, userName, verified, greyinScore,
             Across Greyin
           </p>
           <div className="space-y-0.5" data-testid="pillar-nav">
-            {PILLARS.map((p) => (
-              <a
-                key={p.key}
-                href={p.url}
-                onClick={() => p.key !== 'saltnpepper' && onLogPillarSwitch(p.key)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                  p.key === 'saltnpepper'
-                    ? 'font-semibold text-gray-900 dark:text-gray-50'
-                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'
-                }`}
-              >
-                <span
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: p.color }}
-                  aria-hidden="true"
-                />
-                {p.label}
-                {p.key === 'saltnpepper' && <span className="sr-only"> (current)</span>}
-              </a>
-            ))}
+            <a
+              href="https://greyin.net"
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 mb-1"
+            >
+              <Home className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Greyin Hub
+            </a>
+            {PILLARS.map((p) => {
+              const Icon = PILLAR_ICONS[p.key]
+              return (
+                <a
+                  key={p.key}
+                  href={p.url}
+                  onClick={() => p.key !== 'saltnpepper' && onLogPillarSwitch(p.key)}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    p.key === 'saltnpepper'
+                      ? 'font-semibold text-gray-900 dark:text-gray-50'
+                      : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <Icon className="h-4 w-4 shrink-0" style={{ color: p.color }} aria-hidden="true" />
+                  {p.label}
+                  {p.key === 'saltnpepper' && <span className="sr-only"> (current)</span>}
+                </a>
+              )
+            })}
           </div>
         </div>
       </nav>

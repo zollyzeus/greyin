@@ -31,7 +31,7 @@ interface NotificationRow {
  * 2026-09-06 update (UI/UX elevation plan, Phase 2): stopped marking
  * every notification read just from opening the dropdown -- each item is
  * now marked read individually on click/navigate, plus an explicit
- * "Mark all read" action (docs/ui_ux_elevation_plan.md). Added a
+ * "Mark all read" action (docs/roadmap/ui_ux_elevation_plan.md). Added a
  * lightweight, dependency-free arrival toast -- a plain fixed-position
  * element, not a new npm package, since none of the other pillar apps
  * had a toast library installed and this codebase's own convention

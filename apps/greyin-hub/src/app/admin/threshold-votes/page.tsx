@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { SiteHeader } from '@/components/SiteHeader'
 import { ArrowLeft, BadgeCheck, Users } from 'lucide-react'
 
 /**
@@ -41,8 +40,7 @@ export default async function AdminThresholdVotesPage({
   const otherBucket = summary?.find((row: any) => row.bucket_verified_expert === false)
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <SiteHeader />
+    <>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <Link href="/admin" className="flex items-center text-gray-600 hover:text-indigo-600 dark:text-gray-400">
@@ -126,6 +124,6 @@ export default async function AdminThresholdVotesPage({
           </form>
         </div>
       </div>
-    </main>
+    </>
   )
 }

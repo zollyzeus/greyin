@@ -4,7 +4,7 @@ import { getUserIdByEmail, promoteToAdmin } from '../../utils/admin'
 
 /**
  * Gap-audit items #5 (feature wishlist) and #3 (feedback loop), both
- * centralized on the Hub (docs/emergent_deployment_gap.md, 2026-09-02).
+ * centralized on the Hub (docs/audits/competitive-analysis/emergent_deployment_gap.md, 2026-09-02).
  * Users sign up via a pillar app (Salt & Pepper here, arbitrary) and
  * reach the Hub via the platform's shared SSO cookie, same pattern as
  * admin-cleanup-test-data.spec.ts.
@@ -55,7 +55,13 @@ test('a member can suggest a feature, another member upvotes it, and an admin ca
   await adminPage.waitForURL(`${hubBase}/admin/wishlist`)
 
   await adminPage.goto(`${hubBase}/wishlist`)
-  await expect(adminPage.getByText('planned')).toBeVisible()
+  // Scoped to this test's own card, like every other assertion above --
+  // real seed data already includes another, unrelated 'planned' item
+  // ("Calendar sync for mentor session slots"), so a bare
+  // getByText('planned') is a strict-mode violation waiting to happen.
+  await expect(
+    adminPage.locator('.bg-white.rounded-lg.shadow.p-5').filter({ hasText: title }).getByText('planned')
+  ).toBeVisible()
 
   await adminCtx.close()
 })

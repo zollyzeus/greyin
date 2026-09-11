@@ -24,7 +24,7 @@ export default async function WishlistPage({
 
   const { data: requests } = await supabase
     .from('feature_requests')
-    .select('id, title, description, status, upvote_count, created_at, profiles:user_id ( full_name )')
+    .select('id, title, description, status, upvote_count, created_at, email, profiles:user_id ( full_name )')
     .order('upvote_count', { ascending: false })
     .limit(100)
 
@@ -56,30 +56,38 @@ export default async function WishlistPage({
             <Lightbulb className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
             Suggest a feature
           </h2>
-          {user ? (
-            <form action="/api/wishlist/create" method="POST" className="space-y-3">
+          <form action="/api/wishlist/create" method="POST" className="space-y-3">
+            <input
+              name="title"
+              type="text"
+              required
+              placeholder="What should we build?"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+            />
+            <textarea
+              name="description"
+              rows={2}
+              placeholder="Any more detail? (optional)"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+            />
+            {!user && (
               <input
-                name="title"
-                type="text"
+                name="email"
+                type="email"
                 required
-                placeholder="What should we build?"
+                placeholder="Your email (so we know who to credit — no account needed)"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
               />
-              <textarea
-                name="description"
-                rows={2}
-                placeholder="Any more detail? (optional)"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
-              />
-              <button type="submit" className="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 font-semibold text-sm">
-                Submit
-              </button>
-            </form>
-          ) : (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              <a href="/login?next=/wishlist" className="text-indigo-600 hover:text-indigo-700 font-semibold dark:text-indigo-400 dark:hover:text-indigo-300">Sign in</a> to suggest a feature or upvote.
-            </p>
-          )}
+            )}
+            <button type="submit" className="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 font-semibold text-sm">
+              Submit
+            </button>
+            {!user && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Or <a href="/login?next=/wishlist" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">sign in</a> to also upvote existing suggestions.
+              </p>
+            )}
+          </form>
         </div>
 
         <div className="space-y-3">
@@ -108,7 +116,9 @@ export default async function WishlistPage({
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_STYLES[r.status]}`}>{r.status}</span>
                     </div>
                     {r.description && <p className="text-sm text-gray-600 mb-1 dark:text-gray-400">{r.description}</p>}
-                    <p className="text-xs text-gray-400 dark:text-gray-500">Suggested by {r.profiles?.full_name || 'Member'}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                      Suggested by {r.profiles?.full_name || (r.email ? 'Anonymous visitor' : 'Member')}
+                    </p>
                   </div>
                 </div>
               )

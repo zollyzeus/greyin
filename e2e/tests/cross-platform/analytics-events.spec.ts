@@ -32,21 +32,25 @@ async function getEventCount(userId: string, eventType: string): Promise<number>
 test('rail nav clicks, ⌘K open, and the guided tour each log a real analytics_events row', async ({ page, cleanup }) => {
   const user = await signUpDeepEdge(page, 'candidate', cleanup)
   const userId = await getUserIdByEmail(user.email)
-  await login(page, user, '/dashboard')
+  await login(page, user, '/dashboard', undefined, { suppressTour: false })
 
-  // The guided tour auto-starts for a fresh signup and fires tour_started
-  // on its own -- skip it immediately so it doesn't sit over the rail for
-  // the rest of this test.
+  // The guided tour auto-starts for a fresh signup (~600ms after the
+  // dashboard's first paint) and fires tour_started on its own. Wait for
+  // it to actually be up before asserting the event or skipping -- under
+  // a loaded parallel run it can take several seconds to appear, and the
+  // rest of this test needs its click-blocking overlay gone.
   const tourTooltip = page.getByTestId('guided-tour-tooltip')
-  if (await tourTooltip.isVisible({ timeout: 5_000 }).catch(() => false)) {
-    await page.getByTestId('guided-tour-skip').click()
-  }
+  await expect(tourTooltip).toBeVisible({ timeout: 15_000 })
 
   await expect
-    .poll(() => getEventCount(userId, 'tour_started'), { timeout: 10_000 })
+    .poll(() => getEventCount(userId, 'tour_started'), { timeout: 15_000 })
     .toBeGreaterThan(0)
+
+  await page.getByTestId('guided-tour-skip').click()
+  await expect(tourTooltip).not.toBeVisible()
+
   await expect
-    .poll(() => getEventCount(userId, 'tour_skipped'), { timeout: 10_000 })
+    .poll(() => getEventCount(userId, 'tour_skipped'), { timeout: 15_000 })
     .toBeGreaterThan(0)
 
   // ⌘K check first, while still on /dashboard -- CommandPalette only
@@ -60,7 +64,10 @@ test('rail nav clicks, ⌘K open, and the guided tour each log a real analytics_
     .toBeGreaterThan(0)
   await page.keyboard.press('Escape')
 
-  await page.getByRole('link', { name: 'Browse Jobs' }).click()
+  // Scoped to the rail -- "Browse Jobs" also appears as a dashboard card
+  // and, since the 2026-09-06 footer restructure, a footer link. Only the
+  // rail item carries the data-tour hook and the rail_nav_click handler.
+  await page.locator('[data-tour="nav-jobs"]').click()
   await expect
     .poll(() => getEventCount(userId, 'rail_nav_click'), { timeout: 10_000 })
     .toBeGreaterThan(0)

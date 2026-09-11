@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { SiteHeader } from '@/components/SiteHeader'
 import { ArrowLeft, Briefcase } from 'lucide-react'
 
 /**
@@ -46,8 +45,7 @@ export default async function PeerProjectsAdminPage() {
   })
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <SiteHeader />
+    <>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/admin" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4 dark:text-gray-400 dark:hover:text-gray-300">
@@ -94,6 +92,6 @@ export default async function PeerProjectsAdminPage() {
           <p className="text-gray-500 text-sm dark:text-gray-400">No peer-confirmed projects yet.</p>
         )}
       </div>
-    </main>
+    </>
   )
 }

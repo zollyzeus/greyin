@@ -31,6 +31,9 @@ export default function Home() {
               Join as a Supporter
             </Link>
           </div>
+          <a href="https://greyin.net/#demo" className="inline-block mt-6 text-sm text-teal-50 underline hover:text-white transition">
+            Or explore as a demo user — no signup needed
+          </a>
         </div>
       </div>
 

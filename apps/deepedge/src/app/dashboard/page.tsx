@@ -42,6 +42,11 @@ export default async function DashboardPage() {
   // work while they're here" shape as finalize_completed_mentor_sessions.
   await supabase.rpc('sweep_salary_trend_alerts')
 
+  // Two-sided proactive matchmaking, candidate side (Phase D3, 134) --
+  // same lazy-sweep shape as the salary-trend sweep above, notifying on
+  // a real open-job match the candidate hasn't seen or applied to yet.
+  await supabase.rpc('sweep_proactive_job_matches_for_candidate')
+
   // In-app weekly digest (competitive audit, Aug 2026): the retention
   // lever without a real email send, given the shared SMTP provider's
   // known rate-limit issue. notifications is one shared table written

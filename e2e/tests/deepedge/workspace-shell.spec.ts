@@ -25,6 +25,14 @@ test('rail shows DeepEdge sections and all 6 pillars, DeepEdge marked current', 
   // link at the top is also named "DeepEdge" (it links to the ecosystem
   // hub), so an unscoped name match here is ambiguous between the two.
   const pillarNav = rail.getByTestId('pillar-nav')
+
+  // The rail's top brand logo silently linked to the Hub with no
+  // indication it did (a real UX report -- the pillar name/icon made it
+  // look like it stayed within the app). Fixed with an explicit,
+  // labeled "Greyin Hub" row above the pillar list, plus a hover
+  // tooltip on the logo itself.
+  await expect(pillarNav.getByRole('link', { name: 'Greyin Hub' })).toHaveAttribute('href', 'https://greyin.net')
+  await expect(rail.locator('a[href="https://greyin.net"]').first()).toHaveAttribute('title', 'Go to Greyin Hub')
   for (const pillar of ['DeepEdge', 'GreyMatters', 'Salt & Pepper', 'FlexPro', 'StackWorks', 'Longlist']) {
     await expect(pillarNav.getByRole('link', { name: pillar })).toBeVisible()
   }

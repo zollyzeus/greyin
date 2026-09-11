@@ -52,9 +52,12 @@ export default async function AdminPage({
     .limit(50)
   const { data: scoredIds } = await supabase
     .from('ai_quality_scores')
-    .select('post_id')
+    .select('post_id, authenticity_flag')
     .eq('content_type', 'greymatters_post')
   const scoredPostIdSet = new Set((scoredIds || []).map((s) => s.post_id))
+  // Phase B2 ("11 new AI enhancements" plan) -- informational only, never
+  // auto-hides a post; just a signal for admins reviewing content.
+  const authenticityByPostId = new Map((scoredIds || []).map((s) => [s.post_id, s.authenticity_flag]))
   const unscoredCount = (recentPublishedIds || []).filter((p) => !scoredPostIdSet.has(p.id)).length
   const { data: sweepFlag } = await supabase
     .from('llm_feature_flags')
@@ -147,6 +150,9 @@ export default async function AdminPage({
                   <div>
                     <p className="font-medium">{post.title}</p>
                     <span className="text-xs text-gray-500 capitalize dark:text-gray-400">{post.status}</span>
+                    {authenticityByPostId.get(post.id) === 'possibly_ai_generated' && (
+                      <span className="ml-2 text-xs font-medium text-amber-700 dark:text-amber-400">⚠ Possibly AI-generated</span>
+                    )}
                   </div>
                   {post.status !== 'archived' && (
                     <form action="/api/admin/posts/unpublish" method="POST">

@@ -24,6 +24,11 @@ export default async function EmployerDashboardPage() {
     redirect('/dashboard')
   }
 
+  // Two-sided proactive matchmaking, employer side (Phase D3, 134) --
+  // same lazy, page-load-triggered sweep shape as sweep_salary_trend_alerts()
+  // (063), just scoped to this employer's own open jobs.
+  await supabase.rpc('sweep_proactive_candidate_matches_for_employer')
+
   const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   // Get company data

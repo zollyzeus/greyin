@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ArrowLeft } from 'lucide-react'
 import { WorkspaceShell } from '@/components/WorkspaceShell'
+import { CoverLetterAssist } from '@/components/CoverLetterAssist'
 
 interface ApplyPageProps {
   params: Promise<{ id: string }>
@@ -24,7 +25,7 @@ export default async function ApplyPage({ params, searchParams }: ApplyPageProps
 
   const { data: job } = await supabase
     .from('jobs')
-    .select('id, title, companies ( name )')
+    .select('id, title, description, companies ( name )')
     .eq('id', id)
     .single()
 
@@ -97,6 +98,11 @@ export default async function ApplyPage({ params, searchParams }: ApplyPageProps
                   rows={6}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
                   placeholder="Tell them why you're a great fit..."
+                />
+                <CoverLetterAssist
+                  jobTitle={job.title}
+                  jobDescription={job.description}
+                  companyName={(job.companies as unknown as { name: string } | null)?.name ?? null}
                 />
               </div>
 

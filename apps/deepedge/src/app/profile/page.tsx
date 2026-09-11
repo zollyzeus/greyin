@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { User, Mail, Phone, MapPin, Building2, Save, Globe, BadgeCheck, Shuffle, GraduationCap, RotateCcw } from 'lucide-react'
+import { User, Mail, Phone, MapPin, Building2, Save, Globe, BadgeCheck, Shuffle, GraduationCap, RotateCcw, Link2 } from 'lucide-react'
 import Link from 'next/link'
 import { EcosystemWidget } from '@/components/EcosystemWidget'
 import { ResumeSkillsUploader } from '@/components/ResumeSkillsUploader'
 import { EmploymentHistoryEditor } from '@/components/EmploymentHistoryEditor'
 import { WorkspaceShell } from '@/components/WorkspaceShell'
+import { absoluteUrl } from '@/lib/site-url'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -101,6 +102,15 @@ export default async function ProfilePage() {
     ? Math.round(verifiedOutcomes!.reduce((s, o) => s + (o.score || 0), 0) / verifiedCount)
     : null
 
+  // Shareable Verified Score badge (Phase D2, 133_public_score_badges.sql)
+  // -- opt-in only, so this stays absent until the user has ever toggled
+  // it on once.
+  const { data: badgeRow } = await supabase
+    .from('public_score_badges')
+    .select('slug, enabled')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
   // Check if user is employer/company
   const { data: company } = await supabase
     .from('companies')
@@ -194,6 +204,50 @@ export default async function ProfilePage() {
                 </div>
               </details>
             )}
+          </div>
+        )}
+
+        {/* Shareable Verified Score badge (Phase D2) -- opt-in only, a
+            fully public no-login page at /verify/[slug] showing only the
+            same score breakdown already shown above, never raw evidence
+            rows. Available regardless of Verified Expert status: even a
+            partial, unverified score is real and shareable. */}
+        {greyinScoreRow?.greyin_score != null && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">
+            <h2 className="text-lg font-semibold mb-1 flex items-center gap-2">
+              <Link2 className="w-5 h-5" />
+              Shareable Verified Score Badge
+            </h2>
+            <p className="text-sm text-gray-600 mb-4 dark:text-gray-400">
+              Turn this on to get a public link to your Greyin Score breakdown — no login required to view it.
+              Only the same numbers shown above; nothing else about your profile is exposed.
+            </p>
+            <form action="/api/profile/verified-badge" method="POST" className="space-y-3">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="enabled"
+                  defaultChecked={badgeRow?.enabled || false}
+                  className="h-4 w-4 text-indigo-600 rounded dark:bg-gray-950"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">Enable public badge</span>
+              </label>
+              {badgeRow?.enabled && badgeRow.slug && (
+                <p className="text-sm">
+                  <a
+                    href={absoluteUrl(`/verify/${badgeRow.slug}`).toString()}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-indigo-600 hover:underline dark:text-indigo-400"
+                  >
+                    {absoluteUrl(`/verify/${badgeRow.slug}`).toString()}
+                  </a>
+                </p>
+              )}
+              <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">
+                Save
+              </button>
+            </form>
           </div>
         )}
 

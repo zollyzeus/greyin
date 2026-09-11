@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import 'highlight.js/styles/github-dark.css'
 import { TipButton } from '@/app/components/TipButton'
+import { PostLikeButton } from '@/app/components/PostLikeButton'
 import { CopyLinkButton } from '@/app/components/CopyLinkButton'
 import { FollowButton } from '@/app/components/FollowButton'
 import { absoluteUrl } from '@/app/lib/site-url'
@@ -92,6 +93,10 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
     ? await supabase.from('user_follows').select('followed_id').eq('follower_id', user.id).eq('followed_id', post.author_id).maybeSingle()
     : { data: null }
 
+  const { data: myLike } = user
+    ? await supabase.from('post_likes').select('post_id').eq('post_id', post.id).eq('user_id', user.id).maybeSingle()
+    : { data: null }
+
   const readingTime = Math.ceil((post.content?.length || 0) / 1000) // Rough estimate: 1000 chars = 1 min
 
   return (
@@ -173,6 +178,12 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
             <div className="flex items-center gap-1">
               <span>{post.views_count || 0} views</span>
             </div>
+            <PostLikeButton
+              slug={post.slug}
+              initiallyLiked={!!myLike}
+              initialCount={post.like_count || 0}
+              loggedIn={!!user}
+            />
             {qualityScore && (
               <div className="flex items-center gap-1 text-blue-700 font-medium dark:text-blue-400" title={qualityScore.notes || undefined}>
                 <span>AI quality: {qualityScore.score}/100</span>

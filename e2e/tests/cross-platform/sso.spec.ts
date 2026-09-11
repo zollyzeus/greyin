@@ -61,5 +61,8 @@ test('a session started on Salt & Pepper is recognized on StackWorks, and the me
   await page.goto(stackworksDashboard)
   await expect(page).toHaveURL(stackworksDashboard)
   await expect(page.locator('form[action="/auth/login"]')).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Post a Project' })).toBeVisible()
+  // Scoped to <main> -- the persistent rail also carries a "Post a Project"
+  // link with the same accessible name (strict-mode violation otherwise),
+  // same fix stackworks/auth.spec.ts already uses.
+  await expect(page.locator('main').getByRole('link', { name: 'Post a Project' })).toBeVisible()
 })

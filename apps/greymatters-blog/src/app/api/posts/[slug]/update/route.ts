@@ -96,6 +96,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
             score: quality.score,
             notes: quality.notes,
             provider: quality.provider,
+            authenticity_flag: quality.authenticityFlag,
             scored_at: new Date().toISOString(),
           },
           { onConflict: 'post_id' }

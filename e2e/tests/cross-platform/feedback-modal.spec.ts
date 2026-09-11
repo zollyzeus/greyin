@@ -1,5 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
+import { dismissGuidedTourIfShown } from '../../utils/tour'
 
 const SUPABASE_URL = process.env.SUPABASE_URL!
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -45,6 +46,10 @@ async function seedAdminReply(feedbackId: string, reply: string): Promise<void> 
 test('feedback modal submits, the rail badge lights up on an admin reply, and clears again on open', async ({ page, cleanup }) => {
   const user = await signUpDeepEdge(page, 'candidate', cleanup)
   await login(page, user, '/dashboard')
+  // The guided tour auto-starts for a fresh signup and its full-viewport
+  // overlay swallows clicks on the rail -- dismiss it before touching the
+  // feedback button.
+  await dismissGuidedTourIfShown(page)
 
   const railButton = page.getByTestId('rail-feedback-button')
   const railBadge = railButton.locator('span.bg-red-600')
@@ -89,6 +94,7 @@ test('feedback modal submits, the rail badge lights up on an admin reply, and cl
 test('wishlist tab submits a feature request and upvoting toggles the count', async ({ page, cleanup }) => {
   const user = await signUpDeepEdge(page, 'candidate', cleanup)
   await login(page, user, '/dashboard')
+  await dismissGuidedTourIfShown(page)
 
   await page.getByTestId('rail-feedback-button').click()
   const dialog = page.getByRole('dialog', { name: 'Feedback and wishlist' })

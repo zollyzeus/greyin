@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greyin Roadmap & Scaling Plan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            border-bottom: 3px solid #2c3e50;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #34495e;
+            font-size: 2em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .meta {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            margin-top: 10px;
+        }
+        
+        .meta strong {
+            color: #2c3e50;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 0 5px 5px 0;
+        }
+        
+        .badge-shipped {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .badge-in-progress {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .badge-planned {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .badge-parked {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .badge-blocked {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .timeline {
+            margin: 30px 0;
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline-item {
+            margin-bottom: 30px;
+            padding-left: 40px;
+            position: relative;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #3498db;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #3498db;
+        }
+        
+        .timeline-item.shipped::before {
+            background-color: #27ae60;
+            box-shadow: 0 0 0 3px #27ae60;
+        }
+        
+        .timeline-item.parked::before {
+            background-color: #95a5a6;
+            box-shadow: 0 0 0 3px #95a5a6;
+        }
+        
+        .phase-card {
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            border-left: 4px solid #3498db;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .phase-card h4 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .feature-item {
+            background-color: #f9f9f9;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+        
+        .feature-item.shipped {
+            border-left-color: #27ae60;
+        }
+        
+        .feature-item.parked {
+            border-left-color: #95a5a6;
+            background-color: #f5f5f5;
+        }
+        
+        .feature-item.blocked {
+            border-left-color: #e74c3c;
+            background-color: #ffe8e8;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background-color: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #2c3e50;
+        }
+        
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .box {
+            border: 2px solid #3498db;
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .box-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .priority-high {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe8a5 100%);
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            border-radius: 3px;
+            margin: 15px 0;
+        }
+        
+        .priority-medium {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 3px;
+            margin: 15px 0;
+        }
+        
+        .priority-low {
+            background: linear-gradient(135deg, #e8f8e8 0%, #d4f7d4 100%);
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            border-radius: 3px;
+            margin: 15px 0;
+        }
+        
+        .diagram-container {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h4 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .summary-card p {
+            font-size: 0.95em;
+            margin: 10px 0;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #fdeaea 0%, #fdd4d4 100%);
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            border-radius: 3px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: linear-gradient(135deg, #e8f8e8 0%, #d4f7d4 100%);
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            border-radius: 3px;
+            margin: 15px 0;
+        }
+        
+        footer {
+            border-top: 2px solid #bdc3c7;
+            margin-top: 50px;
+            padding-top: 20px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .pillar-section {
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .pillar-section h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        code {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Greyin Roadmap & Scaling Plan</h1>
+            <div class="meta">
+                <strong>Document Type:</strong> Product Roadmap with Scaling Strategy<br>
+                <strong>Last Updated:</strong> 2026-09-07<br>
+                <strong>Planning Horizon:</strong> Q3 2026 – Q2 2027<br>
+                <strong>Target Audience:</strong> Product team, investors, engineering leadership
+            </div>
+        </header>
+
+        <!-- EXECUTIVE SUMMARY -->
+        <section>
+            <h2>Executive Summary</h2>
+            <p>Greyin has shipped <strong>110+ features across 6 pillar apps</strong> and a unified Hub with production-ready infrastructure (self-hosted Supabase, Docker Swarm, Kong gateway, Traefik reverse proxy). This roadmap addresses <strong>three parallel tracks</strong>:</p>
+            
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h4>🚀 UI/UX Excellence</h4>
+                    <p><strong>Shipped:</strong> Workspace shell (persistent rail + top bar), notification unification, guided tour, command palette, in-context feedback.</p>
+                    <p><strong>Target:</strong> ≥8/10 on UX dimensions (from current ~7.2/10).</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h4>📊 Parked Features (Known Gaps)</h4>
+                    <p><strong>9 planned features</strong> deferred or blocked: advanced search NL filters, salary dashboard, peer verification batching, AI quality assist, revenue dashboard, admin analytics, role-based access control (RBAC), mobile app, and custom integrations.</p>
+                    <p><strong>Reason:</strong> Prioritized UI/UX completion, operational stability, team capacity.</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h4>📈 Scaling (10K → 100K users)</h4>
+                    <p><strong>Planned:</strong> Database sharding, read replicas, CDN caching, LLM cost optimization, multi-region deployment.</p>
+                    <p><strong>Trigger:</strong> User growth thresholds, performance degradation, cost efficiency targets.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CURRENT STATUS -->
+        <section>
+            <h2>Current Status (Q3 2026)</h2>
+            <p><strong>Platform Maturity:</strong> Feature-complete for MVP, production-ready for pilot cohorts (100–1K users). All core paths end-to-end tested, security audit passed (38 items closed), monitoring and alerting operational.</p>
+            
+            <div class="success">
+                <strong>✓ Shipped Milestones:</strong>
+                <ul>
+                    <li>6 pillar apps live on *.greyin.net with unified SSO</li>
+                    <li>Greyin Score algorithm (Bayesian shrinkage) calculating reputation across 4 platforms</li>
+                    <li>Monetization live: DeepEdge subscriptions, FlexPro mentor sessions, Razorpay integration</li>
+                    <li>Real-time notifications with live delivery (WebSocket + 30s fallback)</li>
+                    <li>Dark mode 100% coverage across all 7 apps</li>
+                    <li>LLM integration: resume parsing, post quality, outcome verification, discussion moderation</li>
+                    <li>95 database tables, 38 materialized views, 110+ migrations</li>
+                    <li>100+ end-to-end tests (Playwright) with CI/CD hooks</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Q4 2026 ROADMAP -->
+        <section>
+            <h2>Q4 2026 Roadmap</h2>
+            
+            <h3>Phase 1: Mobile & Responsiveness (Oct–Nov)</h3>
+            <p><strong>Goal:</strong> Ship mobile-optimized versions of all 6 pillar apps. Current app shell works at mobile widths but was not validated with real user traffic.</p>
+            
+            <div class="feature-item shipped">
+                <strong>✓ Completed:</strong> Workspace shell responsive design + drawer rail on mobile
+            </div>
+            
+            <div class="feature-item">
+                <strong>→ In Progress:</strong> Full mobile validation (screen pixel-perfect on 375px, 768px, 1024px breakpoints)
+            </div>
+            
+            <div class="feature-item">
+                <strong>→ Planned:</strong> Native iOS/Android apps (React Native / Expo) as Phase 2 expansion, not Q4
+            </div>
+            
+            <h3>Phase 2: Performance & Scaling Prep (Nov–Dec)</h3>
+            <p><strong>Goal:</strong> Optimize for 10K concurrent users. Current single Supabase instance sufficient for 1K; need preparation for growth.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Initiative</th>
+                        <th>Current</th>
+                        <th>Target (Q4)</th>
+                        <th>Effort</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Query optimization (indexes, EXPLAIN ANALYZE)</td>
+                        <td>Basic B-tree on PK</td>
+                        <td>Optimized slow queries (&gt;100ms)</td>
+                        <td>2 weeks</td>
+                    </tr>
+                    <tr>
+                        <td>Read replica for reporting</td>
+                        <td>All reads/writes on primary</td>
+                        <td>Standby replica for dashboard queries</td>
+                        <td>1 week</td>
+                    </tr>
+                    <tr>
+                        <td>Connection pooling (PgBouncer)</td>
+                        <td>Direct PostgreSQL connections</td>
+                        <td>50 max connections, 100 pool size</td>
+                        <td>3 days</td>
+                    </tr>
+                    <tr>
+                        <td>LLM cost tracking & optimization</td>
+                        <td>~$300/mo (Anthropic Claude)</td>
+                        <td>Baseline cost per feature, routed to cheaper models where feasible</td>
+                        <td>1 week</td>
+                    </tr>
+                    <tr>
+                        <td>Cache strategy (Redis/Memcached)</td>
+                        <td>No caching, fresh queries every time</td>
+                        <td>Cache hot paths (Greyin Score view, platform_search_index)</td>
+                        <td>2 weeks</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- PARKED FEATURES -->
+        <section>
+            <h2>Parked & Pending Features</h2>
+            <p><strong>Status:</strong> 9 planned features are <span class="badge badge-parked">PARKED</span> or <span class="badge badge-blocked">BLOCKED</span>. These were designed, scoped, and prioritized but deferred to make room for UI/UX completion and operational stability. Re-activation depends on user demand, team capacity, or business impact.</p>
+            
+            <h3>High-Priority Parked Features (Reactivate: Q1 2027)</h3>
+            
+            <div class="feature-item parked">
+                <h4>1. Advanced Search NL Filters (DeepEdge)</h4>
+                <span class="badge badge-parked">PARKED</span>
+                <span class="badge" style="background-color: #f39c12; color: white;">HIGH</span>
+                <p><strong>Description:</strong> Natural language filters like "show me jobs that pay $150–200K in NYC, remote-ok, hiring now." Uses the existing LLM intent classifier to parse queries into structured filters before querying <code>jobs</code> table.</p>
+                <p><strong>Current:</strong> Simple keyword search only. Advanced filters exist on the page but rarely used.</p>
+                <p><strong>Why Parked:</strong> LLM call per search + cost tracking overhead. Competing with post-quality and resume-parsing LLM budget.</p>
+                <p><strong>Acceptance Criteria:</strong> NL query like "remote python senior NYC 150-200k" returns 5+ matching jobs; accuracy ≥85% vs. manual tag filters.</p>
+                <p><strong>Estimated Effort:</strong> 5 days (backend prompt tuning, frontend integration, e2e testing).</p>
+            </div>
+            
+            <div class="feature-item parked">
+                <h4>2. Salary Analytics Dashboard</h4>
+                <span class="badge badge-parked">PARKED</span>
+                <span class="badge" style="background-color: #f39c12; color: white;">HIGH</span>
+                <p><strong>Description:</strong> A new "Salary Insights" page (on DeepEdge) showing trends by role, location, company, seniority. Uses <code>salary_trends</code> materialized view with k-anonymity ≥3.</p>
+                <p><strong>Current:</strong> No dashboard; data exists in the view but inaccessible to users.</p>
+                <p><strong>Why Parked:</strong> Requires charting library (recharts), design pass, and permission model (which employers can see which salary ranges?).</p>
+                <p><strong>Acceptance Criteria:</strong> View "Senior Engineer" salaries in NYC (30 data points), grouped by company size, with 25th/50th/75th percentiles.</p>
+                <p><strong>Estimated Effort:</strong> 3 days (design + recharts integration).</p>
+            </div>
+            
+            <div class="feature-item parked">
+                <h4>3. Peer Verification Batching (StackWorks)</h4>
+                <span class="badge badge-parked">PARKED</span>
+                <span class="badge" style="background-color: #f39c12; color: white;">HIGH</span>
+                <p><strong>Description:</strong> Collect peer signatures before marking a project outcome as verified. Right now, one peer's vote is enough (trust-through-low-bar). Batch verification requires 2–3 peer confirmations (configurable by platform).</p>
+                <p><strong>Current:</strong> Single-peer voting works; fraud-flag logic detects obvious collusion but doesn't block.</p>
+                <p><strong>Why Parked:</strong> Affects outcome-score calculation, requires migration of existing outcomes, needs UX for review queues.</p>
+                <p><strong>Acceptance Criteria:</strong> New projects await 2/3 peer approvals before verification badge appears. Admin can raise threshold per pillar.</p>
+                <p><strong>Estimated Effort:</strong> 1 week (schema migration, workflow UI, admin panel).</p>
+            </div>
+            
+            <h3>Medium-Priority Parked Features (Reactivate: Q2 2027)</h3>
+            
+            <div class="feature-item parked">
+                <h4>4. Gig Quality AI Assist (FlexPro)</h4>
+                <span class="badge badge-parked">PARKED</span>
+                <span class="badge" style="background-color: #3498db; color: white;">MEDIUM</span>
+                <p><strong>Description:</strong> When a freelancer creates a gig listing, LLM suggests improvements: "Title too generic, try 'end-to-end React 19 app setup'"; "Rate is below market for this skill, consider $75–100/hr".</p>
+                <p><strong>Current:</strong> Post-quality gate exists but only for Salt & Pepper discussions.</p>
+                <p><strong>Why Parked:</strong> Requires market-data model (what rate ranges are current?) and a separate LLM prompt tuned for gig quality vs. post quality.</p>
+                <p><strong>Acceptance Criteria:</strong> Freelancer sees 3–5 actionable suggestions as they create a gig; can dismiss or apply them.</p>
+                <p><strong>Estimated Effort:</strong> 4 days (prompt engineering + frontend modal).</p>
+            </div>
+            
+            <div class="feature-item parked">
+                <h4>5. Admin Revenue Dashboard</h4>
+                <span class="badge badge-parked">PARKED</span>
+                <span class="badge" style="background-color: #3498db; color: white;">MEDIUM</span>
+                <p><strong>Description:</strong> Greyin's revenue by source (DeepEdge subscriptions, FlexPro mentor premiums, platform fees). Tracks recurring vs. one-time, MRR, churn rate, LTV per pillar.</p>
+                <p><strong>Current:</strong> Raw Razorpay API calls work, but no aggregated view. Admin must query manually or export CSVs.</p>
+                <p><strong>Why Parked:</strong> Needs analytics infrastructure (event logging already shipped in Phase 6); requires charting + finance data model.</p>
+                <p><strong>Acceptance Criteria:</strong> Dashboard shows MTD revenue by pillar, MRR, projected annual recurring revenue (ARR), churn rate trending.</p>
+                <p><strong>Estimated Effort:</strong> 4 days (analytics queries, recharts).</p>
+            </div>
+            
+            <div class="feature-item parked">
+                <h4>6. User Analytics Dashboard</h4>
+                <span class="badge badge-parked">PARKED</span>
+                <span class="badge" style="background-color: #3498db; color: white;">MEDIUM</span>
+                <p><strong>Description:</strong> Admin view of engagement metrics: DAU/MAU, onboarding completion rate, feature adoption (who uses command palette, guided tour), pillar-switch rate.</p>
+                <p><strong>Current:</strong> Events table exists; no dashboard. Admin can query SQL directly.</p>
+                <p><strong>Why Parked:</strong> Requires dashboard UI + design; analytics already logged (Phase 6).</p>
+                <p><strong>Acceptance Criteria:</strong> View last 7/30 days DAU/MAU, onboarding completion rate (%), guided tour replay clicks, pillar hops/user/day.</p>
+                <p><strong>Estimated Effort:</strong> 3 days (dashboard page + recharts).</p>
+            </div>
+            
+            <h3>Low-Priority / Future Parked Features (Q3 2027+)</h3>
+            
+            <div class="feature-item parked">
+                <h4>7. Role-Based Access Control (RBAC)</h4>
+                <span class="badge badge-parked">PARKED</span>
+                <span class="badge" style="background-color: #27ae60; color: white;">LOW</span>
+                <p><strong>Description:</strong> Formalize permissions beyond simple admin/user. Examples: "Content Moderator" (read + moderate discussions, but no access to payments), "Hiring Manager" (post jobs + review candidates, no access to platform analytics).</p>
+                <p><strong>Current:</strong> Only <code>role='admin'</code> vs. <code>role='user'</code>. Admin is all-or-nothing.</p>
+                <p><strong>Why Parked:</strong> Scope creep risk; current binary role is sufficient for 10K users. Migration path documented in ADR-013.</p>
+                <p><strong>Acceptance Criteria:</strong> Define 5–8 roles (Admin, Moderator, Analyst, Support, Employer, etc.). Implement one role (e.g., Moderator) as a proof-of-concept.</p>
+                <p><strong>Estimated Effort:</strong> 2 weeks (schema migration, RLS policy rewrite, admin UI).</p>
+            </div>
+            
+            <div class="feature-item parked">
+                <h4>8. Native Mobile Apps (iOS/Android)</h4>
+                <span class="badge badge-parked">PARKED</span>
+                <span class="badge" style="background-color: #27ae60; color: white;">LOW</span>
+                <p><strong>Description:</strong> React Native apps for iOS and Android, sharing 70–80% codebase with the web frontend.</p>
+                <p><strong>Current:</strong> Web-responsive apps work on mobile but not app-store-ready (no push notifications, no offline sync, no in-app payment routing).</p>
+                <p><strong>Why Parked:</strong> Requires dedicated mobile team; web-responsive MVP sufficient for 2026–2027.</p>
+                <p><strong>Acceptance Criteria:</strong> Fully functional iOS/Android versions in app stores, push notification delivery, offline job search caching (StackWorks).</p>
+                <p><strong>Estimated Effort:</strong> 8–10 weeks (two developers, Expo + Firebase Cloud Messaging).</p>
+            </div>
+            
+            <div class="feature-item parked">
+                <h4>9. Custom Integrations & API Webhooks</h4>
+                <span class="badge badge-parked">PARKED</span>
+                <span class="badge" style="background-color: #27ae60; color: white;">LOW</span>
+                <p><strong>Description:</strong> Let third parties build integrations: "When a job is posted on DeepEdge, send a webhook to our ATS," or "Sync Greyin candidates to our hiring platform."</p>
+                <p><strong>Current:</strong> PostgREST API exists but no webhook infrastructure, no API key management, no rate limiting per customer.</p>
+                <p><strong>Why Parked:</strong> Requires developer portal, documentation, support infrastructure. Deferred until 10K+ users and real demand.</p>
+                <p><strong>Acceptance Criteria:</strong> Admin can create API keys, set rate limits, register webhook endpoints. Webhooks fire for job_posted, candidate_applied, outcome_verified events.</p>
+                <p><strong>Estimated Effort:</strong> 2 weeks (webhook service, developer portal, documentation).</p>
+            </div>
+        </section>
+
+        <!-- SCALING PLAN -->
+        <section>
+            <h2>Scaling Plan (10K → 100K+ Users)</h2>
+            <p><strong>Current Capacity:</strong> Single self-hosted Supabase handles ~1K concurrent users on $24/mo VPS. Database footprint: 95 tables, ~500GB-1TB for 100K active users.</p>
+            
+            <h3>Phase A: Pre-Scale Optimization (Now–Q4 2026)</h3>
+            <p><strong>Goal:</strong> Support 10K users on current infrastructure without major refactor.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Initiative</th>
+                        <th>Investment</th>
+                        <th>Outcome</th>
+                        <th>Timeline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Database Indexing Pass</strong><br>EXPLAIN ANALYZE slow queries; add composite indexes on (user_id, created_at), (pillar, status), etc.</td>
+                        <td>1–2 weeks engineering</td>
+                        <td>Query latency &lt;100ms (95th percentile)</td>
+                        <td>Oct 2026</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Read Replica Setup</strong><br>Promote standby to reporting-only; split heavy analytics queries from transactional load</td>
+                        <td>$12/mo (standby VPS) + 3 days setup</td>
+                        <td>Primary handles writes; replica handles BI/dashboards</td>
+                        <td>Oct 2026</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Connection Pooling (PgBouncer)</strong><br>Cap connections at 50; queue overflow</td>
+                        <td>Free (PgBouncer) + 2 days config</td>
+                        <td>Prevent connection exhaustion at 1K concurrent</td>
+                        <td>Oct 2026</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Redis Cache Layer</strong><br>Cache Greyin Score view, platform_search_index (30s TTL)</td>
+                        <td>$6/mo (Redis tier) + 1 week engineering</td>
+                        <td>Dashboard/search latency &lt;50ms (95th); reduce DB QPS by 30%</td>
+                        <td>Nov 2026</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LLM Cost Optimization</strong><br>Route simple tasks to gpt-3.5-turbo; reserve claude-3.5 for complex scoring</td>
+                        <td>1 week engineering (no new cost)</td>
+                        <td>LLM spend $100–150/mo (vs. current $300); same quality</td>
+                        <td>Nov 2026</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CDN for Static Assets</strong><br>Move /images, /fonts, /icons to Cloudflare</td>
+                        <td>$20/mo Cloudflare + 3 days setup</td>
+                        <td>Page load time &lt;2s (global); reduce VPS bandwidth by 50%</td>
+                        <td>Dec 2026</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="priority-high">
+                <strong>Expected Outcome (End of Q4 2026):</strong>
+                <ul>
+                    <li>Comfortable support for 10K concurrent users on current $24/mo primary + $12/mo replica setup</li>
+                    <li>Database query latency &lt;100ms (95th percentile)</li>
+                    <li>LLM cost reduced to $100–150/mo (40–50% reduction)</li>
+                    <li>Dashboard load time &lt;1s (cold) / &lt;200ms (cached)</li>
+                </ul>
+            </div>
+            
+            <h3>Phase B: Horizontal Scaling (Q1–Q2 2027)</h3>
+            <p><strong>Goal:</strong> Support 100K active users with multi-region capability.</p>
+            
+            <div class="diagram-container">
+                <svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg">
+                    <text x="500" y="25" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+                        Greyin Scaling Architecture — Phase B (100K users)
+                    </text>
+                    
+                    <!-- Users -->
+                    <g id="users">
+                        <rect x="50" y="60" width="200" height="50" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="5"/>
+                        <text x="150" y="90" font-size="12" text-anchor="middle" fill="#2c3e50" font-weight="bold">100K Global Users</text>
+                    </g>
+                    
+                    <!-- Cloudflare CDN -->
+                    <rect x="350" y="60" width="200" height="50" fill="#f0f0f0" stroke="#95a5a6" stroke-width="2" rx="5"/>
+                    <text x="450" y="85" font-size="11" text-anchor="middle" fill="#2c3e50">Cloudflare CDN</text>
+                    <text x="450" y="101" font-size="10" text-anchor="middle" fill="#7f8c8d">(static assets, page cache)</text>
+                    
+                    <!-- Primary Region (US-East) -->
+                    <g id="us-east">
+                        <rect x="50" y="160" width="900" height="160" fill="none" stroke="#3498db" stroke-width="2" stroke-dasharray="5,5" rx="5"/>
+                        <text x="70" y="180" font-size="11" font-weight="bold" fill="#2c3e50">US-East (Primary) — edjitsu-prod-us-east</text>
+                        
+                        <!-- Traefik -->
+                        <rect x="70" y="195" width="180" height="40" fill="#ffeaa7" stroke="#f39c12" stroke-width="2" rx="3"/>
+                        <text x="160" y="222" font-size="10" text-anchor="middle" fill="#2c3e50" font-weight="bold">Traefik Proxy</text>
+                        
+                        <!-- Kong -->
+                        <rect x="270" y="195" width="180" height="40" fill="#ffeaa7" stroke="#f39c12" stroke-width="2" rx="3"/>
+                        <text x="360" y="222" font-size="10" text-anchor="middle" fill="#2c3e50" font-weight="bold">Kong API Gateway</text>
+                        
+                        <!-- Frontend Apps -->
+                        <rect x="470" y="195" width="140" height="40" fill="#a9dfbf" stroke="#27ae60" stroke-width="2" rx="3"/>
+                        <text x="540" y="222" font-size="9" text-anchor="middle" fill="#2c3e50">6 Pillar Apps</text>
+                        
+                        <!-- Database -->
+                        <rect x="630" y="195" width="120" height="40" fill="#aed6f1" stroke="#3498db" stroke-width="2" rx="3"/>
+                        <text x="690" y="222" font-size="9" text-anchor="middle" fill="#2c3e50">PostgreSQL</text>
+                        
+                        <!-- Cache -->
+                        <rect x="770" y="195" width="120" height="40" fill="#f5b7b1" stroke="#e74c3c" stroke-width="2" rx="3"/>
+                        <text x="830" y="222" font-size="9" text-anchor="middle" fill="#2c3e50">Redis Cache</text>
+                        
+                        <!-- Read Replica -->
+                        <rect x="70" y="255" width="820" height="50" fill="#d7bde2" stroke="#9b59b6" stroke-width="2" rx="3"/>
+                        <text x="480" y="275" font-size="10" text-anchor="middle" fill="#2c3e50" font-weight="bold">Read Replica (Standby) — Analytics & Reporting Queries</text>
+                        <text x="480" y="290" font-size="9" text-anchor="middle" fill="#555">30s lag; handles salary_trends, greyin_scores refresh, admin dashboards</text>
+                    </g>
+                    
+                    <!-- Arrows from CDN -->
+                    <path d="M 450 110 Q 400 140 360 195" stroke="#3498db" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                    <path d="M 450 110 Q 400 140 360 195" stroke="#3498db" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                    
+                    <!-- Arrow from users to CDN -->
+                    <path d="M 250 85 L 350 85" stroke="#3498db" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                    
+                    <!-- Arrow marker definition -->
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#3498db" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Initiative</th>
+                        <th>Investment</th>
+                        <th>Outcome</th>
+                        <th>Timeline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Database Sharding (Logical)</strong><br>Shard users by region/ID range; replicate schema to 2–3 shards</td>
+                        <td>$80/mo (3x Postgres instances) + 3 weeks engineering</td>
+                        <td>Handle 100K active users; each shard at 20K concurrent</td>
+                        <td>Q1 2027</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Read Replica per Shard</strong><br>Each shard gets its own standby for analytics</td>
+                        <td>+$36/mo (3 replicas × $12)</td>
+                        <td>Consistent query latency across all shards</td>
+                        <td>Q1 2027</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Global Load Balancing</strong><br>Redirect US/EU/APAC users to nearest shard</td>
+                        <td>Free (Traefik) + 2 weeks engineering</td>
+                        <td>Reduced latency (50ms → 20ms for APAC users)</td>
+                        <td>Q2 2027</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multi-Region Supabase (Geo-Replication)</strong><br>Cross-region read replicas for EU/APAC compliance (GDPR, data residency)</td>
+                        <td>$150/mo (new EU/APAC regions) + 2 weeks setup</td>
+                        <td>GDPR-compliant EU shard; low-latency APAC reads</td>
+                        <td>Q2 2027</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Distributed Caching (Redis Cluster)</strong><br>Multi-node Redis for 99.9% availability; cache misses don't spike load</td>
+                        <td>$40/mo (Redis cluster) + 1 week config</td>
+                        <td>Cache failures don't cascade; consistent TTL across shards</td>
+                        <td>Q1 2027</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LLM Load Balancing</strong><br>Distribute requests across Anthropic + OpenAI + Ollama (on-prem fallback)</td>
+                        <td>No new cost; existing budget</td>
+                        <td>Single LLM provider outage doesn't block features</td>
+                        <td>Q2 2027</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="priority-high">
+                <strong>Expected Outcome (End of Q2 2027):</strong>
+                <ul>
+                    <li>100K+ active users supported across 3 shards</li>
+                    <li>Multi-region deployment (US, EU, APAC)</li>
+                    <li>Sub-100ms query latency globally (95th percentile)</li>
+                    <li>99.9% uptime SLA (multi-region redundancy)</li>
+                    <li>All regulatory compliance (GDPR, data residency)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- COST PROJECTIONS -->
+        <section>
+            <h2>Cost Projections</h2>
+            <p>Greyin platform costs include infrastructure, LLM services, and third-party integrations (Razorpay, email/SMS). Below is a monthly cost model scaled to user counts.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cost Category</th>
+                        <th>1K Users</th>
+                        <th>10K Users</th>
+                        <th>100K Users</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Infrastructure</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;Primary Postgres VPS</td>
+                        <td>$24</td>
+                        <td>$48</td>
+                        <td>$200</td>
+                        <td>DigitalOcean Pro tier</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;Standby/Replica VPS</td>
+                        <td>$0</td>
+                        <td>$12</td>
+                        <td>$120</td>
+                        <td>Read-only replica for analytics</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;Redis Cache</td>
+                        <td>$6</td>
+                        <td>$15</td>
+                        <td>$50</td>
+                        <td>Shared tier → cluster at scale</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;CDN (Cloudflare)</td>
+                        <td>$0</td>
+                        <td>$20</td>
+                        <td>$50</td>
+                        <td>Static asset caching + DDoS protection</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LLM Services</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;Anthropic (Claude 3.5)</td>
+                        <td>$100</td>
+                        <td>$120</td>
+                        <td>$300–500</td>
+                        <td>Resume parsing, post quality, outcomes</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;OpenAI (Fallback/Cheaper)</td>
+                        <td>$0</td>
+                        <td>$30</td>
+                        <td>$100–200</td>
+                        <td>Bulk & low-priority queries</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Third-Party Services</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;Razorpay (Payments)</td>
+                        <td>2% GMV</td>
+                        <td>2% GMV</td>
+                        <td>1.5% GMV</td>
+                        <td>Tiered pricing; volume discount at 100K users</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;SendGrid / Resend (Email)</td>
+                        <td>$10</td>
+                        <td>$25</td>
+                        <td>$100</td>
+                        <td>Transactional + digest emails</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;Sentry (Error Tracking)</td>
+                        <td>$0</td>
+                        <td>$29</td>
+                        <td>$100</td>
+                        <td>Error aggregation + alerting</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;&nbsp;DataDog/New Relic (APM)</td>
+                        <td>$0</td>
+                        <td>$50</td>
+                        <td>$200</td>
+                        <td>Optional; can use free alternatives (Prometheus)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Domain & SSL</strong></td>
+                        <td>$12/year</td>
+                        <td>$12/year</td>
+                        <td>$12/year</td>
+                        <td>Let's Encrypt free; domain fixed cost</td>
+                    </tr>
+                    <tr style="background-color: #ecf0f1; font-weight: bold;">
+                        <td><strong>TOTAL (Monthly)</strong></td>
+                        <td><strong>$152–200</strong></td>
+                        <td><strong>$320–400</strong></td>
+                        <td><strong>$1,100–1,600</strong></td>
+                        <td><strong>excl. Razorpay GMV fees</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="priority-medium">
+                <strong>Revenue Model Assumptions:</strong>
+                <ul>
+                    <li><strong>DeepEdge:</strong> $10–50/mo per active hiring company (Basic/Pro/Premium tiers); assume 5% of user base (500 companies at 10K users) → $75K/mo potential</li>
+                    <li><strong>FlexPro:</strong> 20% take on mentor session bookings + 30% on recording resale; assume avg $50/booking, 5 bookings/freelancer/month, 500 active freelancers → $125K/mo potential</li>
+                    <li><strong>Platform Fees:</strong> Optional 2–3% on job/gig transactions; $100 average GMV/transaction × 5K active transactions/month → $10K/mo</li>
+                    <li><strong>Total Potential (10K users):</strong> $210K/mo at scale (conservative), with 45–50% gross margin after platform costs</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- KNOWN RISKS & MITIGATIONS -->
+        <section>
+            <h2>Known Risks & Mitigations</h2>
+            
+            <div class="feature-item blocked">
+                <h4>Risk 1: Database Query Bottleneck (Greyin Score, Search)</h4>
+                <p><strong>Impact:</strong> At 10K concurrent users, unoptimized queries on <code>greyin_scores</code> / <code>platform_search_index</code> could timeout. Dashboard loads &gt;5s.</p>
+                <p><strong>Mitigation:</strong> Phase A includes indexing pass + Redis cache; Phase B includes read replicas + query routing.</p>
+                <p><strong>Timeline:</strong> Monitoring + alerting in place now; proactive indexing by Oct 2026.</p>
+            </div>
+            
+            <div class="feature-item blocked">
+                <h4>Risk 2: LLM Provider Cost Explosion</h4>
+                <p><strong>Impact:</strong> Unexpected LLM usage surge (e.g., a feature accidentally logs every page load) could push costs to $1K+/mo.</p>
+                <p><strong>Mitigation:</strong> Feature flags per LLM call; cost tracking in <code>llm_requests</code> table; admin dashboard with spend alerts. Feature can be toggled off in <5 min.</p>
+                <p><strong>Timeline:</strong> Alerts configured by Nov 2026.</p>
+            </div>
+            
+            <div class="feature-item blocked">
+                <h4>Risk 3: Cross-Domain Auth Desync</h4>
+                <p><strong>Impact:</strong> If JWT refresh token (shared on .greyin.net domain) expires, user logged out of all 6 apps simultaneously. Poor UX if refresh fails.</p>
+                <p><strong>Mitigation:</strong> Refresh token expires in 400 days; clients refresh proactively (before expiry). 2-minute warning before force-logout (ADR-011).</p>
+                <p><strong>Timeline:</strong> Tested in Phase 1 (idle timeout acceptance spec); live monitoring by Dec 2026.</p>
+            </div>
+            
+            <div class="feature-item blocked">
+                <h4>Risk 4: Mobile Validation Gap</h4>
+                <p><strong>Impact:</strong> Workspace shell designed for desktop; 375px mobile breakpoint may have rendering bugs or UX friction.</p>
+                <p><strong>Mitigation:</strong> Full mobile screenshot pass (Q4 2026, Phase 1). Deployment hold until mobile tests pass.</p>
+                <p><strong>Timeline:</strong> Validation by end of Nov 2026.</p>
+            </div>
+            
+            <div class="feature-item blocked">
+                <h4>Risk 5: Realtime Notification Failures</h4>
+                <p><strong>Impact:</strong> If Supabase Realtime WebSocket connection drops, users don't see live job alerts / messages until next page reload.</p>
+                <p><strong>Mitigation:</strong> 30-second polling fallback (already live); Realtime reconnection on page-visibility change. Acceptance test in Phase 2.</p>
+                <p><strong>Timeline:</strong> Fallback operational; enhanced reconnection logic by Dec 2026.</p>
+            </div>
+
+            <div class="feature-item blocked">
+                <h4>Risk 6: Session Cookie Not httpOnly (SEC-016)</h4>
+                <p><strong>Impact:</strong> Session cookies across all 6 apps carry <code>secure</code>/<code>sameSite:'lax'</code> but deliberately not <code>httpOnly</code> — a real, unmitigated XSS on any one app can read the session cookie directly. Found in the 2026-08-24 security audit; the traceability matrix's own status field says "Fixed," which overstates it (that column reflects the secure/sameSite work; httpOnly itself was a deliberate, separately-tracked gap from day one).</p>
+                <p><strong>Mitigation:</strong> Every app's <code>SiteHeader.tsx</code> calls <code>createClient().auth.getUser()</code> client-side to decide Sign-In-vs-logged-in display; an httpOnly cookie is invisible to that call and would break login-state display platform-wide as-is. Closing this for real needs a genuine refactor — moving that check to a server-rendered prop across all 6 apps — not a cookie-flag change.</p>
+                <p><strong>Timeline:</strong> Not scheduled; revisit alongside any broader auth/session refactor, since it's not a standalone flag flip.</p>
+            </div>
+        </section>
+
+        <!-- SUCCESS METRICS -->
+        <section>
+            <h2>Success Metrics & Milestones</h2>
+            
+            <h3>Q4 2026 Targets</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Current</th>
+                        <th>Target</th>
+                        <th>Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Onboarding completion rate</td>
+                        <td>40%</td>
+                        <td>≥70% (guided tour + better UX)</td>
+                        <td>Product</td>
+                    </tr>
+                    <tr>
+                        <td>Daily active users (DAU)</td>
+                        <td>200–300</td>
+                        <td>500–800</td>
+                        <td>Growth</td>
+                    </tr>
+                    <tr>
+                        <td>UX quality score</td>
+                        <td>7.2/10</td>
+                        <td>≥8.0/10 (all dimensions)</td>
+                        <td>Product</td>
+                    </tr>
+                    <tr>
+                        <td>Dashboard load time (95th %ile)</td>
+                        <td>2–3s</td>
+                        <td>&lt;500ms (cached)</td>
+                        <td>Engineering</td>
+                    </tr>
+                    <tr>
+                        <td>LLM cost per 1K users</td>
+                        <td>$300/mo</td>
+                        <td>$100–150/mo (optimized)</td>
+                        <td>Engineering</td>
+                    </tr>
+                    <tr>
+                        <td>Page mobile compatibility</td>
+                        <td>Responsive but untested</td>
+                        <td>100% pass mobile screenshot suite</td>
+                        <td>Engineering</td>
+                    </tr>
+                    <tr>
+                        <td>Query latency (95th %ile)</td>
+                        <td>100–200ms</td>
+                        <td>&lt;100ms (indexed)</td>
+                        <td>Engineering</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Q1–Q2 2027 Targets (Scaling Phase)</h3>
+            <ul>
+                <li><strong>10K MAU (Monthly Active Users)</strong> on current infrastructure</li>
+                <li><strong>100K DAU (Daily Active Users)</strong> supported via multi-region sharding</li>
+                <li><strong>99.9% uptime SLA</strong> (multi-region redundancy)</li>
+                <li><strong>Sub-100ms query latency</strong> globally (95th percentile)</li>
+                <li><strong>$1M+ MRR</strong> (estimated, pending sales team execution)</li>
+            </ul>
+        </section>
+
+        <!-- CONTINGENCIES -->
+        <section>
+            <h2>Contingencies & Escape Hatches</h2>
+            
+            <div class="warning">
+                <strong>If user growth stalls (DAU plateaus &lt;300 by end of Q4 2026):</strong>
+                <ul>
+                    <li>Pause scaling roadmap (Phase B). Maintain Phase A optimization for operational health.</li>
+                    <li>Redirect team to parked features (advanced search, salary dashboard) to increase engagement.</li>
+                    <li>Conduct user research (cohort interviews) to identify friction points.</li>
+                    <li>Re-evaluate product-market fit; consider pivot to specific use case (e.g., "hiring platform for remote-first companies" vs. broad "professional community").</li>
+                </ul>
+            </div>
+            
+            <div class="warning">
+                <strong>If infrastructure costs exceed $600/mo before 5K users:</strong>
+                <ul>
+                    <li>Pause Redis cache expansion. Use Supabase materialized view caching only.</li>
+                    <li>Disable LLM features (post quality, recommendations) that don't directly drive revenue.</li>
+                    <li>Evaluate managed Supabase SaaS vs. self-hosted (trade operational burden for cost predictability).</li>
+                </ul>
+            </div>
+            
+            <div class="warning">
+                <strong>If mobile validation finds critical UX issues (&gt;30% task failure rate at 375px):</strong>
+                <ul>
+                    <li>Extend Q4 mobile work into early Q1 2027.</li>
+                    <li>Defer performance optimization (Phase A) by 4 weeks; prioritize UX fixes.</li>
+                    <li>Consider web-responsive MVP acceptable for 2026; native mobile apps as separate Phase (2027 H2).</li>
+                </ul>
+            </div>
+            
+            <div class="warning">
+                <strong>If database sharding (Phase B) exceeds 3 weeks effort estimate:</strong>
+                <ul>
+                    <li>Pause sharding. Use vertical scaling (larger Postgres instance) as interim solution.</li>
+                    <li>Consider Managed PostgreSQL (AWS RDS, Heroku Postgres) instead of self-hosted to shift operational burden.</li>
+                    <li>Re-estimate sharding as 2027 Q3+ work.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ROADMAP SUMMARY TIMELINE -->
+        <section>
+            <h2>Consolidated Timeline</h2>
+            <div class="diagram-container">
+                <svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg">
+                    <text x="500" y="25" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+                        Greyin Roadmap — 2026–2027
+                    </text>
+                    
+                    <!-- Quarters -->
+                    <text x="150" y="60" font-size="12" font-weight="bold" fill="#2c3e50">Q3 2026</text>
+                    <rect x="100" y="70" width="100" height="30" fill="#e8f8e8" stroke="#27ae60" stroke-width="2" rx="3"/>
+                    <text x="150" y="91" font-size="10" text-anchor="middle" fill="#2c3e50">Shipped</text>
+                    
+                    <text x="300" y="60" font-size="12" font-weight="bold" fill="#2c3e50">Q4 2026</text>
+                    <rect x="250" y="70" width="100" height="30" fill="#fff3cd" stroke="#f39c12" stroke-width="2" rx="3"/>
+                    <text x="300" y="91" font-size="10" text-anchor="middle" fill="#2c3e50">Current</text>
+                    
+                    <text x="450" y="60" font-size="12" font-weight="bold" fill="#2c3e50">Q1 2027</text>
+                    <rect x="400" y="70" width="100" height="30" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="3"/>
+                    <text x="450" y="91" font-size="10" text-anchor="middle" fill="#2c3e50">Planned</text>
+                    
+                    <text x="600" y="60" font-size="12" font-weight="bold" fill="#2c3e50">Q2 2027</text>
+                    <rect x="550" y="70" width="100" height="30" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="3"/>
+                    <text x="600" y="91" font-size="10" text-anchor="middle" fill="#2c3e50">Planned</text>
+                    
+                    <text x="750" y="60" font-size="12" font-weight="bold" fill="#2c3e50">Q3+ 2027</text>
+                    <rect x="700" y="70" width="100" height="30" fill="#f0f0f0" stroke="#95a5a6" stroke-width="2" rx="3"/>
+                    <text x="750" y="91" font-size="10" text-anchor="middle" fill="#2c3e50">Parked</text>
+                    
+                    <!-- Initiatives -->
+                    <line x1="100" y1="130" x2="900" y2="130" stroke="#bdc3c7" stroke-width="1"/>
+                    
+                    <!-- Phase 0 / 1-5 -->
+                    <text x="20" y="155" font-size="10" font-weight="bold" fill="#2c3e50">UI/UX</text>
+                    <rect x="100" y="145" width="100" height="20" fill="#e8f8e8" stroke="#27ae60" stroke-width="2" rx="2"/>
+                    <text x="150" y="158" font-size="9" text-anchor="middle" fill="#2c3e50">Phases 0–5 ✓</text>
+                    
+                    <!-- Phase 1 - Mobile -->
+                    <text x="20" y="185" font-size="10" font-weight="bold" fill="#2c3e50">Mobile</text>
+                    <rect x="250" y="175" width="100" height="20" fill="#fff3cd" stroke="#f39c12" stroke-width="2" rx="2"/>
+                    <text x="300" y="188" font-size="9" text-anchor="middle" fill="#2c3e50">Phase 1</text>
+                    
+                    <!-- Phase A - Optimization -->
+                    <text x="20" y="215" font-size="10" font-weight="bold" fill="#2c3e50">Scaling-A</text>
+                    <rect x="250" y="205" width="150" height="20" fill="#fff3cd" stroke="#f39c12" stroke-width="2" rx="2"/>
+                    <text x="325" y="218" font-size="9" text-anchor="middle" fill="#2c3e50">Phase A (Opt)</text>
+                    
+                    <!-- Phase B - Sharding -->
+                    <text x="20" y="245" font-size="10" font-weight="bold" fill="#2c3e50">Scaling-B</text>
+                    <rect x="400" y="235" width="250" height="20" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="2"/>
+                    <text x="525" y="248" font-size="9" text-anchor="middle" fill="#2c3e50">Phase B (Sharding, Multi-Region)</text>
+                    
+                    <!-- Parked -->
+                    <text x="20" y="275" font-size="10" font-weight="bold" fill="#2c3e50">Parked</text>
+                    <rect x="700" y="265" width="100" height="20" fill="#f0f0f0" stroke="#95a5a6" stroke-width="2" rx="2"/>
+                    <text x="750" y="278" font-size="9" text-anchor="middle" fill="#555">9 Features</text>
+                    
+                    <!-- Key Milestones -->
+                    <line x1="100" y1="310" x2="900" y2="310" stroke="#bdc3c7" stroke-width="1"/>
+                    <text x="20" y="335" font-size="10" font-weight="bold" fill="#2c3e50">Milestones</text>
+                    
+                    <circle cx="150" cy="345" r="4" fill="#27ae60"/>
+                    <text x="160" y="350" font-size="9" fill="#2c3e50">UX ≥8/10</text>
+                    
+                    <circle cx="300" cy="345" r="4" fill="#f39c12"/>
+                    <text x="310" y="350" font-size="9" fill="#2c3e50">Mobile ✓</text>
+                    
+                    <circle cx="450" cy="345" r="4" fill="#f39c12"/>
+                    <text x="460" y="350" font-size="9" fill="#2c3e50">10K users</text>
+                    
+                    <circle cx="600" cy="345" r="4" fill="#3498db"/>
+                    <text x="610" y="350" font-size="9" fill="#2c3e50">100K users</text>
+                    
+                    <circle cx="750" cy="345" r="4" fill="#95a5a6"/>
+                    <text x="760" y="350" font-size="9" fill="#2c3e50">Native Apps</text>
+                </svg>
+            </div>
+        </section>
+
+        <!-- CONCLUSION -->
+        <section>
+            <h2>Conclusion</h2>
+            <p>Greyin has achieved <strong>feature completion for an MVP platform</strong> with 110+ features, 6 pillar apps, unified SSO, and real-time notifications. The Q4 2026 roadmap focuses on <strong>mobile validation and performance optimization</strong> to support 10K concurrent users, while <strong>9 parked features</strong> remain candidates for re-activation based on user demand and business impact.</p>
+            <p>The scaling plan (Phase B, Q1–Q2 2027) enables <strong>100K+ active users</strong> via database sharding, multi-region deployment, and cost optimization. Infrastructure costs remain predictable: ~$1.1–1.6K/mo at 100K users (excluding payment processor fees).</p>
+            <p><strong>Success depends on</strong>: (1) mobile validation passing Q4 2026, (2) user growth achieving 500–800 DAU by year-end, and (3) operational efficiency targets (sub-100ms query latency, $100–150/mo LLM spend). Contingencies are in place for slower growth, cost overruns, or platform bottlenecks.</p>
+        </section>
+
+        <footer>
+            <p>Greyin Platform — Roadmap & Scaling Plan v1.0 — Generated 2026-09-07</p>
+            <p>For implementation details, refer to <strong>docs/architecture/ARCHITECTURE_DOCUMENTATION.html</strong> and <strong>docs/architecture/ARCHITECTURE_DECISIONS.html</strong></p>
+        </footer>
+    </div>
+</body>
+</html>

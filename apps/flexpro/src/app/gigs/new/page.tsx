@@ -4,7 +4,12 @@ import { ImageUploader } from '@/components/ImageUploader'
 import { GigQualityAssist } from '@/components/GigQualityAssist'
 import { WorkspaceShell } from '@/components/WorkspaceShell'
 
-export default async function NewGigPage() {
+export default async function NewGigPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>
+}) {
+  const { error } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -33,6 +38,12 @@ export default async function NewGigPage() {
         <div className="bg-white rounded-lg shadow-md p-8 dark:bg-gray-900">
           <h1 className="text-2xl font-bold text-gray-900 mb-1 dark:text-gray-50">List a Gig</h1>
           <p className="text-gray-600 mb-6 dark:text-gray-400">A FlexPro Pro subscription unlocks listing — plus a modest service fee when a gig is completed.</p>
+
+          {error && (
+            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 mb-6 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-400">
+              {decodeURIComponent(error)}
+            </div>
+          )}
 
           <form action="/api/gigs/create" method="POST" className="space-y-6">
             <div>

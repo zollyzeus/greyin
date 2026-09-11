@@ -1,4 +1,4 @@
-import { Globe, CheckCircle2 } from 'lucide-react'
+import { Globe, CheckCircle2, Building2, BookOpen, Users, Briefcase, FlaskConical, Telescope } from 'lucide-react'
 
 // Streamlined palette (audit finding: cross-app colors clashed --
 // FlexPro's blue-purple gradient sat too close to Greyin's own
@@ -14,6 +14,22 @@ export const PILLARS = [
   { key: 'stackworks', label: 'StackWorks', description: 'Build with senior peers, earn a verified record', url: 'https://stackworks.greyin.net', color: '#0D9488' },
   { key: 'longlist', label: 'Longlist', description: 'Future roles, quietly explored', url: 'https://longlist.greyin.net', color: '#A16207' },
 ]
+
+// Same brand-icon-per-pillar mapping SiteHeader's "More Platforms"
+// dropdown already uses, for a real visual mark instead of a plain
+// color dot -- exported here so WorkspaceShell's rail can share it too,
+// since both already import PILLARS from this file. Kept in sync by
+// hand across each of these mapping copies (SiteHeader/SiteFooter have
+// their own), matching this platform's established per-app/per-file
+// duplication convention rather than a new shared package for six icons.
+export const PILLAR_ICONS: Record<string, typeof Building2> = {
+  deepedge: Building2,
+  greymatters: BookOpen,
+  saltnpepper: Users,
+  flexpro: Briefcase,
+  stackworks: FlaskConical,
+  longlist: Telescope,
+}
 
 /**
  * One login now works across all six *.greyin.net apps (shared cookie
@@ -33,6 +49,7 @@ export function EcosystemWidget({ activePillars }: { activePillars: string[] }) 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {PILLARS.map((p) => {
           const isActive = activePillars.includes(p.key)
+          const Icon = PILLAR_ICONS[p.key]
           return (
             <a
               key={p.key}
@@ -40,7 +57,7 @@ export function EcosystemWidget({ activePillars }: { activePillars: string[] }) 
               className="flex flex-col items-center text-center gap-1.5 p-3 rounded-lg border text-sm border-gray-200 hover:border-gray-300 transition-colors dark:border-gray-800 dark:hover:border-gray-700"
               style={isActive ? { borderColor: p.color, backgroundColor: `${p.color}0d` } : undefined}
             >
-              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} aria-hidden="true" />
+              <Icon className="w-5 h-5 flex-shrink-0" style={{ color: p.color }} aria-hidden="true" />
               <p className="font-medium text-gray-900 flex items-center gap-1 dark:text-gray-50">
                 {p.label}
                 {isActive && <CheckCircle2 className="w-3.5 h-3.5" style={{ color: p.color }} />}

@@ -3,7 +3,7 @@ import { signUpDeepEdge, login } from '../../utils/auth'
 
 test.describe('DeepEdge auth', () => {
   test('candidate can sign up and log in, landing on the candidate dashboard', async ({ page, cleanup }) => {
-    const user = await signUpDeepEdge(page, 'candidate', cleanup)
+    const user = await signUpDeepEdge(page, 'candidate', cleanup, 15, undefined, true)
     await login(page, user, '/dashboard')
     await expect(page.getByText(`Welcome back, ${user.firstName} ${user.lastName}`)).toBeVisible()
     // .first() -- the common footer (2026-09-03) also links "Browse Jobs"

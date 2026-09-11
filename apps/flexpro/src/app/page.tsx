@@ -32,6 +32,9 @@ export default async function Home() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="font-display text-5xl font-semibold mb-6">Find Freelance Services</h1>
           <p className="text-xl">Connect with talented freelancers for your projects</p>
+          <a href="https://greyin.net/#demo" className="inline-block mt-6 text-sm text-orange-50 underline hover:text-white transition">
+            Or explore as a demo user — no signup needed
+          </a>
         </div>
       </div>
 

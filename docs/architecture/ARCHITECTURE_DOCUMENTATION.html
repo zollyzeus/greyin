@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greyin Platform — Comprehensive Architecture Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            border-bottom: 3px solid #2c3e50;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #34495e;
+            font-size: 2em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .meta {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            margin-top: 10px;
+        }
+        
+        .meta strong {
+            color: #2c3e50;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .toc {
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+        }
+        
+        .toc ul {
+            margin-left: 20px;
+        }
+        
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .diagram-container {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background-color: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #2c3e50;
+        }
+        
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .feature-list {
+            margin: 15px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 3px;
+        }
+        
+        .checkmark {
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .code-block {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .code-block code {
+            color: #ecf0f1;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .note-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .warning-box {
+            background-color: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        footer {
+            border-top: 2px solid #bdc3c7;
+            margin-top: 50px;
+            padding-top: 20px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .box {
+            border: 2px solid #3498db;
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .box-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        strong {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Greyin Platform</h1>
+            <h2 style="border: none; margin: 0; padding: 0; margin-top: 10px;">Comprehensive Architecture Documentation</h2>
+            <div class="meta">
+                <strong>Date:</strong> 2026-09-07<br>
+                <strong>Platform Status:</strong> Production-Ready Multi-App Ecosystem<br>
+                <strong>Version:</strong> 1.0
+            </div>
+        </header>
+
+        <!-- EXECUTIVE SUMMARY -->
+        <section class="section">
+            <h2>Executive Summary</h2>
+            <p>Greyin is a self-hosted, production-grade B2B/B2C platform ecosystem serving senior professionals (12+ years experience) with verified expertise tracking, peer collaboration, and skill-based marketplaces. The platform unifies six pillar applications under a single authentication system, shared reputation score, and cross-pillar activity tracking.</p>
+            
+            <h3>Core Positioning</h3>
+            <ul>
+                <li><strong>Target User:</strong> Senior domain professionals, verified experts, enterprise hiring teams</li>
+                <li><strong>Revenue Model:</strong> B2B hiring subscriptions (DeepEdge), freelance platform fees (FlexPro), outplacement/coaching (enterprise), future hiring pipeline (Longlist)</li>
+                <li><strong>Differentiation:</strong> Real verified expertise (StackWorks/FlexPro verified outcomes), Greyin Score (unified reputation), senior-only peer community (Salt & Pepper)</li>
+            </ul>
+        </section>
+
+        <!-- PART 1: SYSTEM ARCHITECTURE -->
+        <section class="section">
+            <h2>Part 1: Overall Web App Architecture</h2>
+            
+            <h3>1.1 System Architecture Overview</h3>
+            <div class="diagram-container">
+                <svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Title -->
+                    <text x="500" y="25" font-size="18" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+                        Greyin Platform — System Architecture
+                    </text>
+                    
+                    <!-- Layer 1: Reverse Proxy -->
+                    <rect x="50" y="50" width="900" height="80" fill="#3498db" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                    <text x="500" y="80" font-size="14" font-weight="bold" text-anchor="middle" fill="white">
+                        TRAEFIK (Reverse Proxy) — edjitsu-prod Docker Swarm Network
+                    </text>
+                    <text x="500" y="105" font-size="12" text-anchor="middle" fill="white">
+                        SSL: Let's Encrypt | Ports: 80/443
+                    </text>
+                    
+                    <!-- Layer 2: Frontend Apps -->
+                    <text x="50" y="170" font-size="12" font-weight="bold" fill="#2c3e50">Frontend Applications:</text>
+                    
+                    <g>
+                        <!-- Apps -->
+                        <rect x="50" y="180" width="120" height="60" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="3"/>
+                        <text x="110" y="210" font-size="11" font-weight="bold" text-anchor="middle">deepedge</text>
+                        <text x="110" y="225" font-size="10" text-anchor="middle">.greyin.net</text>
+                        
+                        <rect x="180" y="180" width="120" height="60" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="3"/>
+                        <text x="240" y="210" font-size="11" font-weight="bold" text-anchor="middle">greymatters</text>
+                        <text x="240" y="225" font-size="10" text-anchor="middle">.greyin.net</text>
+                        
+                        <rect x="310" y="180" width="120" height="60" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="3"/>
+                        <text x="370" y="210" font-size="11" font-weight="bold" text-anchor="middle">flexpro</text>
+                        <text x="370" y="225" font-size="10" text-anchor="middle">.greyin.net</text>
+                        
+                        <rect x="440" y="180" width="120" height="60" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="3"/>
+                        <text x="500" y="210" font-size="11" font-weight="bold" text-anchor="middle">stackworks</text>
+                        <text x="500" y="225" font-size="10" text-anchor="middle">.greyin.net</text>
+                        
+                        <rect x="570" y="180" width="120" height="60" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="3"/>
+                        <text x="630" y="210" font-size="11" font-weight="bold" text-anchor="middle">saltnpepper</text>
+                        <text x="630" y="225" font-size="10" text-anchor="middle">.greyin.net</text>
+                        
+                        <rect x="700" y="180" width="120" height="60" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="3"/>
+                        <text x="760" y="210" font-size="11" font-weight="bold" text-anchor="middle">longlist</text>
+                        <text x="760" y="225" font-size="10" text-anchor="middle">.greyin.net</text>
+                        
+                        <rect x="830" y="180" width="100" height="60" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="3"/>
+                        <text x="880" y="210" font-size="11" font-weight="bold" text-anchor="middle">greyin hub</text>
+                        <text x="880" y="225" font-size="10" text-anchor="middle">.net</text>
+                    </g>
+                    
+                    <!-- Arrows down to Kong -->
+                    <line x1="500" y1="240" x2="500" y2="290" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <!-- Layer 3: Kong Gateway -->
+                    <rect x="250" y="290" width="500" height="70" fill="#9b59b6" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                    <text x="500" y="320" font-size="13" font-weight="bold" text-anchor="middle" fill="white">
+                        KONG API GATEWAY (Internal)
+                    </text>
+                    <text x="500" y="340" font-size="11" text-anchor="middle" fill="white">
+                        Port: 8000/8443 | PostgREST | GoTrue | Realtime | Storage
+                    </text>
+                    
+                    <!-- Arrows down to PostgreSQL/Redis -->
+                    <line x1="400" y1="360" x2="350" y2="410" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    <line x1="600" y1="360" x2="650" y2="410" stroke="#555" stroke-width="2" marker-end="url(#arrowhead)"/>
+                    
+                    <!-- Layer 4: Database & Cache -->
+                    <rect x="200" y="410" width="300" height="80" fill="#e74c3c" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                    <text x="350" y="440" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+                        PostgreSQL 15 (Primary)
+                    </text>
+                    <text x="350" y="460" font-size="10" text-anchor="middle" fill="white">
+                        pgvector | RLS | pg_cron | 110+ migrations
+                    </text>
+                    <text x="350" y="475" font-size="10" text-anchor="middle" fill="white">
+                        95 tables | 38 views
+                    </text>
+                    
+                    <rect x="550" y="410" width="250" height="80" fill="#27ae60" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                    <text x="675" y="440" font-size="12" font-weight="bold" text-anchor="middle" fill="white">
+                        Redis (Caching)
+                    </text>
+                    <text x="675" y="460" font-size="10" text-anchor="middle" fill="white">
+                        Auth caching | Pub/sub
+                    </text>
+                    <text x="675" y="475" font-size="10" text-anchor="middle" fill="white">
+                        Session store (optional)
+                    </text>
+                    
+                    <!-- Arrow marker definition -->
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto">
+                            <polygon points="0 0, 10 3, 0 6" fill="#555" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+            
+            <h3>1.2 Authentication & Session Management</h3>
+            <div class="note-box">
+                <strong>Shared Single Sign-On (SSO):</strong>
+                <ul>
+                    <li>Supabase GoTrue handles all user authentication</li>
+                    <li>JWT-based sessions with 1-hour access tokens</li>
+                    <li>400-day refresh token cookie (httpOnly, secure, .greyin.net domain)</li>
+                    <li>Automatic token refresh on every request via middleware</li>
+                    <li>One <span class="highlight">profiles</span> table row per user, shared across all 6 apps</li>
+                </ul>
+            </div>
+            
+            <h3>1.3 Data Model Layers</h3>
+            <div class="diagram-container">
+                <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+                    <text x="400" y="25" font-size="16" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+                        Data Model Layers
+                    </text>
+                    
+                    <!-- Layer 1: User Profile -->
+                    <rect x="50" y="50" width="700" height="80" fill="#3498db" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                    <text x="400" y="75" font-size="12" font-weight="bold" text-anchor="middle" fill="white">User & Profile Layer</text>
+                    <text x="400" y="95" font-size="11" text-anchor="middle" fill="white">profiles (1 per user) | email | years_experience | role</text>
+                    <text x="400" y="115" font-size="10" text-anchor="middle" fill="white">All 6 apps share single user table | RLS scoped to auth.uid()</text>
+                    
+                    <!-- Layer 2: Trust & Verification -->
+                    <rect x="50" y="150" width="330" height="110" fill="#9b59b6" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                    <text x="215" y="175" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Trust & Verification</text>
+                    <text x="215" y="195" font-size="10" text-anchor="middle" fill="white">greyin_scores (0-100)</text>
+                    <text x="215" y="210" font-size="10" text-anchor="middle" fill="white">collaborators (verified interactions)</text>
+                    <text x="215" y="225" font-size="10" text-anchor="middle" fill="white">skill_endorsements</text>
+                    <text x="215" y="240" font-size="10" text-anchor="middle" fill="white">peer_contribution_ratings</text>
+                    
+                    <!-- Layer 3: Business Tables -->
+                    <rect x="420" y="150" width="330" height="110" fill="#e74c3c" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                    <text x="585" y="175" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Business Tables (Per Pillar)</text>
+                    <text x="585" y="195" font-size="10" text-anchor="middle" fill="white">DeepEdge: jobs, applications, companies</text>
+                    <text x="585" y="210" font-size="10" text-anchor="middle" fill="white">FlexPro: gigs, gig_orders, gig_reviews</text>
+                    <text x="585" y="225" font-size="10" text-anchor="middle" fill="white">StackWorks: projects, builder_asks, verified_outcomes</text>
+                    <text x="585" y="240" font-size="10" text-anchor="middle" fill="white">+ Salt & Pepper, GreyMatters, Longlist</text>
+                    
+                    <!-- Layer 4: Cross-Pillar -->
+                    <rect x="50" y="280" width="700" height="80" fill="#27ae60" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                    <text x="400" y="305" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Cross-Pillar & Admin Tables</text>
+                    <text x="400" y="325" font-size="11" text-anchor="middle" fill="white">notifications | messages | user_follows | platform_search_index</text>
+                    <text x="400" y="345" font-size="11" text-anchor="middle" fill="white">llm_providers | llm_feature_flags | llm_requests | subscription_tiers</text>
+                    
+                    <!-- Layer 5: Views & Aggregates -->
+                    <rect x="50" y="380" width="700" height="80" fill="#f39c12" stroke="#2c3e50" stroke-width="2" rx="5"/>
+                    <text x="400" y="405" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Views & Aggregates (38 total)</text>
+                    <text x="400" y="425" font-size="11" text-anchor="middle" fill="white">greyin_scores_mv (materialized) | salary_trends (k-anonymity) | platform_search_index</text>
+                    <text x="400" y="445" font-size="11" text-anchor="middle" fill="white">platform_people_index | verified_outcomes | my_activity_heatmap</text>
+                </svg>
+            </div>
+
+            <h3>1.4 API Architecture</h3>
+            <div class="box">
+                <div class="box-title">PostgREST Auto-API</div>
+                <ul>
+                    <li>Real-time generated REST endpoints from every table/view</li>
+                    <li>Automatic path segmentation: <span class="highlight">/rest/v1/{table}</span></li>
+                    <li>Built-in filtering, sorting, pagination: <span class="highlight">?select=*&order_by=created_at.desc&limit=10</span></li>
+                    <li>HTTP auth via <span class="highlight">Authorization: Bearer {JWT}</span></li>
+                    <li>RLS policies enforce access at the database layer</li>
+                </ul>
+            </div>
+
+            <h3>1.5 Frontend Architecture</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Purpose</th>
+                        <th>Shared Across Apps</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Next.js App Router (SSR)</td>
+                        <td>Page rendering, authentication checks</td>
+                        <td>All 7 apps</td>
+                    </tr>
+                    <tr>
+                        <td>SiteHeader + EcosystemWidget</td>
+                        <td>Navigation, pillar switcher, logo</td>
+                        <td>All 7 apps</td>
+                    </tr>
+                    <tr>
+                        <td>ThemeToggle (Dark/Light)</td>
+                        <td>Dark mode selection, localStorage persist</td>
+                        <td>All 7 apps + 89 inline headers</td>
+                    </tr>
+                    <tr>
+                        <td>Tailwind CSS (dark:class)</td>
+                        <td>Utility-first styling, dark mode</td>
+                        <td>All 7 apps</td>
+                    </tr>
+                    <tr>
+                        <td>Supabase Client SDK</td>
+                        <td>Auth, database queries, Realtime</td>
+                        <td>All 7 apps</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>1.6 Infrastructure & Deployment</h3>
+            <div class="diagram-container">
+                <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+                    <text x="450" y="25" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+                        Docker Services Stack
+                    </text>
+                    
+                    <g>
+                        <!-- Database Services -->
+                        <rect x="20" y="50" width="180" height="220" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="5"/>
+                        <text x="110" y="75" font-size="11" font-weight="bold" text-anchor="middle" fill="#2c3e50">Database Services</text>
+                        
+                        <rect x="30" y="90" width="160" height="35" fill="#3498db" stroke="#2c3e50" stroke-width="1" rx="3"/>
+                        <text x="110" y="112" font-size="10" text-anchor="middle" fill="white">supabase_db</text>
+                        <text x="110" y="125" font-size="9" text-anchor="middle" fill="#2c3e50">(PostgreSQL 15)</text>
+                        
+                        <rect x="30" y="135" width="160" height="35" fill="#3498db" stroke="#2c3e50" stroke-width="1" rx="3"/>
+                        <text x="110" y="157" font-size="10" text-anchor="middle" fill="white">supabase_storage</text>
+                        
+                        <rect x="30" y="180" width="160" height="35" fill="#3498db" stroke="#2c3e50" stroke-width="1" rx="3"/>
+                        <text x="110" y="202" font-size="10" text-anchor="middle" fill="white">supabase_meta</text>
+                    </g>
+                    
+                    <g>
+                        <!-- API Services -->
+                        <rect x="220" y="50" width="180" height="220" fill="#fef5e7" stroke="#f39c12" stroke-width="2" rx="5"/>
+                        <text x="310" y="75" font-size="11" font-weight="bold" text-anchor="middle" fill="#2c3e50">API Services</text>
+                        
+                        <rect x="230" y="90" width="160" height="35" fill="#f39c12" stroke="#2c3e50" stroke-width="1" rx="3"/>
+                        <text x="310" y="112" font-size="10" text-anchor="middle" fill="white">supabase_kong</text>
+                        <text x="310" y="125" font-size="9" text-anchor="middle" fill="#2c3e50">(API Gateway)</text>
+                        
+                        <rect x="230" y="135" width="160" height="35" fill="#f39c12" stroke="#2c3e50" stroke-width="1" rx="3"/>
+                        <text x="310" y="157" font-size="10" text-anchor="middle" fill="white">supabase_rest</text>
+                        
+                        <rect x="230" y="180" width="160" height="35" fill="#f39c12" stroke="#2c3e50" stroke-width="1" rx="3"/>
+                        <text x="310" y="202" font-size="10" text-anchor="middle" fill="white">supabase_realtime</text>
+                    </g>
+                    
+                    <g>
+                        <!-- Auth Services -->
+                        <rect x="420" y="50" width="180" height="220" fill="#e8f8e8" stroke="#27ae60" stroke-width="2" rx="5"/>
+                        <text x="510" y="75" font-size="11" font-weight="bold" text-anchor="middle" fill="#2c3e50">Auth Services</text>
+                        
+                        <rect x="430" y="90" width="160" height="35" fill="#27ae60" stroke="#2c3e50" stroke-width="1" rx="3"/>
+                        <text x="510" y="112" font-size="10" text-anchor="middle" fill="white">supabase_auth</text>
+                        <text x="510" y="125" font-size="9" text-anchor="middle" fill="#2c3e50">(GoTrue)</text>
+                        
+                        <rect x="430" y="135" width="160" height="35" fill="#27ae60" stroke="#2c3e50" stroke-width="1" rx="3"/>
+                        <text x="510" y="157" font-size="10" text-anchor="middle" fill="white">supabase_studio</text>
+                        
+                        <rect x="430" y="180" width="160" height="35" fill="#27ae60" stroke="#2c3e50" stroke-width="1" rx="3"/>
+                        <text x="510" y="202" font-size="10" text-anchor="middle" fill="white">redis (optional)</text>
+                    </g>
+                    
+                    <g>
+                        <!-- Frontend Services -->
+                        <rect x="620" y="50" width="260" height="220" fill="#f8e8f8" stroke="#9b59b6" stroke-width="2" rx="5"/>
+                        <text x="750" y="75" font-size="11" font-weight="bold" text-anchor="middle" fill="#2c3e50">Frontend Apps</text>
+                        
+                        <text x="750" y="100" font-size="9" text-anchor="middle" fill="#2c3e50">Next.js 14 Builds</text>
+                        <rect x="630" y="110" width="120" height="25" fill="#9b59b6" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                        <text x="690" y="127" font-size="9" text-anchor="middle" fill="white">deepedge</text>
+                        
+                        <rect x="760" y="110" width="120" height="25" fill="#9b59b6" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                        <text x="820" y="127" font-size="9" text-anchor="middle" fill="white">greymatters</text>
+                        
+                        <rect x="630" y="145" width="120" height="25" fill="#9b59b6" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                        <text x="690" y="162" font-size="9" text-anchor="middle" fill="white">flexpro</text>
+                        
+                        <rect x="760" y="145" width="120" height="25" fill="#9b59b6" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                        <text x="820" y="162" font-size="9" text-anchor="middle" fill="white">stackworks</text>
+                        
+                        <rect x="630" y="180" width="120" height="25" fill="#9b59b6" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                        <text x="690" y="197" font-size="9" text-anchor="middle" fill="white">saltnpepper</text>
+                        
+                        <rect x="760" y="180" width="120" height="25" fill="#9b59b6" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                        <text x="820" y="197" font-size="9" text-anchor="middle" fill="white">longlist</text>
+                        
+                        <rect x="695" y="215" width="110" height="25" fill="#9b59b6" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                        <text x="750" y="232" font-size="9" text-anchor="middle" fill="white">greyin hub</text>
+                    </g>
+                </svg>
+            </div>
+        </section>
+
+        <!-- PART 2: APP-LEVEL FEATURES -->
+        <section class="section">
+            <h2>Part 2: App-Level Features & Architecture</h2>
+            
+            <h3>2.1 Platform-Wide Features (43 features)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature ID</th>
+                        <th>Feature Name</th>
+                        <th>Implementation</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FR-PW-01/02</td>
+                        <td>Authentication & Identity</td>
+                        <td>Supabase GoTrue, email verification</td>
+                        <td><span style="color: #27ae60; font-weight: bold;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>FR-PW-03/33</td>
+                        <td>Unified Notifications</td>
+                        <td>Real-time bell dropdown, live updates</td>
+                        <td><span style="color: #27ae60; font-weight: bold;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>FR-PW-05/06</td>
+                        <td>Cross-Pillar Search</td>
+                        <td>platform_search_index + LLM parsing</td>
+                        <td><span style="color: #27ae60; font-weight: bold;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>FR-PW-07/08</td>
+                        <td>Greyin Score</td>
+                        <td>Bayesian shrinkage, multi-platform</td>
+                        <td><span style="color: #27ae60; font-weight: bold;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>FR-PW-40/41/42/43</td>
+                        <td>Dark/Light Mode</td>
+                        <td>Tailwind dark:class, 240+ variants</td>
+                        <td><span style="color: #27ae60; font-weight: bold;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>FR-PW-34</td>
+                        <td>Idle Session Timeout</td>
+                        <td>20 min + 2 min warning</td>
+                        <td><span style="color: #27ae60; font-weight: bold;">✓</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>2.2 Monetization & Subscriptions</h3>
+            <div class="box">
+                <div class="box-title">DeepEdge: Tiered Hiring Credits</div>
+                <ul>
+                    <li><strong>Model:</strong> Admin-priced self-serve subscription tiers (Basic/Pro/Premium)</li>
+                    <li><strong>Features:</strong> Job posting, profile views, contact views, job invitations</li>
+                    <li><strong>Payment:</strong> Razorpay recurring charges</li>
+                    <li><strong>Grandfathering:</strong> Pre-2026-09-04 companies get free basic tier</li>
+                </ul>
+            </div>
+
+            <div class="box">
+                <div class="box-title">FlexPro: Mentor Sessions & Monetization</div>
+                <ul>
+                    <li><strong>Session Types:</strong> 1:1, cohort, package credits</li>
+                    <li><strong>Recording Resale:</strong> Mentors can sell recorded sessions</li>
+                    <li><strong>Payment:</strong> Per-session or package bundles via Razorpay</li>
+                    <li><strong>Gating:</strong> Verified Expert only (Greyin Score ≥60)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- PART 3: PILLAR FEATURES -->
+        <section class="section">
+            <h2>Part 3: Pillar-Level Features</h2>
+
+            <h3>3.1 DeepEdge (Enterprise Hiring) — 16 Features</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Job Posting</td>
+                        <td>Employers create/manage open positions</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Job Search</td>
+                        <td>Candidates search by role, skills, location, salary, remote</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Applications</td>
+                        <td>Candidate apply with cover letter, status tracking</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Application Withdrawal</td>
+                        <td>Candidate can withdraw application at any time</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Job Close/Reopen</td>
+                        <td>Employer can pause and resume hiring</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Candidate Search</td>
+                        <td>Subscription-gated, shows Verified Experts only</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Resume Parsing</td>
+                        <td>LLM extracts employment history from PDF</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Company Reviews</td>
+                        <td>Candidates review employers anonymously</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3.2 GreyMatters (Blog) — 13 Features</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>AI-Enhanced</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Post Creation</td>
+                        <td>✗</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Post Quality Scoring</td>
+                        <td>✓ (Pre-publish LLM gate)</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Comments & Moderation</td>
+                        <td>✓ (LLM flags inappropriate)</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Newsletter</td>
+                        <td>✓ (LLM selects top posts)</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>RSS Feed</td>
+                        <td>✗</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Weekly Digests</td>
+                        <td>✓ (Auto-generated content)</td>
+                        <td><span style="color: #27ae60;">✓</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3.3 FlexPro (Freelance) — 17 Features</h3>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Gig Posting:</strong> Sellers create service listings (design, development, coaching, etc.)</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Gig Search:</strong> Buyers filter by category, price, rating, delivery time</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Order Management:</strong> Purchase, deliver, review workflow</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Mutual Reviews:</strong> Both buyer and seller can rate each other</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Mentor Sessions:</strong> Verified Experts sell 1:1, cohort, or package sessions</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Recording Resale:</strong> Mentors can monetize session recordings</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Gig Quality Assist (AI):</strong> LLM provides non-blocking seller suggestions</span>
+                </div>
+            </div>
+
+            <h3>3.4 StackWorks (Peer Collaboration) — 16 Features</h3>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Project Posting:</strong> Builders pitch ideas for collaboration</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Ask Creation:</strong> Call for specific roles (backend, design, product, etc.)</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Outcome Verification (AI):</strong> LLM reviews GitHub history + creator review for quality</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Greyin Score Feed:</strong> Verified outcomes contribute to Greyin Score</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Upvoting:</strong> Community signal for project ranking</span>
+                </div>
+            </div>
+
+            <h3>3.5 Salt & Pepper (Senior Community) — 18 Features</h3>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Discussions:</strong> Verified members only (12+ years experience)</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Pre-Publish Moderation (AI):</strong> LLM flags guideline violations before post</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Karma System:</strong> Upvotes/downvotes build reputation</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Trust Levels:</strong> Badges based on age + karma score</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span><strong>Member Directory:</strong> Browse verified experts by expertise area</span>
+                </div>
+            </div>
+
+            <h3>3.6 Longlist (Future Hiring) — 9 Features</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Quiet Roles</td>
+                        <td>Employers post roles not yet public</td>
+                    </tr>
+                    <tr>
+                        <td>Subscriptions</td>
+                        <td>Candidates subscribe to role types/departments</td>
+                    </tr>
+                    <tr>
+                        <td>Alerts</td>
+                        <td>Email digests when roles publish (weekly/monthly)</td>
+                    </tr>
+                    <tr>
+                        <td>Public Directory</td>
+                        <td>Browse published roles by employer</td>
+                    </tr>
+                    <tr>
+                        <td>AI Recommendations</td>
+                        <td>LLM matches candidates to stored roles</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- PART 4: AI FEATURES -->
+        <section class="section">
+            <h2>Part 4: AI Inference & Calculations</h2>
+
+            <h3>4.1 LLM Infrastructure</h3>
+            <div class="diagram-container">
+                <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+                    <text x="450" y="25" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+                        LLM Feature Matrix
+                    </text>
+                    
+                    <rect x="50" y="50" width="800" height="40" fill="#34495e" stroke="#2c3e50" stroke-width="1" rx="3"/>
+                    <text x="80" y="75" font-size="11" font-weight="bold" fill="white">Feature</text>
+                    <text x="280" y="75" font-size="11" font-weight="bold" fill="white">Pillar</text>
+                    <text x="420" y="75" font-size="11" font-weight="bold" fill="white">Use Case</text>
+                    <text x="650" y="75" font-size="11" font-weight="bold" fill="white">Status</text>
+                    
+                    <g id="rows">
+                        <!-- Post Quality -->
+                        <rect x="50" y="95" width="800" height="35" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+                        <text x="80" y="117" font-size="10">Post Quality Scoring</text>
+                        <text x="280" y="117" font-size="10">GreyMatters</text>
+                        <text x="420" y="117" font-size="10">Pre-publish gate</text>
+                        <text x="650" y="117" font-size="10" fill="#27ae60" font-weight="bold">✓ Active</text>
+                        
+                        <!-- Outcome Verification -->
+                        <rect x="50" y="135" width="800" height="35" fill="white" stroke="#bdc3c7" stroke-width="1"/>
+                        <text x="80" y="157" font-size="10">Outcome Verification</text>
+                        <text x="280" y="157" font-size="10">StackWorks</text>
+                        <text x="420" y="157" font-size="10">Score collaboration quality</text>
+                        <text x="650" y="157" font-size="10" fill="#27ae60" font-weight="bold">✓ Active</text>
+                        
+                        <!-- Gig Quality -->
+                        <rect x="50" y="175" width="800" height="35" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+                        <text x="80" y="197" font-size="10">Gig Quality Assist</text>
+                        <text x="280" y="197" font-size="10">FlexPro</text>
+                        <text x="420" y="197" font-size="10">Seller suggestions (non-blocking)</text>
+                        <text x="650" y="197" font-size="10" fill="#27ae60" font-weight="bold">✓ Active</text>
+                        
+                        <!-- Resume Parsing -->
+                        <rect x="50" y="215" width="800" height="35" fill="white" stroke="#bdc3c7" stroke-width="1"/>
+                        <text x="80" y="237" font-size="10">Resume Parsing</text>
+                        <text x="280" y="237" font-size="10">DeepEdge</text>
+                        <text x="420" y="237" font-size="10">Extract employment history</text>
+                        <text x="650" y="237" font-size="10" fill="#27ae60" font-weight="bold">✓ Active</text>
+                        
+                        <!-- Job Recommendations -->
+                        <rect x="50" y="255" width="800" height="35" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+                        <text x="80" y="277" font-size="10">Job Recommendations</text>
+                        <text x="280" y="277" font-size="10">DeepEdge</text>
+                        <text x="420" y="277" font-size="10">k-NN ranking + feedback loop</text>
+                        <text x="650" y="277" font-size="10" fill="#27ae60" font-weight="bold">✓ Active</text>
+                        
+                        <!-- Discussion Moderation -->
+                        <rect x="50" y="295" width="800" height="35" fill="white" stroke="#bdc3c7" stroke-width="1"/>
+                        <text x="80" y="317" font-size="10">Discussion Moderation</text>
+                        <text x="280" y="317" font-size="10">Salt &amp; Pepper</text>
+                        <text x="420" y="317" font-size="10">Pre-publish gate, flag violations</text>
+                        <text x="650" y="317" font-size="10" fill="#27ae60" font-weight="bold">✓ Active</text>
+                        
+                        <!-- NL Search -->
+                        <rect x="50" y="335" width="800" height="35" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+                        <text x="80" y="357" font-size="10">Natural Language Search</text>
+                        <text x="280" y="357" font-size="10">All Pillars</text>
+                        <text x="420" y="357" font-size="10">Parse query intent → DB filters</text>
+                        <text x="650" y="357" font-size="10" fill="#27ae60" font-weight="bold">✓ Active</text>
+                    </g>
+                </svg>
+            </div>
+
+            <h3>4.2 Greyin Score Algorithm</h3>
+            <div class="code-block">
+<code>def calculate_greyin_score(user_id):
+    # 1. Per-platform evidence collection
+    stackworks_outcomes = get_verified_outcomes(user_id, 'stackworks')
+    flexpro_completions = get_order_completions(user_id, 'flexpro')
+    saltnpepper_karma = get_discussion_karma(user_id)
+    greymatters_posts = count_published_posts(user_id)
+    
+    # 2. Bayesian shrinkage (pull outliers toward mean)
+    stackworks_score = shrink_toward_mean(
+        observed_mean = mean(stackworks_outcomes.scores),
+        population_mean = 40,
+        n = len(stackworks_outcomes),
+        precision = 10  # Higher = stronger shrinkage
+    )
+    
+    # 3. Headcount weighting (more evidence = more weight)
+    scores_by_platform = {
+        'stackworks': (stackworks_score, len(stackworks_outcomes)),
+        'flexpro': (flexpro_score, len(flexpro_completions)),
+        'saltnpepper': (saltnpepper_score, 1),
+        'greymatters': (greymatters_score, 1)
+    }
+    
+    # Weighted average with evidence counts
+    platform_composite = weighted_mean(
+        [(score, min(count, 5)) for score, count in scores_by_platform.values()]
+    )
+    
+    # 4. Add career experience (15% weight)
+    years_exp = get_years_experience(user_id)
+    experience_term = (years_exp / 30) * 100
+    
+    greyin_score = (0.85 * platform_composite) + (0.15 * experience_term)
+    
+    return max(0, min(100, int(greyin_score)))
+</code>
+            </div>
+
+            <h3>4.3 Job Recommendation Engine</h3>
+            <p><strong>Algorithm:</strong> Candidate embeddings → Job embeddings → k-NN ranking → exclude downvotes → diversity reweighting</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Step</th>
+                        <th>Computation</th>
+                        <th>Latency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1. Encode candidate</td>
+                        <td>Skills + role history → vector embedding</td>
+                        <td>&lt;100ms</td>
+                    </tr>
+                    <tr>
+                        <td>2. Encode open jobs</td>
+                        <td>Job title + description → vectors</td>
+                        <td>&lt;500ms (batch)</td>
+                    </tr>
+                    <tr>
+                        <td>3. k-NN ranking</td>
+                        <td>Cosine similarity on embeddings</td>
+                        <td>&lt;50ms</td>
+                    </tr>
+                    <tr>
+                        <td>4. Exclusion filter</td>
+                        <td>Remove recently downvoted jobs</td>
+                        <td>&lt;10ms</td>
+                    </tr>
+                    <tr>
+                        <td>5. Diversity reweight</td>
+                        <td>If 3+ downvotes, favor different roles/companies</td>
+                        <td>&lt;50ms</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.4 Outcome Verification (StackWorks)</h3>
+            <div class="note-box">
+                <strong>Process:</strong>
+                <ol>
+                    <li>Supporter submits ask completion with summary</li>
+                    <li>Project creator reviews + LLM evaluates:</li>
+                    <ul style="margin-left: 40px;">
+                        <li>Fetch linked GitHub repo</li>
+                        <li>Look for recent commits matching description</li>
+                        <li>Score implementation quality (50-100 scale)</li>
+                    </ul>
+                    <li>Creator provides human score</li>
+                    <li>Average of LLM + human score stored</li>
+                    <li>Score feeds into Greyin Score (30% platform weight)</li>
+                </ol>
+            </div>
+
+            <h3>4.5 Salary Analytics (k-Anonymity)</h3>
+            <div class="warning-box">
+                <strong>Privacy Rule:</strong> Only show aggregates with k≥3 (minimum 3 individual submissions per group)
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Role Level</th>
+                        <th>Location</th>
+                        <th>Years Exp</th>
+                        <th>Q1</th>
+                        <th>Median</th>
+                        <th>Q3</th>
+                        <th>N</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Senior Engineer</td>
+                        <td>NYC</td>
+                        <td>10-15</td>
+                        <td>$165K</td>
+                        <td>$180K</td>
+                        <td>$195K</td>
+                        <td>47</td>
+                    </tr>
+                    <tr>
+                        <td>Staff Engineer</td>
+                        <td>NYC</td>
+                        <td>15+</td>
+                        <td>$210K</td>
+                        <td>$240K</td>
+                        <td>$280K</td>
+                        <td>12</td>
+                    </tr>
+                    <tr>
+                        <td>Manager</td>
+                        <td>Remote</td>
+                        <td>10-15</td>
+                        <td>$120K</td>
+                        <td>$145K</td>
+                        <td>$170K</td>
+                        <td>23</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- PART 5: OUTCOMES & SECURITY -->
+        <section class="section">
+            <h2>Part 5: Outcomes & Deliverables</h2>
+
+            <h3>5.1 Implementation Summary</h3>
+            <ul>
+                <li><strong>Total Features:</strong> 110+ across 6 pillars + platform</li>
+                <li><strong>Database:</strong> 110+ migrations, 95 tables, 38 views</li>
+                <li><strong>Frontend:</strong> 7 Next.js apps, 169 pages darkified</li>
+                <li><strong>Testing:</strong> 100+ Playwright e2e tests</li>
+                <li><strong>Security Audits:</strong> 38 items verified closed</li>
+                <li><strong>AI Features:</strong> 8 LLM capabilities, ~$200-300/month spend</li>
+            </ul>
+
+            <h3>5.2 Security Measures</h3>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>Row-Level Security (RLS) on every table</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>Email verification on signup (double-opt-in for newsletters)</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>Password strength enforcement (8+ chars, complexity)</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>Idle session timeout (20 min + 2 min warning)</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>HTTPS/TLS everywhere (Let's Encrypt, auto-renewal)</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>HMAC-SHA256 webhook verification (Razorpay)</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>k-anonymity on salary data (3-person minimum)</span>
+                </div>
+                <div class="feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>Daily automated backups (30-day retention)</span>
+                </div>
+            </div>
+
+            <h3>5.3 Performance Metrics</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Metric</th>
+                        <th>Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Profile Page Load</td>
+                        <td>Time to First Byte + Greyin Score fetch</td>
+                        <td>&lt;200ms</td>
+                    </tr>
+                    <tr>
+                        <td>Job Recommendations</td>
+                        <td>k-NN ranking (k=10)</td>
+                        <td>&lt;100ms</td>
+                    </tr>
+                    <tr>
+                        <td>Resume Parsing</td>
+                        <td>PDF upload → employment history extraction</td>
+                        <td>&lt;2s</td>
+                    </tr>
+                    <tr>
+                        <td>Notifications Update</td>
+                        <td>Realtime subscription (WebSocket)</td>
+                        <td>&lt;500ms</td>
+                    </tr>
+                    <tr>
+                        <td>Salary Trends Query</td>
+                        <td>k-anonymity aggregate (k≥3)</td>
+                        <td>&lt;500ms</td>
+                    </tr>
+                    <tr>
+                        <td>E2E Test Suite</td>
+                        <td>100+ tests including multi-tab fuzzing</td>
+                        <td>~2 hours</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- PART 6: DEPLOYMENT -->
+        <section class="section">
+            <h2>Part 6: Deployment & Operations</h2>
+
+            <h3>6.1 Domain Configuration</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Domain</th>
+                        <th>Application</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>greyin.net</td>
+                        <td>Hub (Central Dashboard)</td>
+                        <td>Primary</td>
+                    </tr>
+                    <tr>
+                        <td>deepedge.greyin.net</td>
+                        <td>Enterprise Hiring</td>
+                        <td>Pillar</td>
+                    </tr>
+                    <tr>
+                        <td>greymatters.greyin.net</td>
+                        <td>Technical Blog</td>
+                        <td>Pillar</td>
+                    </tr>
+                    <tr>
+                        <td>flexpro.greyin.net</td>
+                        <td>Freelance Marketplace</td>
+                        <td>Pillar</td>
+                    </tr>
+                    <tr>
+                        <td>stackworks.greyin.net</td>
+                        <td>Peer Collaboration</td>
+                        <td>Pillar</td>
+                    </tr>
+                    <tr>
+                        <td>saltnpepper.greyin.net</td>
+                        <td>Senior Community</td>
+                        <td>Pillar</td>
+                    </tr>
+                    <tr>
+                        <td>longlist.greyin.net</td>
+                        <td>Future Hiring Pipeline</td>
+                        <td>Pillar</td>
+                    </tr>
+                    <tr>
+                        <td>api.greyin.net</td>
+                        <td>Kong Gateway (Internal)</td>
+                        <td>Infrastructure</td>
+                    </tr>
+                    <tr>
+                        <td>studio.greyin.net</td>
+                        <td>Supabase Admin UI</td>
+                        <td>Infrastructure</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>6.2 Database Migrations</h3>
+            <div class="note-box">
+                <strong>Total Migrations:</strong> 110+
+                <ul>
+                    <li>001: Initial schema setup</li>
+                    <li>002-030: Multi-pillar infrastructure</li>
+                    <li>031-110: Feature-specific tables, views, triggers</li>
+                </ul>
+                <strong>Auto-Application:</strong> All migrations run automatically on backend startup
+            </div>
+
+            <h3>6.3 Monitoring & Observability</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Health Check</th>
+                        <th>Alert Threshold</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>PostgreSQL</td>
+                        <td>Connection test + query health</td>
+                        <td>Failed connection after 3 retries</td>
+                    </tr>
+                    <tr>
+                        <td>Kong Gateway</td>
+                        <td>GET /health endpoint</td>
+                        <td>Non-200 response for 2 consecutive checks</td>
+                    </tr>
+                    <tr>
+                        <td>PostgREST API</td>
+                        <td>Query test view</td>
+                        <td>&gt;5s query latency</td>
+                    </tr>
+                    <tr>
+                        <td>Frontend Domains</td>
+                        <td>HTTPS 200 OK</td>
+                        <td>5-minute interval via UptimeRobot</td>
+                    </tr>
+                    <tr>
+                        <td>Disk Space</td>
+                        <td>Storage usage percentage</td>
+                        <td>&gt;80% capacity alert</td>
+                    </tr>
+                    <tr>
+                        <td>CPU/Memory</td>
+                        <td>Resource utilization</td>
+                        <td>&gt;85% utilization for 5+ min</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- CONCLUSION -->
+        <section class="section">
+            <h2>Conclusion</h2>
+            <p>Greyin is a <strong>production-grade, feature-complete B2B/B2C marketplace platform</strong> with unified architecture, verified expertise tracking, AI-augmented matching, and privacy-first design.</p>
+            
+            <div class="box">
+                <div class="box-title">Core Capabilities</div>
+                <ol>
+                    <li><strong>Unified Architecture:</strong> 6 pillar apps + Hub, single auth, shared Greyin Score</li>
+                    <li><strong>Verified Expertise:</strong> Bayesian-shrunk reputation score + Verified Expert gate</li>
+                    <li><strong>Smart Matching:</strong> AI-powered recommendations, verification, endorsements</li>
+                    <li><strong>Monetization:</strong> Tiered subscriptions, mentor bookings, freelance orders</li>
+                    <li><strong>AI-Augmented:</strong> LLM-powered content quality, verification, moderation</li>
+                    <li><strong>Privacy-First:</strong> k-anonymized data, anonymous ratings, RLS everywhere</li>
+                    <li><strong>Enterprise-Grade:</strong> Security audits, daily backups, HTTPS, rate limiting, dark/light mode</li>
+                </ol>
+            </div>
+
+            <p style="margin-top: 30px;"><strong>Status:</strong> All 6 pillars operational, monetization active, 100+ e2e tests passing, production-ready for user growth.</p>
+        </section>
+
+        <footer>
+            <p>Greyin Platform Architecture Documentation v1.0 — Generated 2026-09-07</p>
+            <p>For technical questions or design reviews, refer to <strong>docs/architecture/ARCHITECTURE_DECISIONS.md</strong> for rationale behind major architectural choices.</p>
+        </footer>
+    </div>
+</body>
+</html>

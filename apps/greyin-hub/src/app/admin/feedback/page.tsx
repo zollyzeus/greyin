@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { SiteHeader } from '@/components/SiteHeader'
 import { ArrowLeft, MessageSquareHeart, Star } from 'lucide-react'
 
 export default async function AdminFeedbackPage() {
@@ -31,8 +30,7 @@ export default async function AdminFeedbackPage() {
     .limit(20)
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <SiteHeader />
+    <>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/admin" className="flex items-center text-gray-600 hover:text-indigo-600 mb-6 dark:text-gray-400">
@@ -104,6 +102,6 @@ export default async function AdminFeedbackPage() {
           )}
         </div>
       </div>
-    </main>
+    </>
   )
 }

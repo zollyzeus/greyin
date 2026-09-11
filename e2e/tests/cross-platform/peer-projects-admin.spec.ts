@@ -79,10 +79,13 @@ test('an admin sees a flagged reciprocal-rating project and can delete it', asyn
   await login(adminPage, admin, `${hubBase}/dashboard`, hubBase)
   await adminPage.goto(`${hubBase}/admin/peer-projects`)
   await expect(adminPage.getByText(projectTitle)).toBeVisible()
-  await expect(adminPage.getByText('⚠ Possible reciprocal rating')).toBeVisible()
 
+  // Scope the flag assertion to this test's own project row -- a leftover
+  // flagged project from an earlier interrupted run makes an unscoped
+  // getByText a strict-mode violation.
   const projectRow = adminPage.locator('div.bg-white.rounded-lg.shadow-sm.border').filter({ hasText: projectTitle })
   await expect(projectRow).toHaveCount(1)
+  await expect(projectRow.getByText('⚠ Possible reciprocal rating')).toBeVisible()
   await projectRow.getByRole('button', { name: 'Delete' }).click()
   await adminPage.waitForURL(`${hubBase}/admin/peer-projects`)
   await expect(adminPage.getByText(projectTitle)).not.toBeVisible()

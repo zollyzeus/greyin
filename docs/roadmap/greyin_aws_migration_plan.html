@@ -1,0 +1,434 @@
+<title>Greyin AWS Migration Path</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef0ea;
+    --paper-raised: #ffffff;
+    --paper-sunk: #e2e5dd;
+    --ink: #1b211d;
+    --ink-soft: #545e56;
+    --ink-faint: #838d84;
+    --line: #d3d8cd;
+    --line-strong: #b7bdb0;
+    --accent: #9c7429;
+    --accent-ink: #5f4718;
+    --accent-soft: #f1e5c9;
+    --risk: #a83d2c;
+    --risk-soft: #f4e0da;
+    --risk-ink: #7a2c1f;
+    --scale: #2c7a54;
+    --scale-soft: #dcefe2;
+    --scale-ink: #1e5a3d;
+    --shadow: 0 1px 2px rgba(27,33,29,0.06), 0 8px 26px -10px rgba(27,33,29,0.2);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #14181a; --paper-raised: #1b2124; --paper-sunk: #101314;
+      --ink: #e9ece5; --ink-soft: #aeb6ac; --ink-faint: #7c847b;
+      --line: #2c332e; --line-strong: #3c453d;
+      --accent: #d9ab5a; --accent-ink: #f0d29a; --accent-soft: #3a2f1a;
+      --risk: #e08267; --risk-soft: #3a231d; --risk-ink: #f0b09d;
+      --scale: #6bcb98; --scale-soft: #16281f; --scale-ink: #a7e6c4;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 8px 30px -10px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #14181a; --paper-raised: #1b2124; --paper-sunk: #101314;
+    --ink: #e9ece5; --ink-soft: #aeb6ac; --ink-faint: #7c847b;
+    --line: #2c332e; --line-strong: #3c453d;
+    --accent: #d9ab5a; --accent-ink: #f0d29a; --accent-soft: #3a2f1a;
+    --risk: #e08267; --risk-soft: #3a231d; --risk-ink: #f0b09d;
+    --scale: #6bcb98; --scale-soft: #16281f; --scale-ink: #a7e6c4;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 8px 30px -10px rgba(0,0,0,0.55);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 15.5px;
+    line-height: 1.6;
+  }
+  ::selection { background: var(--accent-soft); color: var(--accent-ink); }
+  h1, h2, h3 { font-family: "Fraunces", ui-serif, Georgia, serif; text-wrap: balance; margin: 0; }
+  code, .mono, .fig text { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  a { color: var(--accent-ink); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: clamp(1.5rem, 4vw, 3.2rem) clamp(1.25rem, 4vw, 2rem) 5rem; }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent-ink); background: var(--accent-soft);
+    display: inline-block; padding: 0.28em 0.7em; border-radius: 3px; margin-bottom: 1rem;
+  }
+  h1.title { font-size: clamp(1.6rem, 3vw, 2.3rem); font-weight: 600; letter-spacing: -0.01em; }
+
+  .verdict {
+    margin-top: 1.4rem;
+    padding: 1.2rem 1.4rem;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    box-shadow: var(--shadow);
+    max-width: 78ch;
+    font-size: 1rem;
+  }
+  .verdict b { color: var(--accent-ink); }
+
+  section { margin-top: 3rem; }
+  h2.sec { font-size: 1.15rem; font-weight: 500; margin-bottom: 0.3rem; }
+  p.sub { color: var(--ink-soft); font-size: 0.88rem; max-width: 70ch; margin-top: 0.2rem; margin-bottom: 1.3rem; }
+
+  figure { margin: 0; }
+  .fig-frame {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 1.2rem clamp(0.6rem, 2vw, 1.6rem);
+    overflow-x: auto;
+  }
+  .fig-frame svg { width: 100%; height: auto; display: block; min-width: 640px; }
+  figcaption {
+    margin-top: 0.7rem;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    max-width: 78ch;
+  }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 1.1rem; margin-top: 1rem; font-size: 0.78rem; color: var(--ink-soft); }
+  .legend .sw { display: inline-flex; align-items: center; gap: 0.4em; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  .callouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.9rem; margin-top: 1.6rem; }
+  .callout {
+    padding: 0.95rem 1.1rem;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--paper-sunk);
+    font-size: 0.86rem;
+    color: var(--ink-soft);
+  }
+  .callout .lbl { display: block; font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .callout.keep .lbl { color: var(--scale-ink); }
+  .callout.change .lbl { color: var(--accent-ink); }
+  .callout.drop .lbl { color: var(--risk-ink); }
+  .callout b { color: var(--ink); }
+
+  .gaps { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1.3rem; }
+  .gap-card {
+    display: grid;
+    grid-template-columns: 2.1rem 1fr;
+    gap: 0.2rem 0.9rem;
+    padding: 0.95rem 1.1rem;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    box-shadow: var(--shadow);
+  }
+  .gap-card .num { font-family: "IBM Plex Mono", monospace; font-size: 0.95rem; font-weight: 600; color: var(--ink-faint); padding-top: 0.1rem; }
+  .gap-card .head { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+  .gap-card h3 { font-size: 0.98rem; font-weight: 600; font-family: "IBM Plex Sans", sans-serif; }
+  .gap-card p { margin: 0.35rem 0 0; font-size: 0.87rem; color: var(--ink-soft); grid-column: 2; max-width: 72ch; }
+  .sevtag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.18em 0.55em; border-radius: 4px;
+  }
+  .sevtag.blocker { background: var(--risk-soft); color: var(--risk-ink); }
+  .sevtag.decision { background: var(--accent-soft); color: var(--accent-ink); }
+  .sevtag.oversight { background: var(--paper-sunk); color: var(--ink-soft); border: 1px solid var(--line-strong); }
+
+  footer.end {
+    margin-top: 3.5rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    max-width: 74ch;
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <span class="eyebrow">Revised verdict &middot; 2026-08-31</span>
+  <h1 class="title">Greyin&rsquo;s path to AWS</h1>
+  <div class="verdict">
+    <b>Don&rsquo;t move yet.</b> Greyin is pre-revenue, has zero real users on prod, and its single self-managed VPS has held up under every real load this session has thrown at it (166+ e2e runs, no infra failure). A hyperscaler move right now trades a working ~$30/mo box for a realistic $150&ndash;250/mo floor and a real jump in operational surface (VPC, IAM, ECS, secrets, CI/CD) to solve a scaling problem that doesn&rsquo;t exist yet. The architecture already in place — Postgres + RLS, containerized apps — is exactly what keeps this option cheap to exercise later; waiting doesn&rsquo;t cost you the option. Below: why, the cheaper middle step if partial reliability is wanted sooner, the concrete triggers that should flip this call, and — once one fires — the path this page originally laid out.
+  </div>
+
+  <section>
+    <h2 class="sec">Should Greyin move to a hyperscaler at all, right now?</h2>
+    <p class="sub">No. Not because the architecture wouldn&rsquo;t survive it — it would — but because nothing today needs it, and the cost of finding out is real money at a stage where every dollar is runway.</p>
+    <div class="callouts">
+      <div class="callout drop"><span class="lbl">No revenue, no users</span>Prod has never carried a real end user. There is no uptime SLA to meet, no traffic pattern to absorb, no customer asking for it. Migrating now optimizes for a load profile that doesn&rsquo;t exist.</div>
+      <div class="callout drop"><span class="lbl">The VPS hasn&rsquo;t actually failed</span>One node has carried this session&rsquo;s entire e2e history — 166+ tests in a single run, repeated full-suite passes — with zero infra-caused outage. The evidence for &ldquo;this can&rsquo;t scale&rdquo; doesn&rsquo;t exist yet; the evidence for &ldquo;this has held up fine&rdquo; does.</div>
+      <div class="callout drop"><span class="lbl">Real cost jump</span>Rough floor, not a quote: Supabase Cloud Pro ~$25 + Fargate compute for 6 apps ~$60 + ALB ~$20 + NAT Gateway ~$35 (a fixed hourly charge regardless of traffic) + CloudFront/Route 53/Secrets Manager ~$10&ndash;15 &asymp; <b>$150&ndash;250/mo</b>, against a current all-in ~$24&ndash;40/mo. That&rsquo;s 5&ndash;8&times;, mostly in charges that don&rsquo;t scale down to zero even at zero traffic.</div>
+      <div class="callout drop"><span class="lbl">Opportunity cost</span>The audit two passes back found 13 real functional gaps (self-service job close/reopen, OAuth, feedback loop, pre-publish moderation) that move Greyin toward actually having users. At MVP stage, that&rsquo;s very likely the higher-value use of the same engineering hours.</div>
+      <div class="callout keep"><span class="lbl">Optionality isn&rsquo;t decaying</span>Because the app already speaks Postgres + RLS through a portable client shape, this option stays just as cheap to exercise in six months as it is today. Nothing about waiting locks anything in — the opposite of, say, building on Emergent&rsquo;s proprietary object-storage API, which does get more expensive to leave the longer it&rsquo;s used.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">If partial reliability is wanted sooner, there&rsquo;s a cheaper middle step</h2>
+    <p class="sub">The full plan below bundles two separate decisions — &ldquo;do I want managed, multi-AZ Postgres&rdquo; and &ldquo;do I want a full hyperscaler re-architecture&rdquo; — that don&rsquo;t have to move together.</p>
+    <div class="callouts">
+      <div class="callout change"><span class="lbl">Do</span>Move just the database to <b>Supabase Cloud</b> (~$25/mo to start) if the single point of failure on Postgres specifically is the actual worry — same client calls, same RLS, a <code>pg_dump</code>/restore away.</div>
+      <div class="callout keep"><span class="lbl">Don&rsquo;t (yet)</span>Leave the 6 Next.js apps exactly where they are, or at most move them to a lightweight PaaS (Fly.io, Render, Railway) if the VPS itself becomes the concern — a fraction of ECS/VPC/ALB&rsquo;s operational weight for a team this size.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">Is this even an AWS-specific decision?</h2>
+    <p class="sub">Mostly no — worth naming since the previous pass framed this as &ldquo;AWS&rdquo; specifically. The one concrete thing pulling toward AWS was &ldquo;Supabase Cloud happens to run on AWS,&rdquo; but the app never talks to an AWS API directly through that path — it talks to a Supabase endpoint. Supabase Cloud project region/provider is a setting, not an architectural commitment. This only becomes a real AWS-vs-GCP-vs-Azure decision the day something in the stack starts calling a hyperscaler&rsquo;s native APIs directly (Lambda, native S3, SES) — not before.</p>
+  </section>
+
+  <section>
+    <h2 class="sec">Triggers that should flip this recommendation</h2>
+    <p class="sub">Revisit this page when any one of these is true, not on a calendar.</p>
+    <div class="gaps">
+      <div class="gap-card"><div class="num">&rarr;</div><div class="head"><h3>Real paying customers with an uptime expectation</h3></div><p>A revenue commitment changes what an outage costs — that&rsquo;s the actual trigger for HA, not the architecture diagram existing.</p></div>
+      <div class="gap-card"><div class="num">&rarr;</div><div class="head"><h3>The VPS actually runs out of headroom</h3></div><p>CPU/RAM/disk pressure under real (not test) load — measured, not guessed.</p></div>
+      <div class="gap-card"><div class="num">&rarr;</div><div class="head"><h3>A customer or compliance ask specifically requires it</h3></div><p>An enterprise buyer needing SOC2/a named cloud provider is a real, external forcing function — very different from a self-imposed one.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">Today vs. the recommended target — once one of the triggers above fires</h2>
+    <p class="sub">What changes is everything below the Supabase client URL. What doesn&rsquo;t change is every line of app code that calls it.</p>
+    <figure class="fig-frame">
+      <svg viewBox="0 0 1040 490" role="img" aria-label="Left: current single-VPS Docker Swarm deployment running 6 Next.js apps and a full self-hosted Supabase stack on one node, no high availability. Right: recommended AWS target — Route 53 and CloudFront/ALB route to 6 Next.js apps on auto-scaling ECS Fargate, which call Supabase Cloud, a managed multi-AZ service, using the same client calls and RLS policies unchanged, with file storage on Amazon S3. A dashed divider between the two panels is labeled MIGRATE: app code and RLS policies unchanged, only the substrate moves.">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+          <marker id="arrowAccent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+
+        <!-- ============ LEFT PANEL: TODAY ============ -->
+        <text x="240" y="26" text-anchor="middle" font-size="12" font-weight="600" letter-spacing="0.08em" fill="currentColor">TODAY</text>
+        <circle cx="240" cy="52" r="14" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="240" y="56" text-anchor="middle" font-size="10">users</text>
+        <line x1="240" y1="66" x2="240" y2="88" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+        <text x="252" y="80" font-size="10" fill="var(--ink-soft)">DNS A record</text>
+
+        <rect x="20" y="88" width="440" height="372" rx="10" fill="none" stroke="var(--risk)" stroke-width="1.4" stroke-dasharray="5 4"/>
+        <text x="40" y="112" font-size="11.5" font-weight="600" fill="var(--risk-ink)">Single VPS &middot; Docker Swarm</text>
+        <text x="40" y="128" font-size="9.5" fill="var(--ink-faint)">Hetzner/DigitalOcean &middot; one node &middot; ~$24&ndash;40/mo</text>
+
+        <rect x="50" y="146" width="380" height="56" rx="6" fill="var(--paper-sunk)" stroke="var(--line-strong)"/>
+        <text x="240" y="170" text-anchor="middle" font-size="11.5" font-weight="600">6&times; Next.js app containers</text>
+        <text x="240" y="186" text-anchor="middle" font-size="9.5" fill="var(--ink-faint)">greyin-b2b &middot; hub &middot; freeagent &middot; s&amp;p &middot; stackedge &middot; greymatters</text>
+
+        <line x1="240" y1="202" x2="240" y2="228" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+        <text x="252" y="219" font-size="9.5" fill="var(--ink-soft)">cookie session</text>
+
+        <rect x="50" y="228" width="380" height="180" rx="6" fill="var(--paper-sunk)" stroke="var(--line-strong)"/>
+        <text x="240" y="250" text-anchor="middle" font-size="11.5" font-weight="600">Self-hosted Supabase stack</text>
+        <text x="70" y="270" font-size="10">Postgres + RLS</text>
+        <text x="70" y="288" font-size="10">GoTrue (auth)</text>
+        <text x="70" y="306" font-size="10">PostgREST</text>
+        <text x="70" y="324" font-size="10">Storage-api &rarr; local file volume</text>
+        <text x="70" y="342" font-size="10">Kong (gateway) &middot; Realtime</text>
+        <line x1="60" y1="352" x2="420" y2="352" stroke="var(--line)"/>
+        <text x="240" y="372" text-anchor="middle" font-size="9.5" fill="var(--risk-ink)">one Postgres instance, one disk, one process per service</text>
+        <text x="240" y="388" text-anchor="middle" font-size="9.5" fill="var(--risk-ink)">— all on the same node</text>
+
+        <rect x="50" y="422" width="380" height="28" rx="14" fill="var(--risk-soft)"/>
+        <text x="240" y="440" text-anchor="middle" font-size="10" font-weight="600" fill="var(--risk-ink)">node dies &rarr; everything is down &middot; no HA</text>
+
+        <!-- ============ DIVIDER ============ -->
+        <line x1="520" y1="40" x2="520" y2="480" stroke="var(--accent)" stroke-width="1.4" stroke-dasharray="2 5"/>
+        <text x="520" y="30" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="0.05em" fill="var(--accent-ink)">MIGRATE</text>
+        <text x="500" y="245" text-anchor="middle" font-size="9.5" fill="var(--accent-ink)" transform="rotate(-90 500 245)">app code + RLS policies: unchanged</text>
+        <text x="540" y="245" text-anchor="middle" font-size="9.5" fill="var(--accent-ink)" transform="rotate(-90 540 245)">only the substrate underneath moves</text>
+
+        <!-- ============ RIGHT PANEL: RECOMMENDED ============ -->
+        <text x="800" y="26" text-anchor="middle" font-size="12" font-weight="600" letter-spacing="0.08em" fill="currentColor">RECOMMENDED &middot; AWS</text>
+        <circle cx="800" cy="52" r="14" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="800" y="56" text-anchor="middle" font-size="10">users</text>
+        <line x1="800" y1="66" x2="800" y2="86" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+        <rect x="730" y="86" width="140" height="30" rx="6" fill="var(--paper-sunk)" stroke="var(--line-strong)"/>
+        <text x="800" y="105" text-anchor="middle" font-size="10.5" font-weight="600">Route 53</text>
+
+        <line x1="800" y1="116" x2="800" y2="136" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+        <rect x="680" y="136" width="240" height="32" rx="6" fill="var(--paper-sunk)" stroke="var(--line-strong)"/>
+        <text x="800" y="156" text-anchor="middle" font-size="10.5" font-weight="600">CloudFront + ALB</text>
+
+        <line x1="800" y1="168" x2="800" y2="190" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+        <rect x="600" y="190" width="400" height="86" rx="8" fill="var(--scale-soft)" stroke="var(--scale)" stroke-width="1.2"/>
+        <text x="800" y="212" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--scale-ink)">ECS Fargate &middot; auto-scaling</text>
+        <rect x="625" y="224" width="90" height="34" rx="5" fill="var(--paper-raised)" stroke="var(--line-strong)"/>
+        <rect x="725" y="224" width="90" height="34" rx="5" fill="var(--paper-raised)" stroke="var(--line-strong)"/>
+        <rect x="825" y="224" width="150" height="34" rx="5" fill="var(--paper-raised)" stroke="var(--line-strong)"/>
+        <text x="670" y="245" text-anchor="middle" font-size="9">task</text>
+        <text x="770" y="245" text-anchor="middle" font-size="9">task</text>
+        <text x="900" y="245" text-anchor="middle" font-size="9">&hellip; &times;N tasks, 6 apps</text>
+        <text x="800" y="270" text-anchor="middle" font-size="9" fill="var(--scale-ink)">scales out on load, multi-AZ</text>
+
+        <line x1="800" y1="276" x2="800" y2="300" stroke="var(--accent)" stroke-width="1.6" marker-end="url(#arrowAccent)"/>
+        <text x="800" y="294" text-anchor="middle" font-size="9.5" font-weight="600" fill="var(--accent-ink)">same Supabase client calls + RLS &mdash; unchanged</text>
+
+        <rect x="600" y="304" width="270" height="140" rx="8" fill="var(--paper-sunk)" stroke="var(--line-strong)"/>
+        <text x="735" y="326" text-anchor="middle" font-size="11.5" font-weight="600">Supabase Cloud</text>
+        <text x="735" y="340" text-anchor="middle" font-size="9" fill="var(--ink-faint)">managed &middot; runs on AWS &middot; Multi-AZ</text>
+        <text x="622" y="360" font-size="10">Postgres + RLS</text>
+        <text x="622" y="378" font-size="10">GoTrue (auth)</text>
+        <text x="622" y="396" font-size="10">PostgREST</text>
+        <text x="622" y="414" font-size="10">Realtime</text>
+        <text x="735" y="432" text-anchor="middle" font-size="9" fill="var(--scale-ink)">automated backups &middot; failover</text>
+
+        <line x1="870" y1="374" x2="900" y2="374" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+        <rect x="900" y="330" width="100" height="88" rx="8" fill="var(--scale-soft)" stroke="var(--scale)"/>
+        <text x="950" y="352" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--scale-ink)">Amazon</text>
+        <text x="950" y="366" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--scale-ink)">S3</text>
+        <text x="950" y="386" text-anchor="middle" font-size="8.5" fill="var(--scale-ink)">resumes,</text>
+        <text x="950" y="398" text-anchor="middle" font-size="8.5" fill="var(--scale-ink)">images</text>
+        <text x="800" y="465" text-anchor="middle" font-size="9.5" fill="var(--ink-faint)">STORAGE_BACKEND=s3 &mdash; already a config toggle, no app change</text>
+      </svg>
+      <figcaption>Left: the current deployment — 6 app containers and the full Supabase stack sharing one Docker Swarm node. Right: the recommended target — the same apps and the same Supabase-shaped data layer, just running as managed, multi-AZ AWS services. The gold arrow is the whole point: everything above it is identical code.</figcaption>
+    </figure>
+    <div class="legend">
+      <span class="sw"><span class="dot" style="background:var(--risk)"></span>single point of failure today</span>
+      <span class="sw"><span class="dot" style="background:var(--scale)"></span>managed / auto-scaling / multi-AZ</span>
+      <span class="sw"><span class="dot" style="background:var(--accent)"></span>the unchanged contract</span>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">Get there in five steps, not one leap</h2>
+    <p class="sub">For when a trigger above actually fires. Each step ships independently and de-risks the next one. Nothing here requires an app-code rewrite.</p>
+    <figure class="fig-frame">
+      <svg viewBox="0 0 1040 170" role="img" aria-label="Five-step migration path: step 0, clean up leftover GreyMatters test data; step 1, flip the storage backend to S3, a zero-code config change; step 2, cut over from self-hosted Supabase to Supabase Cloud via pg_dump and restore; step 3, move the six Next.js apps to ECS Fargate behind ALB; step 4, build the realtime notification bell on Supabase Realtime from day one instead of an in-memory socket.">
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <line x1="70" y1="60" x2="970" y2="60" stroke="var(--line-strong)" stroke-width="1.2"/>
+        <!-- nodes -->
+        <g>
+          <circle cx="70" cy="60" r="19" fill="var(--paper-sunk)" stroke="var(--ink-soft)" stroke-width="1.3"/>
+          <text x="70" y="65" text-anchor="middle" font-size="13" font-weight="700">0</text>
+          <text x="70" y="98" text-anchor="middle" font-size="10" font-weight="600">Clean up</text>
+          <text x="70" y="112" text-anchor="middle" font-size="9" fill="var(--ink-faint)">GreyMatters</text>
+          <text x="70" y="124" text-anchor="middle" font-size="9" fill="var(--ink-faint)">test posts</text>
+        </g>
+        <line x1="94" y1="60" x2="286" y2="60" stroke="currentColor" stroke-width="1.2" marker-end="url(#arrow2)"/>
+        <g>
+          <circle cx="310" cy="60" r="19" fill="var(--scale-soft)" stroke="var(--scale)" stroke-width="1.3"/>
+          <text x="310" y="65" text-anchor="middle" font-size="13" font-weight="700" fill="var(--scale-ink)">1</text>
+          <text x="310" y="98" text-anchor="middle" font-size="10" font-weight="600">Storage &rarr; S3</text>
+          <text x="310" y="112" text-anchor="middle" font-size="9" fill="var(--ink-faint)">config toggle,</text>
+          <text x="310" y="124" text-anchor="middle" font-size="9" fill="var(--ink-faint)">zero app code</text>
+        </g>
+        <line x1="334" y1="60" x2="526" y2="60" stroke="currentColor" stroke-width="1.2" marker-end="url(#arrow2)"/>
+        <g>
+          <circle cx="550" cy="60" r="19" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.3"/>
+          <text x="550" y="65" text-anchor="middle" font-size="13" font-weight="700" fill="var(--accent-ink)">2</text>
+          <text x="550" y="98" text-anchor="middle" font-size="10" font-weight="600">Supabase Cloud</text>
+          <text x="550" y="112" text-anchor="middle" font-size="9" fill="var(--ink-faint)">pg_dump &rarr; restore,</text>
+          <text x="550" y="124" text-anchor="middle" font-size="9" fill="var(--ink-faint)">swap URL + keys</text>
+        </g>
+        <line x1="574" y1="60" x2="766" y2="60" stroke="currentColor" stroke-width="1.2" marker-end="url(#arrow2)"/>
+        <g>
+          <circle cx="790" cy="60" r="19" fill="var(--scale-soft)" stroke="var(--scale)" stroke-width="1.3"/>
+          <text x="790" y="65" text-anchor="middle" font-size="13" font-weight="700" fill="var(--scale-ink)">3</text>
+          <text x="790" y="98" text-anchor="middle" font-size="10" font-weight="600">Apps &rarr; Fargate</text>
+          <text x="790" y="112" text-anchor="middle" font-size="9" fill="var(--ink-faint)">existing images,</text>
+          <text x="790" y="124" text-anchor="middle" font-size="9" fill="var(--ink-faint)">behind ALB</text>
+        </g>
+        <line x1="814" y1="60" x2="946" y2="60" stroke="currentColor" stroke-width="1.2" marker-end="url(#arrow2)"/>
+        <g>
+          <circle cx="970" cy="60" r="19" fill="var(--paper-sunk)" stroke="var(--ink-soft)" stroke-width="1.3"/>
+          <text x="970" y="65" text-anchor="middle" font-size="13" font-weight="700">4</text>
+          <text x="970" y="98" text-anchor="middle" font-size="10" font-weight="600">Realtime bell</text>
+          <text x="970" y="112" text-anchor="middle" font-size="9" fill="var(--ink-faint)">on Supabase</text>
+          <text x="970" y="124" text-anchor="middle" font-size="9" fill="var(--ink-faint)">Realtime, day one</text>
+        </g>
+      </svg>
+      <figcaption>Step 1 is deliberately the lowest-risk possible first rep on real AWS credentials — nothing user-facing depends on it. Step 4 is a &ldquo;build it already-scalable&rdquo; note, not a migration task: when the notification bell gets built, it should ride Supabase Realtime from the start rather than repeat Emergent&rsquo;s in-memory-socket trap.</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2 class="sec">What this deliberately does <em>not</em> do</h2>
+    <div class="callouts">
+      <div class="callout keep"><span class="lbl">Keep</span>Every RLS policy, every Supabase client call, every migration file — all 86 of them apply to Supabase Cloud unchanged.</div>
+      <div class="callout change"><span class="lbl">Change</span>Only the hosting substrate: one VPS &rarr; managed multi-AZ services. The app never notices.</div>
+      <div class="callout drop"><span class="lbl">Rejected</span>Full decompose to RDS + Cognito + native S3 SDK. Technically possible, but rewrites the auth/RLS layer for no functional gain — the coupling to Supabase&rsquo;s JWT shape makes this the expensive path, not the natural one.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">Gaps in this plan, before it&rsquo;s executable</h2>
+    <p class="sub">For whenever a trigger fires — the five steps above are the right <em>order</em>, but not yet a runbook. Each of the following needs an answer first, ranked by what actually blocks starting vs. what just needs a decision on record.</p>
+
+    <div class="gaps">
+      <div class="gap-card">
+        <div class="num">01</div>
+        <div class="head"><h3>Cost estimate is order-of-magnitude, not a quote</h3><span class="sevtag blocker">blocker</span></div>
+        <p>The $150&ndash;250/mo figure above is built from known fixed-charge line items (ALB, NAT Gateway), not a real AWS pricing calculator run or a Supabase Cloud usage projection. Good enough to see the shape of the decision now; not good enough to budget against — get a real number before the day this is actually triggered.</p>
+      </div>
+      <div class="gap-card">
+        <div class="num">02</div>
+        <div class="head"><h3>No cutover runbook</h3><span class="sevtag blocker">blocker</span></div>
+        <p>Step 2 says &ldquo;pg_dump &rarr; restore, swap URL + keys&rdquo; as if it&rsquo;s one motion. It isn&rsquo;t: what freezes writes during the dump, how long is that window, what&rsquo;s the DNS TTL before traffic actually follows the cutover, and what&rsquo;s the fallback if Supabase Cloud misbehaves in the first hour — flip Route 53 back to the still-warm VPS, or fix forward? None of that is decided yet.</p>
+      </div>
+      <div class="gap-card">
+        <div class="num">03</div>
+        <div class="head"><h3>&ldquo;Test against prod only&rdquo; has no answer for a substrate migration</h3><span class="sevtag blocker">blocker</span></div>
+        <p>The project&rsquo;s own standing convention is e2e runs against real prod, not an isolated stack. That convention has no meaning for a migration that, by definition, doesn&rsquo;t have a &ldquo;prod&rdquo; on the new substrate yet. This plan needs an explicit, named exception — e.g. running the full e2e suite against the new AWS stack before it takes real traffic, once only — rather than silently skipping validation or silently breaking the existing rule.</p>
+      </div>
+      <div class="gap-card">
+        <div class="num">04</div>
+        <div class="head"><h3>Secrets management unaddressed</h3><span class="sevtag decision">needs a decision</span></div>
+        <p>Every credential (<code>JWT_SECRET</code>, DB passwords, Razorpay keys, LLM provider keys) currently lives in a plain <code>.env</code> file on the VPS — the exact shape of thing this session&rsquo;s own JWT rotation had to work around. ECS task definitions want these injected from Secrets Manager or SSM Parameter Store, not baked into an image or a compose file. Worth doing as part of step 3, not left implicit.</p>
+      </div>
+      <div class="gap-card">
+        <div class="num">05</div>
+        <div class="head"><h3>No VPC/network design</h3><span class="sevtag decision">needs a decision</span></div>
+        <p>&ldquo;ECS Fargate&rdquo; isn&rsquo;t a complete answer by itself — it needs subnets (public for the ALB, private for the tasks), security groups scoped to only what talks to what, and a NAT gateway for the apps&rsquo; outbound calls (Supabase Cloud, Razorpay, the LLM providers). Undrawn in the diagram on purpose — it&rsquo;s a real step 3 sub-task, not a detail to skip.</p>
+      </div>
+      <div class="gap-card">
+        <div class="num">06</div>
+        <div class="head"><h3>Kong config carryover unverified</h3><span class="sevtag decision">needs a decision</span></div>
+        <p>The current stack has hand-signed consumer JWTs in <code>kong.yml</code> from this session&rsquo;s own SEC-011 rotation work. Supabase Cloud runs its own managed gateway — worth explicitly confirming there&rsquo;s no custom Kong routing/plugin this project depends on beyond stock Supabase behavior, rather than assuming a clean swap.</p>
+      </div>
+      <div class="gap-card">
+        <div class="num">07</div>
+        <div class="head"><h3>Bundle the parked SES fix into this same migration</h3><span class="sevtag decision">worth bundling</span></div>
+        <p>Hostinger&rsquo;s 500/hr SMTP cap is a known, already-parked issue (session memory: <code>project_smtp_rate_limit_parked.md</code>), with SES already on record as the recommended fix. An AWS migration is the natural moment to fold that in rather than carry the SMTP limitation onto the new infra unchanged.</p>
+      </div>
+      <div class="gap-card">
+        <div class="num">08</div>
+        <div class="head"><h3>No observability plan</h3><span class="sevtag oversight">oversight</span></div>
+        <p>Nothing here says how you&rsquo;d know a Fargate task is unhealthy or Supabase Cloud is degraded — ECS health checks, CloudWatch log groups/alarms, and a real on-call signal need to exist before this carries production traffic, not get added after the first incident.</p>
+      </div>
+      <div class="gap-card">
+        <div class="num">09</div>
+        <div class="head"><h3>Region alignment + version parity unverified</h3><span class="sevtag oversight">oversight</span></div>
+        <p>The Supabase Cloud project region needs to match the ECS region (cross-region DB calls would quietly add latency to every request). And this session has already hit real version-mismatch bugs more than once (the @supabase/ssr cookie-format break, the PostgREST schema-cache-reload gotcha) — worth explicitly confirming Supabase Cloud runs the same Postgres extensions and PostgREST/GoTrue versions as the self-hosted stack before assuming the migrations apply cleanly.</p>
+      </div>
+      <div class="gap-card">
+        <div class="num">10</div>
+        <div class="head"><h3>No CI/CD path stated</h3><span class="sevtag oversight">oversight</span></div>
+        <p>Deploys today are a manual shell script (<code>deploy.sh</code>, <code>docker stack deploy</code>). Step 3 implicitly assumes images land in ECR and task definitions update somehow — that pipeline (GitHub Actions or CodeBuild/CodePipeline) isn&rsquo;t designed yet, just presumed.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="end">
+    Companion documents: the full code-level feature/security audit (<a href="https://claude.ai/code/artifact/bb926e18-9b9e-46e8-8c7c-b2ae73db423e">artifact</a>, also saved at <code>docs/audits/competitive-analysis/emergent_code_audit.html</code>) and the running gap analysis at <code>docs/audits/competitive-analysis/emergent_deployment_gap.md</code>. No migration work has started — this page states the target and the order of operations, plus the open questions above that stand between it and a real runbook.
+  </footer>
+</div>

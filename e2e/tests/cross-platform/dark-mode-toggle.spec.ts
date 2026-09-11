@@ -13,7 +13,7 @@ import { test, expect } from '../../utils/fixtures'
  * with the 5 pillar apps' own saturated hero bands (only DeepEdge and
  * Greyin Hub looked finished), and rolled back at user direction in
  * favor of focusing on the existing light/dark pair. See
- * docs/ui_ux_elevation_plan.md's dated update for the full account and
+ * docs/roadmap/ui_ux_elevation_plan.md's dated update for the full account and
  * screenshots. This spec is back to the original binary check.
  *
  * Lives here, not under a single app's own tests/<app>/, because it

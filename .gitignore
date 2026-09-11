@@ -29,6 +29,13 @@ e2e/playwright-report/
 # per-file limit anyway. (greyin_b3.7z is 2.3 GB.)
 /greyin_b*.7z
 
+# Pitch-deck binaries -- iterative .pptx/.pdf revisions and the source
+# Slidesgo templates. Large, not source code, and git can't diff binary
+# formats meaningfully -- committing them bloats history permanently.
+# Files stay on disk; just untracked.
+docs/business-pitch/PitchDeck/
+docs/templates/
+
 # Database backups -- raw pg_dump output, never belongs in git regardless
 # of repo visibility. These accumulate automatically (nightly rotation)
 # and were previously committed by mistake; untracked going forward.
@@ -37,6 +44,9 @@ deployment/backups/*.sql.gz
 # OS
 .DS_Store
 Thumbs.db
+
+# LibreOffice lock files (left behind by headless soffice conversions)
+.~lock.*#
 
 # Logs
 *.log

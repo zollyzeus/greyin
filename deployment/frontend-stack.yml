@@ -81,6 +81,9 @@ services:
       # audience this stat display exists to impress. lib/supabase/service.ts
       # bypasses that for just these two read-only aggregate counts.
       - SUPABASE_SERVICE_ROLE_KEY=${SERVICE_ROLE_KEY}
+      # Runtime-only (never NEXT_PUBLIC_*): read by /api/demo-login to sign
+      # a visitor into one of the 5 curated "Launch Demo" persona accounts.
+      - DEMO_ACCOUNT_PASSWORD=${DEMO_ACCOUNT_PASSWORD}
     networks:
       - edjitsu-network
     deploy:

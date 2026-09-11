@@ -1,7 +1,78 @@
 import 'dotenv/config'
+import type { TestUser } from './testUser'
 
 const SUPABASE_URL = process.env.SUPABASE_URL!
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+function adminHeaders() {
+  return {
+    apikey: SERVICE_ROLE_KEY,
+    Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+    'Content-Type': 'application/json',
+  }
+}
+
+/**
+ * Provision a test account WITHOUT going through the signup form or
+ * GoTrue's email pipeline -- the whole point being that the shared SMTP
+ * relay (admin@greyin.net, ~500/hr, also carries real user OTP) can't
+ * absorb the ~200 confirmation sends a full suite run would otherwise
+ * fire, so it rate-limits and cascades failures through every
+ * signup-dependent spec (see project_smtp_rate_limit history).
+ *
+ * Two silent admin-API calls reproduce exactly what a real signup +
+ * emailed-OTP confirm does to the database, minus the email:
+ *  1. POST /admin/users (no email_confirm)  -> INSERT auth.users
+ *     -> on_auth_user_created / handle_new_user (placeholder profile).
+ *  2. PUT  /admin/users/{id} {email_confirm:true} -> UPDATE
+ *     -> on_auth_user_email_confirmed / handle_email_confirmed
+ *        (real role from metadata + companies/candidates/pillar_memberships).
+ * `metadata` must carry the same keys the app's own /auth/signup route
+ * puts in `options.data`: first_name, last_name, role, years_experience,
+ * and stackworks_role where the app sets it.
+ */
+export async function adminCreateAndConfirmUser(
+  user: TestUser,
+  metadata: Record<string, unknown>,
+  expectedRole?: string,
+): Promise<void> {
+  const createRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+    method: 'POST',
+    headers: adminHeaders(),
+    body: JSON.stringify({ email: user.email, password: user.password, user_metadata: metadata }),
+  })
+  if (!createRes.ok) {
+    throw new Error(`admin createUser failed for ${user.email}: ${createRes.status} ${await createRes.text()}`)
+  }
+  const created = await createRes.json()
+  const userId: string | undefined = created?.id ?? created?.user?.id
+  if (!userId) {
+    throw new Error(`admin createUser returned no id for ${user.email}: ${JSON.stringify(created).slice(0, 300)}`)
+  }
+
+  const confirmRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${userId}`, {
+    method: 'PUT',
+    headers: adminHeaders(),
+    body: JSON.stringify({ email_confirm: true }),
+  })
+  if (!confirmRes.ok) {
+    throw new Error(`admin confirm failed for ${user.email}: ${confirmRes.status} ${await confirmRes.text()}`)
+  }
+
+  if (!expectedRole) return
+  // handle_email_confirmed's profiles upsert can still be a beat behind
+  // the PUT's 200 under parallel load -- poll for the specific role, same
+  // as confirmTestUserEmail does after a form signup.
+  for (let attempt = 0; attempt < 15; attempt++) {
+    const check = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=role`, { headers: restHeaders() })
+    if (check.ok) {
+      const rows = await check.json()
+      if (rows[0]?.role === expectedRole) return
+    }
+    await new Promise((r) => setTimeout(r, 200))
+  }
+  throw new Error(`profiles.role for ${user.email} never became '${expectedRole}' after admin confirm`)
+}
 
 // This GoTrue version silently ignores the documented `?email=` filter (it
 // just returns page 1 unfiltered) and hard-caps `per_page` at 20 regardless
@@ -595,6 +666,20 @@ export async function seedReputationPoints(userId: string, points: number): Prom
 }
 
 /**
+ * Reads a user's real reputation_events rows for a given event_type --
+ * used by referrals.spec.ts to confirm redeem_referral_code() (138)
+ * actually awarded a real 'referral_converted' row, not just that the
+ * RPC returned success.
+ */
+export async function getReputationEvents(userId: string, eventType: string): Promise<Record<string, any>[]> {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/reputation_events?user_id=eq.${userId}&event_type=eq.${eventType}&select=*`,
+    { headers: restHeaders() }
+  )
+  return res.json()
+}
+
+/**
  * Seeds a StackWorks/"The Lab" project row directly via the service role,
  * for specs (e.g. Salt & Pepper's own parallel builder_projects admin
  * moderation panel) that need one to exist but aren't themselves
@@ -805,6 +890,25 @@ export async function setCandidateProfile(userId: string, fields: Record<string,
   })
   if (!res.ok) {
     throw new Error(`Failed to set candidate profile fields: ${res.status} ${await res.text()}`)
+  }
+}
+
+/**
+ * Directly overrides profiles.years_experience -- used to simulate a
+ * non-expert account without depending on the browser-signup form's
+ * own under-12-years path (which skips email verification and isn't a
+ * combination any existing spec exercised). greyin_scores.is_verified_expert
+ * recomputes live off this column (plus a qualifying Greyin Score, which
+ * a fresh account has none of), so this is enough to flip that flag.
+ */
+export async function setYearsExperience(userId: string, years: number): Promise<void> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`, {
+    method: 'PATCH',
+    headers: restHeaders(),
+    body: JSON.stringify({ years_experience: years }),
+  })
+  if (!res.ok) {
+    throw new Error(`Failed to set years_experience: ${res.status} ${await res.text()}`)
   }
 }
 

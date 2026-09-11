@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { absoluteUrl } from '@/lib/site-url'
 import { NextResponse } from 'next/server'
 
-// Recommended by docs/emergent_deployment_gap.md's UI/UX audit (2026-08-26,
+// Recommended by docs/audits/competitive-analysis/emergent_deployment_gap.md's UI/UX audit (2026-08-26,
 // re-confirmed 2026-08-31 and again 2026-09-02): live e2e-suite content
 // left on public feeds -- 10 "E2E AI Quality Post" + 35 "E2E Verified
 // Expert Only Post" entries on GreyMatters' public blog (the visible,

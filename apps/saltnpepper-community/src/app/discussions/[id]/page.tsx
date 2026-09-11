@@ -2,9 +2,11 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { sweepUnscoredReplies } from '@/lib/reply-quality'
-import { Users, ArrowLeft, User, Clock } from 'lucide-react'
+import { summarizeThread } from '@/lib/thread-summary'
+import { Users, ArrowLeft, User, Clock, Sparkles } from 'lucide-react'
 import { FollowButton } from '@/components/FollowButton'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { DiscussionVoteButtons } from '@/components/DiscussionVoteButtons'
 
 export default async function DiscussionDetailPage({
   params,
@@ -40,8 +42,14 @@ export default async function DiscussionDetailPage({
   // /dashboard instead; see sweepUnscoredReplies' own comment.
   await sweepUnscoredReplies(3, id)
 
+  const threadSummary = await summarizeThread(discussion.title, discussion.body, (replies || []).map((r) => ({ body: r.body })))
+
   const { data: myFollow } = user && discussion.author_id
     ? await supabase.from('user_follows').select('followed_id').eq('follower_id', user.id).eq('followed_id', discussion.author_id).maybeSingle()
+    : { data: null }
+
+  const { data: myVoteRow } = user
+    ? await supabase.from('discussion_votes').select('value').eq('discussion_id', id).eq('user_id', user.id).maybeSingle()
     : { data: null }
 
   return (
@@ -64,7 +72,14 @@ export default async function DiscussionDetailPage({
           Back to discussions
         </Link>
 
-        <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900">
+        <div className="bg-white rounded-lg shadow-md p-8 mb-6 dark:bg-gray-900 flex gap-6">
+          <DiscussionVoteButtons
+            discussionId={discussion.id}
+            initialScore={discussion.upvote_count || 0}
+            initialMyVote={myVoteRow?.value || 0}
+            loggedIn={!!user}
+          />
+          <div className="flex-1">
           {discussion.category && (
             <span className="inline-block px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold mb-3 dark:bg-purple-950/40 dark:text-purple-400">
               {discussion.category}
@@ -86,7 +101,18 @@ export default async function DiscussionDetailPage({
               next={`/discussions/${id}`}
             />
           )}
+          </div>
         </div>
+
+        {threadSummary && (
+          <details className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6 dark:bg-purple-950/30 dark:border-purple-900">
+            <summary className="flex items-center gap-2 text-sm font-semibold text-purple-700 cursor-pointer select-none dark:text-purple-400">
+              <Sparkles className="h-4 w-4" />
+              AI summary of this thread
+            </summary>
+            <p className="text-sm text-gray-700 mt-3 dark:text-gray-300">{threadSummary}</p>
+          </details>
+        )}
 
         <div>
           <h2 className="text-xl font-bold text-gray-900 mb-4 dark:text-gray-50">

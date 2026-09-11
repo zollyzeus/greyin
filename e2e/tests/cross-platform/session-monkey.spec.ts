@@ -85,6 +85,18 @@ test('randomized multi-tab session fuzzing finds no stale logged-in/out state', 
   })()
 
   const ctx = await browser.newContext()
+  // This spec builds its own context instead of going through the login()
+  // helper, so opt out of GuidedTour's auto-start here too -- its
+  // full-viewport overlay otherwise sits over the /dashboard sign-out
+  // control the fuzzer clicks. addInitScript is context-wide and covers
+  // every tab and navigation.
+  await ctx.addInitScript(() => {
+    try {
+      localStorage.setItem('greyin:e2e-no-tour', '1')
+    } catch {
+      /* storage blocked -- tour just auto-starts, same as a real user */
+    }
+  })
   const tabs = [await ctx.newPage(), await ctx.newPage()]
   let active = 0
   // Ground truth the fuzzer itself tracks -- the shared .greyin.net

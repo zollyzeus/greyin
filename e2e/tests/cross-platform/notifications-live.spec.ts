@@ -24,7 +24,7 @@ async function insertNotification(userId: string, type: string, title: string) {
 
 /**
  * UI/UX elevation plan, Phase 2's own missing acceptance test
- * (docs/ui_ux_elevation_plan.md names this file directly). The two
+ * (docs/roadmap/ui_ux_elevation_plan.md names this file directly). The two
  * per-app specs (deepedge/notification-bell.spec.ts,
  * saltnpepper/notification-bell.spec.ts) already cover live delivery,
  * the arrival toast, and mark-one/mark-all-read within a single app --

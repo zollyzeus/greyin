@@ -53,6 +53,27 @@ export async function POST(request: Request) {
     return NextResponse.redirect(absoluteUrl('/gigs/new'))
   }
 
+  // Emergent-parity anti-fraud gate: a gig priced above a high-value
+  // threshold requires the freelancer to already be a verified expert
+  // (greyin_scores.is_verified_expert -- 12+ years experience OR a
+  // qualifying Greyin Score per platform_gate_settings), rather than a
+  // second, disconnected years-only check. ₹25,000 is well above the
+  // real current max gig price (confirmed ~₹9,000 against prod), so no
+  // existing listing is retroactively blocked.
+  const priceMax = formData.get('price_max') ? parseInt(formData.get('price_max') as string, 10) : null
+  if (priceMax && priceMax > 25000) {
+    const { data: scoreRow } = await supabase
+      .from('greyin_scores')
+      .select('is_verified_expert')
+      .eq('user_id', user.id)
+      .maybeSingle()
+    if (!scoreRow?.is_verified_expert) {
+      return NextResponse.redirect(
+        absoluteUrl('/gigs/new?error=' + encodeURIComponent('Gigs priced above ₹25,000 require a verified-expert profile (12+ years experience or an established Greyin Score).'))
+      )
+    }
+  }
+
   const tagsRaw = formData.get('tags') as string
   const tags = tagsRaw ? tagsRaw.split(',').map((s) => s.trim()).filter(Boolean) : []
   const imageUrl = (formData.get('image_url') as string || '').trim()

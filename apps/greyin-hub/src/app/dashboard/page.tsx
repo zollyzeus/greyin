@@ -1,11 +1,13 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { BadgeCheck, Shuffle, RotateCcw, GraduationCap, ArrowUpRight, Users, User, ShieldCheck } from 'lucide-react'
+import { BadgeCheck, Shuffle, RotateCcw, GraduationCap, ArrowUpRight, Users, User, ShieldCheck, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { SiteHeader } from '@/components/SiteHeader'
 import { EcosystemWidget } from '@/components/EcosystemWidget'
 import { ActivityHeatmap } from '@/components/ActivityHeatmap'
 import { PeerProjectsSection, type PendingTag, type PeerProjectView } from '@/components/PeerProjectsSection'
+import { ReferralWidget } from '@/components/ReferralWidget'
+import { projectCareerPath } from '@/lib/career-path'
 
 // 'peer' added alongside the two existing pillar-transaction sources
 // once 089_peer_projects.sql extended collaborators to include
@@ -97,6 +99,19 @@ export default async function DashboardPage() {
     ? await supabase.from('profiles').select('id, full_name').in('id', collaboratorIds)
     : { data: [] }
 
+  // AI enhancement (Phase C2) -- cross-pillar career-path projection,
+  // live/on-demand off the user's own greyin_scores row. See
+  // apps/greyin-hub/src/lib/career-path.ts's own header comment for why
+  // this lives on the Hub rather than any single pillar app.
+  const careerPath = await projectCareerPath(user.id)
+
+  // Platform-wide referral program (138) -- create_referral_code() is an
+  // idempotent get-or-create, so this always returns the user's one
+  // permanent code (never mints a new one on repeat visits).
+  const { data: referralCode } = await supabase.rpc('create_referral_code')
+  const { data: referralStatsRows } = await supabase.rpc('get_referral_stats')
+  const referralJoinedCount = referralStatsRows?.[0]?.joined_count ?? 0
+
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <SiteHeader />
@@ -155,12 +170,26 @@ export default async function DashboardPage() {
           <ActivityHeatmap activity={activity ?? []} joinDate={profile?.created_at ?? new Date().toISOString()} />
         </div>
 
+        {careerPath && (
+          <details className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900" open>
+            <summary className="text-lg font-semibold flex items-center gap-2 cursor-pointer">
+              <Sparkles className="w-5 h-5" />
+              Your career path (AI-synthesized)
+            </summary>
+            <p className="mt-4 text-sm text-gray-700 whitespace-pre-line dark:text-gray-300">{careerPath}</p>
+          </details>
+        )}
+
         <PeerProjectsSection
           currentUserId={user.id}
           pendingTags={pendingTags}
           projects={peerProjects}
           alreadyRatedPairs={alreadyRatedPairs}
         />
+
+        {referralCode && (
+          <ReferralWidget code={referralCode} joinedCount={Number(referralJoinedCount)} />
+        )}
 
         {(profile?.is_pivoter || profile?.is_reentry || profile?.is_mentor) && (
           <div className="bg-white rounded-lg shadow p-6 mb-6 dark:bg-gray-900">

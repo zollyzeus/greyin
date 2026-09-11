@@ -53,6 +53,13 @@ export function GuidedTour({ steps, storageKey }: { steps: TourStep[]; storageKe
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (cancelled || !user) return
       setUserId(user.id)
+      // e2e escape hatch: the suite's auth helpers set this so the
+      // full-viewport auto-start overlay doesn't intercept the clicks
+      // every authenticated test makes right after landing. Real users
+      // never set it; Replay still works (separate effect, keyed off userId).
+      try {
+        if (localStorage.getItem('greyin:e2e-no-tour') === '1') return
+      } catch {}
       const flagKey = `greyin:tour-seen:${storageKey}:${user.id}`
       flagKeyRef.current = flagKey
       try {

@@ -4,7 +4,7 @@
 # ============================================================
 #
 # The platform's icon/color drift (39 files, fixed across three
-# separate waves per docs/ui_ux_elevation_plan.md) is a hand-copy
+# separate waves per docs/roadmap/ui_ux_elevation_plan.md) is a hand-copy
 # problem: PILLARS in EcosystemWidget.tsx is the single most-referenced
 # canonical source (every app's SiteHeader "More Platforms" dropdown,
 # WorkspaceShell's "Across Greyin" section, and AuthLayout's brand panel

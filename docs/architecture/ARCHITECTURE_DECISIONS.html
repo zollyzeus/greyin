@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greyin Architecture — Technical Decision Records</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            border-bottom: 3px solid #2c3e50;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #34495e;
+            font-size: 2em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .meta {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            margin-top: 10px;
+        }
+        
+        .meta strong {
+            color: #2c3e50;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .adr-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .adr-header h3 {
+            color: white;
+            margin-top: 0;
+            border: none;
+            padding: 0;
+        }
+        
+        .adr-section {
+            background-color: #f9f9f9;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 3px;
+        }
+        
+        .adr-section strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .decision-badge {
+            display: inline-block;
+            background-color: #27ae60;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 0 5px 0 0;
+        }
+        
+        .tradeoff {
+            margin: 15px 0;
+        }
+        
+        .tradeoff-pro {
+            border-left: 4px solid #27ae60;
+            background-color: #e8f8e8;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+        }
+        
+        .tradeoff-con {
+            border-left: 4px solid #e74c3c;
+            background-color: #fdeaea;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+        }
+        
+        .tradeoff-pro strong {
+            color: #27ae60;
+        }
+        
+        .tradeoff-con strong {
+            color: #e74c3c;
+        }
+        
+        .code-block {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .diagram-container {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background-color: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #2c3e50;
+        }
+        
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .box {
+            border: 2px solid #3498db;
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .box-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .philosophy {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .philosophy strong {
+            display: block;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h4 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .summary-card p {
+            font-size: 0.95em;
+            margin: 10px 0;
+        }
+        
+        footer {
+            border-top: 2px solid #bdc3c7;
+            margin-top: 50px;
+            padding-top: 20px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th {
+            background-color: #34495e;
+            color: white;
+        }
+        
+        .comparison-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        strong {
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Greyin Architecture</h1>
+            <h2 style="border: none; margin: 0; padding: 0; margin-top: 10px;">Technical Decision Records (ADR)</h2>
+            <div class="meta">
+                <strong>Document Type:</strong> Architecture Decision Log (ADL)<br>
+                <strong>Last Updated:</strong> 2026-09-07<br>
+                <strong>Target Audience:</strong> Developers, architects, stakeholders
+            </div>
+        </header>
+
+        <!-- INTRODUCTION -->
+        <section>
+            <h2>Introduction</h2>
+            <p>This document captures the major architectural decisions made during Greyin platform development, including rationale, alternatives considered, and trade-offs. Each decision is organized as an Architecture Decision Record (ADR).</p>
+        </section>
+
+        <!-- ADR-001 -->
+        <section>
+            <div class="adr-header">
+                <h3>ADR-001: Supabase Self-Hosted vs. Commercial PaaS</h3>
+                <span class="decision-badge">DECISION: Self-Hosted Supabase</span>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Rationale:</strong>
+                <ul>
+                    <li><strong>Cost:</strong> $27-42/month vs. $500-2000/month SaaS alternatives (5-year TCO: $80K vs. $145K+)</li>
+                    <li><strong>Lock-in:</strong> Open source components (LGPL v3, GPL v2, Apache 2.0) enable exit</li>
+                    <li><strong>Control:</strong> Full database access for complex queries, triggers, RLS</li>
+                    <li><strong>Scale:</strong> Can handle 1000+ concurrent users on $24/mo VPS</li>
+                    <li><strong>Vendor Risk:</strong> No single vendor controlling user data</li>
+                </ul>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Alternatives Considered:</strong>
+                <ul>
+                    <li><span class="highlight">Firebase (Firestore):</span> No complex SQL, limited RLS, vendor lock-in</li>
+                    <li><span class="highlight">Directus:</span> Headless CMS focused, not ideal for StackWorks/FlexPro business logic</li>
+                    <li><span class="highlight">PocketBase:</span> Single-file SQLite, insufficient for 100+ concurrent users</li>
+                    <li><span class="highlight">Frappe/ERPNext:</span> ERP focused, heavyweight for marketplace platform</li>
+                </ul>
+            </div>
+            
+            <div class="tradeoff">
+                <div class="tradeoff-con">
+                    <strong>✗ Trade-offs (Cons):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Operational overhead: manual upgrades, backup management, monitoring</li>
+                        <li>DevOps skill requirement (Docker, PostgreSQL, Kong configuration)</li>
+                    </ul>
+                </div>
+                <div class="tradeoff-pro">
+                    <strong>✓ Trade-offs (Pros):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Unlimited SQL complexity and custom functions</li>
+                        <li>Transparent cost per feature (can see LLM spend, storage usage)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-002 -->
+        <section>
+            <div class="adr-header">
+                <h3>ADR-002: 6-Pillar Microapp Architecture vs. Monolith</h3>
+                <span class="decision-badge">DECISION: Separate Next.js Apps</span>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Rationale:</strong>
+                <ul>
+                    <li><strong>Independent Deployment:</strong> Each app can ship features on its own cadence (no blocking)</li>
+                    <li><strong>Isolated State:</strong> Apps can be deleted/paused without affecting others (e.g., pause GreyMatters, keep others live)</li>
+                    <li><strong>Distinct UX:</strong> Each app can optimize UI for its specific workflow (job search ≠ forum discussion)</li>
+                    <li><strong>Team Scaling:</strong> Multiple teams can own separate pillars without coordination overhead</li>
+                    <li><strong>Skill Variety:</strong> Recruit engineers with deep expertise in marketplace (FlexPro), community (Salt & Pepper), etc.</li>
+                </ul>
+            </div>
+            
+            <div class="diagram-container">
+                <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+                    <text x="450" y="25" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+                        Microapp Architecture vs. Monolith
+                    </text>
+                    
+                    <!-- Monolith -->
+                    <rect x="50" y="60" width="350" height="200" fill="#fdeaea" stroke="#e74c3c" stroke-width="2" rx="5"/>
+                    <text x="225" y="85" font-size="12" font-weight="bold" text-anchor="middle" fill="#2c3e50">❌ Monolith</text>
+                    
+                    <rect x="70" y="100" width="310" height="25" fill="#e74c3c" stroke="#c0392b" stroke-width="1" rx="2"/>
+                    <text x="225" y="117" font-size="10" text-anchor="middle" fill="white">Single Next.js App (100K+ LOC)</text>
+                    
+                    <text x="70" y="150" font-size="10" fill="#2c3e50"><tspan x="70">✗ Coupled features</tspan></text>
+                    <text x="70" y="165" font-size="10" fill="#2c3e50"><tspan x="70">✗ Shared state = risk</tspan></text>
+                    <text x="70" y="180" font-size="10" fill="#2c3e50"><tspan x="70">✗ Hard to scale teams</tspan></text>
+                    <text x="70" y="195" font-size="10" fill="#2c3e50"><tspan x="70">✗ One failure = all down</tspan></text>
+                    <text x="70" y="210" font-size="10" fill="#2c3e50"><tspan x="70">✗ Slow deployment</tspan></text>
+                    
+                    <!-- Microapps -->
+                    <rect x="500" y="60" width="350" height="200" fill="#e8f8e8" stroke="#27ae60" stroke-width="2" rx="5"/>
+                    <text x="675" y="85" font-size="12" font-weight="bold" text-anchor="middle" fill="#2c3e50">✓ Microapps</text>
+                    
+                    <rect x="520" y="100" width="70" height="25" fill="#27ae60" stroke="#1e8449" stroke-width="1" rx="2"/>
+                    <text x="555" y="117" font-size="9" text-anchor="middle" fill="white">DeepEdge</text>
+                    
+                    <rect x="600" y="100" width="70" height="25" fill="#27ae60" stroke="#1e8449" stroke-width="1" rx="2"/>
+                    <text x="635" y="117" font-size="9" text-anchor="middle" fill="white">FlexPro</text>
+                    
+                    <rect x="680" y="100" width="70" height="25" fill="#27ae60" stroke="#1e8449" stroke-width="1" rx="2"/>
+                    <text x="715" y="117" font-size="9" text-anchor="middle" fill="white">StackWorks</text>
+                    
+                    <rect x="760" y="100" width="70" height="25" fill="#27ae60" stroke="#1e8449" stroke-width="1" rx="2"/>
+                    <text x="795" y="117" font-size="9" text-anchor="middle" fill="white">+ 3 more</text>
+                    
+                    <text x="520" y="150" font-size="10" fill="#2c3e50"><tspan x="520">✓ Independent deploy</tspan></text>
+                    <text x="520" y="165" font-size="10" fill="#2c3e50"><tspan x="520">✓ Isolated teams</tspan></text>
+                    <text x="520" y="180" font-size="10" fill="#2c3e50"><tspan x="520">✓ Clear boundaries</tspan></text>
+                    <text x="520" y="195" font-size="10" fill="#2c3e50"><tspan x="520">✓ Fast development</tspan></text>
+                    <text x="520" y="210" font-size="10" fill="#2c3e50"><tspan x="520">✓ Shared backend</tspan></text>
+                </svg>
+            </div>
+            
+            <div class="tradeoff">
+                <div class="tradeoff-con">
+                    <strong>✗ Trade-offs (Cons):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Code duplication risk: each app has its own SiteHeader (mitigated by shared git discipline)</li>
+                        <li>Deployment coordination: 7 apps to deploy, not 1</li>
+                    </ul>
+                </div>
+                <div class="tradeoff-pro">
+                    <strong>✓ Trade-offs (Pros):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Clear boundaries: DeepEdge team owns /candidates/[id], no conflicts</li>
+                        <li>Fast development: feature ship → test → deploy in parallel</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-003 -->
+        <section>
+            <div class="adr-header">
+                <h3>ADR-003: Greyin Score — Bayesian Shrinkage vs. Simple Average</h3>
+                <span class="decision-badge">DECISION: Bayesian Shrinkage</span>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Rationale:</strong>
+                <ul>
+                    <li><strong>Noisy Signal Reduction:</strong> A user with 1 outcome scoring 95/100 doesn't deserve 95 points (could be outlier)</li>
+                    <li><strong>Shrinkage Formula:</strong> Pulls high-outlier scores down, low-outlier scores up toward population mean</li>
+                    <li><strong>Headcount Weight:</strong> More outcomes = less shrinkage = more weight to actual performance</li>
+                    <li><strong>Fairness:</strong> A candidate with 10 outcomes at 70 is more trustworthy than one with 1 outcome at 100</li>
+                </ul>
+            </div>
+            
+            <div class="code-block">
+<code>def shrink_toward_mean(observed_mean, population_mean, n, precision):
+    # Bayesian posterior: blend observed data with population knowledge
+    # Higher n (more outcomes) → less shrinkage
+    # Lower n (rare outcomes) → strong shrinkage toward mean
+    
+    weight = n / (n + precision)
+    shrunk_score = weight * observed_mean + (1 - weight) * population_mean
+    
+    return shrunk_score
+
+# Example: 1 outcome at 95 vs. 10 outcomes at 70
+single_outcome = shrink_toward_mean(95, 40, 1, 10)  # → ~50 (shrunk down)
+many_outcomes = shrink_toward_mean(70, 40, 10, 10)  # → 65 (less shrinkage)
+</code>
+            </div>
+            
+            <div class="tradeoff">
+                <div class="tradeoff-con">
+                    <strong>✗ Trade-offs (Cons):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Harder to explain to users (Bayesian statistics)</li>
+                        <li>Score may feel low to high-performing early users</li>
+                    </ul>
+                </div>
+                <div class="tradeoff-pro">
+                    <strong>✓ Trade-offs (Pros):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Resistant to gaming/sockpuppeting</li>
+                        <li>Score improves as users build history (incentivizes long-term engagement)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-004 -->
+        <section>
+            <div class="adr-header">
+                <h3>ADR-004: Row-Level Security (RLS) vs. Application-Layer Authorization</h3>
+                <span class="decision-badge">DECISION: Database-Layer RLS</span>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Rationale:</strong>
+                <ul>
+                    <li><strong>Unhackable by App Bug:</strong> An RLS bug in auth.ts can't bypass database policy</li>
+                    <li><strong>Audit Trail:</strong> Every SELECT/UPDATE logged by PostgreSQL, not buried in app logs</li>
+                    <li><strong>Scaling:</strong> Authorization logic doesn't scale with N apps (all 6 pillars obey same RLS)</li>
+                    <li><strong>Consistency:</strong> No chance of DeepEdge implementing permission check differently from FlexPro</li>
+                </ul>
+            </div>
+            
+            <div class="code-block">
+<code>-- Every user-scoped table has policy like:
+ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read own applications"
+  ON applications FOR SELECT
+  USING (auth.uid() = candidate_id OR 
+         auth.uid() IN (
+           SELECT owner_id FROM companies 
+           WHERE id = job_id::company_id
+         ));
+
+-- Even if app accidentally queries all applications,
+-- database filters result set automatically
+</code>
+            </div>
+            
+            <div class="tradeoff">
+                <div class="tradeoff-con">
+                    <strong>✗ Trade-offs (Cons):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>RLS policies harder to debug (not in IDE syntax highlighting)</li>
+                        <li>Requires SQL knowledge to understand policies</li>
+                    </ul>
+                </div>
+                <div class="tradeoff-pro">
+                    <strong>✓ Trade-offs (Pros):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>No way to accidentally expose data via app bug</li>
+                        <li>Admin can query logs and see if RLS was ever bypassed</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-005 -->
+        <section>
+            <div class="adr-header">
+                <h3>ADR-005: Synchronous LLM Scoring vs. Async Job Queue</h3>
+                <span class="decision-badge">DECISION: Hybrid (Sync for user-facing, Async for batch)</span>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Rationale:</strong>
+                <ul>
+                    <li><strong>User Feedback:</strong> Resume parsing blocks upload completion, but users expect instant feedback</li>
+                    <li><strong>Cost Control:</strong> Async allows rate limiting (e.g., daily digest job runs once/day)</li>
+                    <li><strong>Fallback Path:</strong> If LLM provider down, upload still succeeds (quality missing, not blocked)</li>
+                    <li><strong>Simplicity Trade-off:</strong> Sync is simpler; async adds job queue burden</li>
+                </ul>
+            </div>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Sync/Async</th>
+                        <th>Reason</th>
+                        <th>Latency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Resume parsing</td>
+                        <td>Sync (timeout 2s)</td>
+                        <td>Upload completion UX</td>
+                        <td>&lt;2s</td>
+                    </tr>
+                    <tr>
+                        <td>Post quality</td>
+                        <td>Sync (blocking gate)</td>
+                        <td>Pre-publish QA</td>
+                        <td>&lt;2s</td>
+                    </tr>
+                    <tr>
+                        <td>Outcome verification</td>
+                        <td>Sync (creator review)</td>
+                        <td>Happens during human review</td>
+                        <td>&lt;3s</td>
+                    </tr>
+                    <tr>
+                        <td>Gig quality assist</td>
+                        <td>Sync (suggestions)</td>
+                        <td>Non-blocking, seller sees immediately</td>
+                        <td>&lt;1s</td>
+                    </tr>
+                    <tr>
+                        <td>Digests</td>
+                        <td>Async (nightly)</td>
+                        <td>Batch operation</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>Salary trends</td>
+                        <td>Async (hourly)</td>
+                        <td>Pre-computed materialized view</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="tradeoff">
+                <div class="tradeoff-con">
+                    <strong>✗ Trade-offs (Cons):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Sync calls can timeout (handled via try/catch, degrades gracefully)</li>
+                        <li>Cost spike if LLM provider fails to rate-limit (mitigated by admin flags)</li>
+                    </ul>
+                </div>
+                <div class="tradeoff-pro">
+                    <strong>✓ Trade-offs (Pros):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Immediate user feedback for upload completion</li>
+                        <li>Batch operations keep costs low</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-006 -->
+        <section>
+            <div class="adr-header">
+                <h3>ADR-006: Shared Cookie Domain (SSO) vs. Per-App Logins</h3>
+                <span class="decision-badge">DECISION: Shared .greyin.net Cookie Domain</span>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Rationale:</strong>
+                <ul>
+                    <li><strong>User Friction:</strong> Login once → access all 6 apps without re-authenticating</li>
+                    <li><strong>Token Refresh:</strong> All apps share same JWT refresh token cookie, no desync</li>
+                    <li><strong>Real-World Usage:</strong> Users switch between apps during sessions (e.g., post StackWorks, share on GreyMatters)</li>
+                </ul>
+            </div>
+            
+            <div class="code-block">
+<code>Cookie: __Secure-sb-access-token
+Domain: .greyin.net          # Shared across all subdomains
+Path: /
+HttpOnly: true               # Inaccessible to JavaScript
+Secure: true                 # HTTPS only
+SameSite: Lax                # CSRF protection
+Max-Age: 3600               # 1 hour
+
+Refresh Token:
+Domain: .greyin.net
+Max-Age: 34560000          # 400 days
+</code>
+            </div>
+            
+            <div class="tradeoff">
+                <div class="tradeoff-con">
+                    <strong>✗ Trade-offs (Cons):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>If one app logs you out, all apps log you out (intentional security feature)</li>
+                        <li>Cookie theft = access to all 6 apps (mitigated by httpOnly + secure flags)</li>
+                    </ul>
+                </div>
+                <div class="tradeoff-pro">
+                    <strong>✓ Trade-offs (Pros):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>No session desync between apps</li>
+                        <li>True unified platform experience</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-007 -->
+        <section>
+            <div class="adr-header">
+                <h3>ADR-007: Materialized Views for Greyin Score vs. Real-Time Calculation</h3>
+                <span class="decision-badge">DECISION: Materialized View (Hourly Refresh)</span>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Rationale:</strong>
+                <ul>
+                    <li><strong>Query Speed:</strong> Pre-computed score responds in &lt;100ms (vs. 5+ second calculation)</li>
+                    <li><strong>Consistency:</strong> All views of a user's score within an hour are identical (no race conditions)</li>
+                    <li><strong>LLM Cost:</strong> Score doesn't invoke LLM (would be expensive per-request)</li>
+                    <li><strong>Admin Insight:</strong> View includes debugging columns (per-platform breakdowns)</li>
+                </ul>
+            </div>
+            
+            <div class="code-block">
+<code>-- Refresh materialized view every hour via pg_cron
+SELECT cron.schedule(
+    'refresh_greyin_scores', 
+    '0 * * * *',  -- every hour
+    'REFRESH MATERIALIZED VIEW CONCURRENTLY greyin_scores'
+);
+
+-- Result: 95 tables → view queries in parallel → merged result
+-- Concurrency prevents long-term locks
+</code>
+            </div>
+            
+            <div class="tradeoff">
+                <div class="tradeoff-con">
+                    <strong>✗ Trade-offs (Cons):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Score lags real activity by up to 1 hour</li>
+                        <li>Requires pg_cron for refresh (adds operational complexity)</li>
+                    </ul>
+                </div>
+                <div class="tradeoff-pro">
+                    <strong>✓ Trade-offs (Pros):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Fast profile page loads</li>
+                        <li>Employers can search by score without slow queries</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-008 -->
+        <section>
+            <div class="adr-header">
+                <h3>ADR-008: k-Anonymity for Salary Trends vs. Raw Aggregates</h3>
+                <span class="decision-badge">DECISION: k-Anonymity (k≥3)</span>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Rationale:</strong>
+                <ul>
+                    <li><strong>Privacy:</strong> With only 2 salaries at "Senior Engineer, NYC", you can identify individuals</li>
+                    <li><strong>Business Confidence:</strong> Employers trust aggregates based on 10+ samples vs. 2</li>
+                    <li><strong>Regulatory:</strong> GDPR/privacy regulations expect k-anonymity on demographic data</li>
+                    <li><strong>Transparency:</strong> Users know aggregates are robust (3+ samples shown in UI)</li>
+                </ul>
+            </div>
+            
+            <div class="code-block">
+<code>-- Only show aggregates with k≥3
+CREATE VIEW salary_trends AS
+SELECT
+    role_level, location, years_experience,
+    AVG(salary_usd) as avg_salary,
+    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY salary_usd) as q1,
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY salary_usd) as q3,
+    COUNT(*) as sample_size
+FROM employment_history
+WHERE years_experience >= 10
+GROUP BY role_level, location, years_experience
+HAVING COUNT(*) >= 3;  -- k-anonymity threshold
+</code>
+            </div>
+            
+            <div class="tradeoff">
+                <div class="tradeoff-con">
+                    <strong>✗ Trade-offs (Cons):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Early platform has gaps (rare job titles below k=3 threshold)</li>
+                        <li>Requires tracking salary submissions (privacy risk if breached)</li>
+                    </ul>
+                </div>
+                <div class="tradeoff-pro">
+                    <strong>✓ Trade-offs (Pros):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Candidates trust salary data as representative</li>
+                        <li>No way to reverse-engineer individual salaries</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-009 -->
+        <section>
+            <div class="adr-header">
+                <h3>ADR-009: LLM Provider Registry vs. Hardcoded Provider</h3>
+                <span class="decision-badge">DECISION: Pluggable Provider Registry</span>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Rationale:</strong>
+                <ul>
+                    <li><strong>Vendor Optionality:</strong> If Anthropic prices spike, switch to OpenAI</li>
+                    <li><strong>Cost Optimization:</strong> Route different features to different providers (fast features → cheaper model)</li>
+                    <li><strong>Local Inference:</strong> Support Ollama for on-premise deployments</li>
+                    <li><strong>Feature Flags:</strong> Admin can disable a feature's LLM scoring (e.g., disable post quality if budget tight)</li>
+                </ul>
+            </div>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>Model</th>
+                        <th>Cost (1K tokens)</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Anthropic</td>
+                        <td>claude-3.5-sonnet</td>
+                        <td>$0.003 in / $0.015 out</td>
+                        <td>High-quality scoring, verification</td>
+                    </tr>
+                    <tr>
+                        <td>OpenAI</td>
+                        <td>gpt-4</td>
+                        <td>$0.03 in / $0.06 out</td>
+                        <td>Complex reasoning (fallback)</td>
+                    </tr>
+                    <tr>
+                        <td>OpenAI</td>
+                        <td>gpt-3.5-turbo</td>
+                        <td>$0.0005 in / $0.0015 out</td>
+                        <td>Budget mode, simple tasks</td>
+                    </tr>
+                    <tr>
+                        <td>Ollama</td>
+                        <td>llama2, mistral</td>
+                        <td>$0 (self-hosted)</td>
+                        <td>On-premise deployments</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="tradeoff">
+                <div class="tradeoff-con">
+                    <strong>✗ Trade-offs (Cons):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Admin overhead: configure providers, monitor costs, toggle flags</li>
+                        <li>Latency variance (Ollama may be slower than API endpoints)</li>
+                    </ul>
+                </div>
+                <div class="tradeoff-pro">
+                    <strong>✓ Trade-offs (Pros):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Cost control and vendor independence</li>
+                        <li>Can experiment with cheaper models for specific features</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-010 -->
+        <section>
+            <div class="adr-header">
+                <h3>ADR-010: Peer-Confirmed Projects vs. Verification-Only Achievements</h3>
+                <span class="decision-badge">DECISION: Separate peer_score from greyin_score</span>
+            </div>
+            
+            <div class="adr-section">
+                <strong>Rationale:</strong>
+                <ul>
+                    <li><strong>Evidence Types:</strong> In-platform verified outcomes (StackWorks/FlexPro) are gold-standard; off-platform collaboration is weaker signal</li>
+                    <li><strong>Reciprocal Rating Fraud:</strong> Without gating, two friends could collude to rate each other 5 stars (detected via flags)</li>
+                    <li><strong>Transparency:</strong> Employers see both scores, can weight as they choose</li>
+                    <li><strong>Safety:</strong> Peer projects don't affect hiring (Verified Expert gate), only informational</li>
+                </ul>
+            </div>
+            
+            <div class="diagram-container">
+                <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+                    <text x="450" y="25" font-size="14" font-weight="bold" text-anchor="middle" fill="#2c3e50">
+                        Score Separation Strategy
+                    </text>
+                    
+                    <!-- greyin_score (Primary) -->
+                    <rect x="50" y="60" width="380" height="220" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="5"/>
+                    <text x="240" y="85" font-size="12" font-weight="bold" text-anchor="middle" fill="#2c3e50">greyin_score (Primary)</text>
+                    <text x="240" y="105" font-size="10" text-anchor="middle" fill="#555">Gold-standard in-platform evidence</text>
+                    
+                    <rect x="70" y="125" width="340" height="30" fill="#3498db" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                    <text x="240" y="145" font-size="10" text-anchor="middle" fill="white">StackWorks verified outcomes (30%)</text>
+                    
+                    <rect x="70" y="160" width="340" height="30" fill="#3498db" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                    <text x="240" y="180" font-size="10" text-anchor="middle" fill="white">FlexPro order completions (30%)</text>
+                    
+                    <rect x="70" y="195" width="340" height="30" fill="#3498db" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                    <text x="240" y="215" font-size="10" text-anchor="middle" fill="white">Salt & Pepper karma (20%)</text>
+                    
+                    <rect x="70" y="230" width="340" height="30" fill="#3498db" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                    <text x="240" y="250" font-size="10" text-anchor="middle" fill="white">Career experience (20%)</text>
+                    
+                    <!-- peer_score (Secondary) -->
+                    <rect x="470" y="60" width="380" height="220" fill="#fef5e7" stroke="#f39c12" stroke-width="2" rx="5"/>
+                    <text x="660" y="85" font-size="12" font-weight="bold" text-anchor="middle" fill="#2c3e50">peer_score (Secondary)</text>
+                    <text x="660" y="105" font-size="10" text-anchor="middle" fill="#555">Off-platform collaboration (informational)</text>
+                    
+                    <rect x="490" y="125" width="340" height="30" fill="#f39c12" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                    <text x="660" y="145" font-size="10" text-anchor="middle" fill="white">Peer-confirmed projects (mutual tags)</text>
+                    
+                    <rect x="490" y="160" width="340" height="30" fill="#f39c12" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                    <text x="660" y="180" font-size="10" text-anchor="middle" fill="white">Peer contribution ratings (1-5 stars)</text>
+                    
+                    <rect x="490" y="195" width="340" height="30" fill="#f39c12" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                    <text x="660" y="215" font-size="10" text-anchor="middle" fill="white">Reciprocal rating detection</text>
+                    
+                    <rect x="490" y="230" width="340" height="30" fill="#f39c12" stroke="#2c3e50" stroke-width="1" rx="2"/>
+                    <text x="660" y="250" font-size="10" text-anchor="middle" fill="white">Fraud flag if suspicious patterns</text>
+                </svg>
+            </div>
+            
+            <div class="tradeoff">
+                <div class="tradeoff-con">
+                    <strong>✗ Trade-offs (Cons):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>More complex scoring system (two separate scores, not one)</li>
+                        <li>Harder to explain to users</li>
+                    </ul>
+                </div>
+                <div class="tradeoff-pro">
+                    <strong>✓ Trade-offs (Pros):</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Resistant to gaming via collusion</li>
+                        <li>Preserves integrity of StackWorks/FlexPro evidence</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADR-011 through ADR-014 Summary -->
+        <section>
+            <h2>Additional Decisions (ADR-011 to ADR-014)</h2>
+            
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h4>ADR-011: Idle Session Timeout</h4>
+                    <p><strong>Decision:</strong> 20-minute idle + 2-minute warning</p>
+                    <p><strong>Rationale:</strong> Security (prevent unattended hijacking) + User control (warning allows recovery)</p>
+                    <p><strong>Pattern:</strong> AWS/Salesforce standard</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h4>ADR-012: Dark Mode Implementation</h4>
+                    <p><strong>Decision:</strong> Tailwind dark:class + localStorage toggle + system preference fallback</p>
+                    <p><strong>Rationale:</strong> User choice (override system), no FOUC (inline script), persistent (localStorage)</p>
+                    <p><strong>Coverage:</strong> 240+ classes darkified across 7 apps</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h4>ADR-013: Explicit Admin Role</h4>
+                    <p><strong>Decision:</strong> Simple role='admin' field vs. ABAC</p>
+                    <p><strong>Rationale:</strong> Simplicity (3 roles covers all use cases), RLS clarity, avoids over-engineering</p>
+                    <p><strong>Future Path:</strong> Can migrate to fine-grained permissions if needed via roles_pivot table</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h4>ADR-014: Test Data Cleanup</h4>
+                    <p><strong>Decision:</strong> Synchronous admin-triggered cleanup route</p>
+                    <p><strong>Rationale:</strong> Simplicity (one-off), transparency (admin sees results), idempotence (can run multiple times)</p>
+                    <p><strong>Implementation:</strong> POST /api/admin/cleanup-test-data filters by "E2E " prefix</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHILOSOPHY -->
+        <section>
+            <h2>Architecture Philosophy</h2>
+            
+            <div class="philosophy">
+                <strong>Simplicity Over Cleverness</strong>
+                <p>Bayesian shrinkage is the most complex scoring algorithm; everything else is straightforward. Avoid over-engineering until it's clearly needed.</p>
+            </div>
+            
+            <div class="philosophy">
+                <strong>Database-Layer Security</strong>
+                <p>RLS policies, not app-layer authorization. PostgreSQL enforces permissions regardless of app bugs.</p>
+            </div>
+            
+            <div class="philosophy">
+                <strong>Transparent Operations</strong>
+                <p>Every LLM call logged, every cost attributed, every admin action auditable. Visibility builds confidence.</p>
+            </div>
+            
+            <div class="philosophy">
+                <strong>User Agency</strong>
+                <p>Idle timeout warning (not forced), dark mode toggle (not system-only), feature flags (not hardcoded). Respect user choices.</p>
+            </div>
+            
+            <div class="philosophy">
+                <strong>Vendor Independence</strong>
+                <p>Pluggable LLM providers, self-hosted Supabase, open source everywhere. Avoid lock-in; maintain exit strategies.</p>
+            </div>
+            
+            <div class="philosophy">
+                <strong>Privacy First</strong>
+                <p>k-anonymity on salary, anonymous peer ratings, RLS everywhere. Default to privacy-preserving design.</p>
+            </div>
+            
+            <div class="philosophy">
+                <strong>Scalable Teams</strong>
+                <p>6 pillar apps can ship independently, shared Hub enforces consistency. Structure enables team growth without chaos.</p>
+            </div>
+        </section>
+
+        <!-- CONCLUSION -->
+        <section>
+            <h2>Conclusion</h2>
+            <p>These 14 decisions prioritize <strong>long-term maintainability, security, and cost efficiency</strong> over short-term implementation speed. Each decision includes clear trade-offs, enabling future architects to understand when/if to reconsider.</p>
+            <p>As the platform grows, revisit these decisions annually. Market conditions change, technologies evolve, and the best decision today may need reconsideration tomorrow.</p>
+        </section>
+
+        <footer>
+            <p>Greyin Platform — Technical Decision Records v1.0 — Generated 2026-09-07</p>
+            <p>For implementation details, refer to <strong>docs/architecture/ARCHITECTURE_DOCUMENTATION.html</strong></p>
+        </footer>
+    </div>
+</body>
+</html>

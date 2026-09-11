@@ -62,10 +62,51 @@ export class Cleanup {
     for (const email of this.userEmails) {
       const id = await findUserIdByEmail(email)
       if (!id) continue
-      await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${id}`, {
+
+      // The same FK-cascade-ordering bug documented in the 2026-09-07
+      // pitch-demo scrutiny pass (project_pitch_demo_scrutiny_fixes):
+      // verified_outcomes/reputation_events/ai_quality_scores/
+      // peer_project_ratings each carry an AFTER DELETE trigger (122)
+      // that re-upserts greyin_score_inputs keyed on that row's own
+      // subject -- cascading through auth.users can reach profiles
+      // before reaching these tables in the same statement, and the
+      // trigger's upsert then fails with a FK violation against the
+      // now-gone profile, aborting GoTrue's whole delete (a 500, not a
+      // 404 or a partial success). The catch below silently swallowed
+      // exactly this failure for every test that awards reputation
+      // (seedReputationPoints, and now redeem_referral_code, 138) --
+      // confirmed live: 6 real orphaned test accounts (with real
+      // referral_converted reputation_events) accumulated in prod this
+      // way, invisible until directly queried. Deleting these 4 tables'
+      // rows explicitly first, while the profile still exists for the
+      // trigger's own upsert to find, avoids the ordering problem
+      // entirely -- same fix as the seed file's own cleanup phase.
+      // Column name holding the "subject" differs per table -- confirmed
+      // directly against the live schema, not assumed (verified_outcomes/
+      // ai_quality_scores use subject_user_id, not user_id; peer_project_ratings
+      // has no single user_id at all, only rater_id/ratee_id).
+      for (const [table, filter] of [
+        ['verified_outcomes', `subject_user_id=eq.${id}`],
+        ['reputation_events', `user_id=eq.${id}`],
+        ['ai_quality_scores', `subject_user_id=eq.${id}`],
+        ['peer_project_ratings', `or=(rater_id.eq.${id},ratee_id.eq.${id})`],
+      ]) {
+        await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, {
+          method: 'DELETE',
+          headers: headers(),
+        }).catch(() => {})
+      }
+
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${id}`, {
         method: 'DELETE',
         headers: headers(),
-      }).catch(() => {})
+      }).catch((e) => {
+        console.warn(`[Cleanup] failed to delete user ${email} (${id}):`, e)
+        return null
+      })
+      if (res && !res.ok) {
+        console.warn(`[Cleanup] failed to delete user ${email} (${id}): ${res.status} ${await res.text()}`)
+      }
     }
   }
 }

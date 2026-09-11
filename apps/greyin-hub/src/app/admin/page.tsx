@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { SiteHeader } from '@/components/SiteHeader'
-import { ShieldCheck, Bot, BadgeCheck, Briefcase, Trash2, Lightbulb, MessageSquareHeart, Scale } from 'lucide-react'
+import { ShieldCheck, Bot, BadgeCheck, Briefcase, Trash2, Lightbulb, MessageSquareHeart, Scale, MessageSquareWarning, TrendingUp, ShieldAlert } from 'lucide-react'
 
 /**
  * Platform-wide admin lives here, not on any one pillar app -- Greyin
@@ -40,9 +39,7 @@ export default async function AdminPage({
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <SiteHeader />
-
+    <>
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-2 mb-6">
           <ShieldCheck className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
@@ -80,9 +77,24 @@ export default async function AdminPage({
             <h2 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">AI Matching Bias Audit</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">Aggregate representation check on AI-surfaced matches, from opt-in self-ID data.</p>
           </Link>
+          <Link href="/admin/job-recommendation-feedback" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition dark:bg-gray-900">
+            <MessageSquareWarning className="h-6 w-6 text-indigo-600 mb-2 dark:text-indigo-400" />
+            <h2 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">Job Recommendation Feedback</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Aggregate helpful/not-helpful rates per recommendation type.</p>
+          </Link>
+          <Link href="/admin/market-intelligence" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition dark:bg-gray-900">
+            <TrendingUp className="h-6 w-6 text-indigo-600 mb-2 dark:text-indigo-400" />
+            <h2 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">Market Intelligence</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">AI-synthesized briefing over platform-wide skill demand, hiring velocity, and salary trends.</p>
+          </Link>
+          <Link href="/admin/cross-pillar-flags" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition dark:bg-gray-900">
+            <ShieldAlert className="h-6 w-6 text-amber-600 mb-2 dark:text-amber-400" />
+            <h2 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">Cross-Pillar Reciprocity Flags</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Pairs trading favorable signals across two different platforms, for human review.</p>
+          </Link>
         </div>
 
-        {/* Recommended by docs/emergent_deployment_gap.md's UI/UX audit --
+        {/* Recommended by docs/audits/competitive-analysis/emergent_deployment_gap.md's UI/UX audit --
             e2e-suite content (title prefix "E2E ") left live on public
             feeds, most visibly GreyMatters' blog. Idempotent -- running
             with nothing to clean just returns zeros. */}
@@ -111,6 +123,6 @@ export default async function AdminPage({
           </form>
         </div>
       </div>
-    </main>
+    </>
   )
 }

@@ -12,7 +12,7 @@ import { signUpDeepEdge, login } from '../../utils/auth'
 
 test('tour auto-starts for a fresh user, Next/Prev/Skip work, and it does not re-fire after a reload', async ({ page, cleanup }) => {
   const user = await signUpDeepEdge(page, 'candidate', cleanup)
-  await login(page, user, '/dashboard')
+  await login(page, user, '/dashboard', undefined, { suppressTour: false })
 
   const tooltip = page.getByTestId('guided-tour-tooltip')
   await expect(tooltip).toBeVisible({ timeout: 10_000 })
@@ -40,7 +40,7 @@ test('tour auto-starts for a fresh user, Next/Prev/Skip work, and it does not re
 
 test('"Replay tour" re-arms it after it has already been seen', async ({ page, cleanup }) => {
   const user = await signUpDeepEdge(page, 'candidate', cleanup)
-  await login(page, user, '/dashboard')
+  await login(page, user, '/dashboard', undefined, { suppressTour: false })
 
   const tooltip = page.getByTestId('guided-tour-tooltip')
   await expect(tooltip).toBeVisible({ timeout: 10_000 })

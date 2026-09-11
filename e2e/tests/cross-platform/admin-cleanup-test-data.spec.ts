@@ -3,7 +3,7 @@ import { signUpSaltNPepper, login } from '../../utils/auth'
 import { getUserIdByEmail, promoteToAdmin, createTestPost } from '../../utils/admin'
 
 /**
- * docs/emergent_deployment_gap.md's UI/UX audit recommended an idempotent
+ * docs/audits/competitive-analysis/emergent_deployment_gap.md's UI/UX audit recommended an idempotent
  * cleanup route for e2e-suite content left on live public feeds (found:
  * 45 posts on GreyMatters, 183 builder_projects on StackWorks -- both
  * cleared manually 2026-09-02). Covers the route itself: admin-gated,

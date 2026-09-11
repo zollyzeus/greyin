@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { MessageCircle, PlusCircle, Clock, User } from 'lucide-react'
 import { SiteHeader } from '@/components/SiteHeader'
+import { DiscussionVoteButtons } from '@/components/DiscussionVoteButtons'
 
 const CATEGORIES = [
   { name: 'Architecture Reviews', icon: '🏗️' },
@@ -39,6 +40,17 @@ export default async function DiscussionsPage({
   }
 
   const { data: rawDiscussions } = await discussionsQuery
+
+  const { data: { user } } = await supabase.auth.getUser()
+  const myVotes: Record<string, number> = {}
+  if (user && rawDiscussions && rawDiscussions.length > 0) {
+    const { data: votes } = await supabase
+      .from('discussion_votes')
+      .select('discussion_id, value')
+      .eq('user_id', user.id)
+      .in('discussion_id', rawDiscussions.map((d: any) => d.id))
+    for (const v of votes || []) myVotes[v.discussion_id] = v.value
+  }
 
   const discussions =
     sort === 'hot' && rawDiscussions
@@ -125,6 +137,13 @@ export default async function DiscussionsPage({
                     className="block bg-white rounded-lg shadow-md hover:shadow-lg transition p-6 dark:bg-gray-900"
                   >
                     <div className="flex gap-4">
+                      <DiscussionVoteButtons
+                        discussionId={d.id}
+                        initialScore={d.upvote_count || 0}
+                        initialMyVote={myVotes[d.id] || 0}
+                        loggedIn={!!user}
+                        size="sm"
+                      />
                       <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 dark:bg-purple-950/40">
                         <User className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                       </div>

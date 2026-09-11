@@ -63,6 +63,9 @@ export default async function Home() {
               Find Jobs
             </Link>
           </div>
+          <a href="https://greyin.net/#demo" className="inline-block mt-6 text-sm text-indigo-100 underline hover:text-white transition">
+            Or explore as a demo user — no signup needed
+          </a>
         </div>
       </div>
 
