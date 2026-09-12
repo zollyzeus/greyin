@@ -28,9 +28,23 @@ export const metadata = {
 // platform's established per-app-duplication convention for small,
 // identical components) so it renders on every route, auth screens
 // included, regardless of whether that page uses SiteHeader.
+//
+// Fixed height (lg:h-8, 2026-09-12): WorkspaceShell's rail is
+// `lg:fixed lg:inset-y-0` -- position:fixed takes it out of normal
+// document flow entirely, so at the `lg` breakpoint it used to start at
+// the very top of the viewport (y=0), painting over this banner's left
+// 256px (the rail's width) instead of sitting below it like the rest of
+// the page does. That also meant the rail's own top brand row and the
+// content column's header row -- both h-16 -- started at different y
+// offsets (0 vs. this banner's height), so their bottom borders never
+// lined up either. Giving this banner a fixed, known height at `lg` and
+// pointing the rail at that same offset (`lg:top-8` instead of
+// `lg:inset-y-0`, see WorkspaceShell.tsx) fixes both: the banner now
+// spans the full width including behind where the rail begins, and the
+// two h-16 rows start from the same y and stay in sync.
 function PreviewBanner() {
   return (
-    <div className="bg-gray-900 text-gray-300 text-xs text-center py-1.5 px-4">
+    <div className="bg-gray-900 text-gray-300 text-xs text-center py-1.5 px-4 lg:h-8 lg:flex lg:items-center lg:justify-center lg:py-0">
       <span className="font-medium text-white">Preview build</span> — people, companies, and activity shown across Greyin are seeded demonstration data, not real users.
     </div>
   )

@@ -1,4 +1,4 @@
-import { Globe, CheckCircle2 } from 'lucide-react'
+import { Globe, CheckCircle2, Building2, BookOpen, Users, Briefcase, FlaskConical, Telescope } from 'lucide-react'
 
 // Canonical source, kept in sync with the identical array in every other
 // app (deepedge, flexpro, stackworks, saltnpepper-community,
@@ -11,6 +11,19 @@ export const PILLARS = [
   { key: 'stackworks', label: 'StackWorks', description: 'Build with senior peers, earn a verified record', url: 'https://stackworks.greyin.net', color: '#0D9488' },
   { key: 'longlist', label: 'Longlist', description: 'Future roles, quietly explored', url: 'https://longlist.greyin.net', color: '#A16207' },
 ]
+
+// Same brand-icon-per-pillar mapping every other app's EcosystemWidget/
+// SiteHeader/SiteFooter/WorkspaceShell rail already uses -- this file was
+// the second place (after greymatters-blog, fixed earlier the same audit)
+// still rendering a plain color dot instead of the real pillar icon.
+export const PILLAR_ICONS: Record<string, typeof Building2> = {
+  deepedge: Building2,
+  greymatters: BookOpen,
+  saltnpepper: Users,
+  flexpro: Briefcase,
+  stackworks: FlaskConical,
+  longlist: Telescope,
+}
 
 /**
  * One login works across all six *.greyin.net apps (shared cookie
@@ -31,6 +44,7 @@ export function EcosystemWidget({ activePillars }: { activePillars: string[] }) 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {PILLARS.map((p) => {
           const isActive = activePillars.includes(p.key)
+          const Icon = PILLAR_ICONS[p.key]
           return (
             <a
               key={p.key}
@@ -38,12 +52,12 @@ export function EcosystemWidget({ activePillars }: { activePillars: string[] }) 
               className="flex flex-col items-center text-center gap-1.5 p-3 rounded-lg border text-sm border-gray-200 hover:border-gray-300 transition-colors dark:border-gray-800 dark:hover:border-gray-700"
               style={isActive ? { borderColor: p.color, backgroundColor: `${p.color}0d` } : undefined}
             >
-              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} aria-hidden="true" />
+              <Icon className="w-5 h-5 flex-shrink-0" style={{ color: p.color }} aria-hidden="true" />
               <p className="font-medium text-gray-900 flex items-center gap-1 dark:text-gray-50">
                 {p.label}
                 {isActive && <CheckCircle2 className="w-3.5 h-3.5" style={{ color: p.color }} />}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{isActive ? 'Active' : 'Visit to join'}</p>
+              <p className={`text-xs font-medium ${isActive ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>{isActive ? 'Active' : 'Visit to join'}</p>
             </a>
           )
         })}

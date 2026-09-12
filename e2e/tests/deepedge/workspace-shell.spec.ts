@@ -61,6 +61,62 @@ test('rail navigation actually navigates within the app', async ({ page, cleanup
   await page.waitForURL(/\/dashboard\/applications$/)
 })
 
+/**
+ * Sidebar-organization request (2026-09-12): Feed must be the first
+ * link in the rail (the cross-pillar activity landing point) and
+ * Profile must be the last -- both the candidate and employer nav
+ * arrays were reordered to this rule, with everything in between
+ * sequenced by real usage frequency/impact rather than left in the
+ * order features happened to ship.
+ */
+test('the rail lists Feed first and Profile last, for both candidate and employer personas', async ({ browser, cleanup }) => {
+  const candidateCtx = await browser.newContext()
+  const candidatePage = await candidateCtx.newPage()
+  const candidate = await signUpDeepEdge(candidatePage, 'candidate', cleanup)
+  await login(candidatePage, candidate, '/dashboard')
+  // Scoped to the main nav list's own wrapper div, not `nav a` broadly --
+  // the same <nav> also contains the "Across Greyin" pillar links below it.
+  const candidateLinks = await candidatePage.locator('aside').first().locator('nav > div').first().locator('a').allTextContents()
+  expect(candidateLinks[0]).toContain('Feed')
+  expect(candidateLinks[candidateLinks.length - 1]).toContain('Profile')
+  await candidateCtx.close()
+
+  const employerCtx = await browser.newContext()
+  const employerPage = await employerCtx.newPage()
+  const employer = await signUpDeepEdge(employerPage, 'employer', cleanup)
+  await login(employerPage, employer, '/employer/dashboard')
+  const employerLinks = await employerPage.locator('aside').first().locator('nav > div').first().locator('a').allTextContents()
+  expect(employerLinks[0]).toContain('Feed')
+  expect(employerLinks[employerLinks.length - 1]).toContain('Company Settings')
+  await employerCtx.close()
+})
+
+/**
+ * The preview-build banner used to be excluded from the sidebar's
+ * column (the fixed-position rail started at the very top of the
+ * viewport, painting over the banner's left 256px) -- fixed by giving
+ * the banner a known height and anchoring the rail below it instead of
+ * at the very top. That same fix also brought the rail's brand row and
+ * the header row (both h-16) back into vertical sync, since previously
+ * they started from different y-offsets.
+ */
+test('the preview banner spans the full width including behind the sidebar, and the rail brand row stays in sync with the header row', async ({ page, cleanup }) => {
+  const candidate = await signUpDeepEdge(page, 'candidate', cleanup)
+  await login(page, candidate, '/dashboard')
+  await page.setViewportSize({ width: 1280, height: 900 })
+
+  const banner = page.getByText('Preview build').locator('xpath=ancestor::div[1]')
+  const bannerBox = await banner.boundingBox()
+  expect(bannerBox?.x).toBeLessThanOrEqual(1)
+
+  const brandRow = page.locator('aside').first().locator('div').filter({ hasText: 'DeepEdge' }).first()
+  const header = page.locator('header').first()
+  const brandBox = await brandRow.boundingBox()
+  const headerBox = await header.boundingBox()
+  expect(brandBox?.height).toBeCloseTo(headerBox?.height ?? -1, 0)
+  expect(brandBox?.y).toBeCloseTo(headerBox?.y ?? -1, 0)
+})
+
 test('mobile: hamburger opens a drawer with the same rail, closes on navigation', async ({ page, cleanup }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   const candidate = await signUpDeepEdge(page, 'candidate', cleanup)

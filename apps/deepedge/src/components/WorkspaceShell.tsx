@@ -89,11 +89,19 @@ interface WorkspaceShellProps {
 // one-click-away (Feed, Profile) alongside the sections that bar never
 // had at all (Applications, Find Talent) -- the migration to this shell
 // is additive to reachability, not a narrowing of it.
+// Sequenced per a sidebar-organization request (2026-09-12): Feed first
+// (the cross-pillar activity landing point), Profile last (right before
+// the always-last Feedback & Ideas, rendered separately below), and
+// everything else ordered by real usage frequency/impact for a
+// candidate -- Dashboard (their own status/score home base, checked
+// every visit) > My Applications (frequent status checks) > Browse Jobs
+// (the core job-seeking action) > Find Talent (peer/candidate-pool
+// browsing, the least frequent of the four).
 const CANDIDATE_NAV = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'dashboard' },
   { href: '/feed', label: 'Feed', icon: Rss, key: 'feed' },
-  { href: '/jobs', label: 'Browse Jobs', icon: Briefcase, key: 'jobs' },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'dashboard' },
   { href: '/dashboard/applications', label: 'My Applications', icon: FileText, key: 'applications' },
+  { href: '/jobs', label: 'Browse Jobs', icon: Briefcase, key: 'jobs' },
   { href: '/candidates', label: 'Find Talent', icon: Users, key: 'candidates' },
   { href: '/profile', label: 'Profile', icon: Settings, key: 'profile' },
 ] as const
@@ -105,12 +113,18 @@ const CANDIDATE_NAV = [
 // unread count + link, not the live NotificationBell dropdown every
 // other page already has) is a strict downgrade this migration fixes
 // as a side effect, not a scope increase.
+// Same sequencing rule as CANDIDATE_NAV above: Feed first, Company
+// Settings (the employer's own "Profile" equivalent) last. Middle order
+// by frequency/impact for an employer -- Dashboard (home base) > Browse
+// Candidates (the core paid search feature) > Messages (ongoing
+// candidate conversations) > Post Job (high-impact but occasional, once
+// per opening).
 const EMPLOYER_NAV = [
-  { href: '/employer/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'employer-dashboard' },
-  { href: '/employer/post-job', label: 'Post Job', icon: PlusCircle, key: 'post-job' },
-  { href: '/candidates', label: 'Browse Candidates', icon: Users, key: 'candidates' },
   { href: '/feed', label: 'Feed', icon: Rss, key: 'feed' },
+  { href: '/employer/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'employer-dashboard' },
+  { href: '/candidates', label: 'Browse Candidates', icon: Users, key: 'candidates' },
   { href: '/messages', label: 'Messages', icon: MessageCircle, key: 'messages' },
+  { href: '/employer/post-job', label: 'Post Job', icon: PlusCircle, key: 'post-job' },
   { href: '/employer/settings', label: 'Company Settings', icon: Settings, key: 'employer-settings' },
 ] as const
 
@@ -342,7 +356,7 @@ export function WorkspaceShell({ activeSection, variant = 'candidate', role, use
       <GuidedTour steps={variant === 'employer' ? EMPLOYER_TOUR_STEPS : CANDIDATE_TOUR_STEPS} storageKey="deepedge" />
 
       {/* Desktop rail -- persistent, fixed width, full height */}
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:top-8 lg:bottom-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
         <RailContents variant={variant} role={role} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
       </aside>
 

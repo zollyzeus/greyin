@@ -61,7 +61,7 @@ export function EcosystemWidget({ activePillars }: { activePillars: string[] }) 
                 {p.label}
                 {isActive && <CheckCircle2 className="w-3.5 h-3.5" style={{ color: p.color }} />}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{isActive ? 'Active' : 'Visit to join'}</p>
+              <p className={`text-xs font-medium ${isActive ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}`}>{isActive ? 'Active' : 'Visit to join'}</p>
             </a>
           )
         })}

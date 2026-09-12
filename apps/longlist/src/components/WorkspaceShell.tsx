@@ -54,6 +54,12 @@ interface WorkspaceShellProps {
   children: React.ReactNode
 }
 
+// Sidebar-organization request (2026-09-12): Feed-first, Profile-last
+// applied everywhere else on the platform -- Longlist has no Feed
+// feature at all (no cross-pillar activity stream here), so Dashboard
+// stays the practical first item; Profile stays last, and the
+// employer-only items (hasCompany) are already ordered by
+// frequency/impact (posting, then reviewing who subscribed).
 const BASE_NAV = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'dashboard' },
   { href: '/roles', label: 'Browse Future Roles', icon: Compass, key: 'roles' },
@@ -253,7 +259,7 @@ export function WorkspaceShell({ activeSection, hasCompany, userName, verified, 
       <FeedbackWishlistModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <GuidedTour steps={TOUR_STEPS} storageKey="longlist" />
 
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:top-8 lg:bottom-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
         <RailContents hasCompany={hasCompany} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
       </aside>
 

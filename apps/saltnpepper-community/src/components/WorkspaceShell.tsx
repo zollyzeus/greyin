@@ -46,9 +46,13 @@ interface WorkspaceShellProps {
   children: React.ReactNode
 }
 
+// Sequenced per a sidebar-organization request (2026-09-12): Feed first,
+// Profile last, everything else by usage frequency/impact -- Dashboard
+// (home base) > Discussions (the core community content) > Messages
+// (less frequent, private 1:1s).
 const BASE_NAV = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'dashboard' },
   { href: '/feed', label: 'Feed', icon: Rss, key: 'feed' },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'dashboard' },
   { href: '/discussions', label: 'Discussions', icon: MessageSquare, key: 'discussions' },
   { href: '/messages', label: 'Messages', icon: MessageCircle, key: 'messages' },
   { href: '/profile', label: 'Profile', icon: Settings, key: 'profile' },
@@ -258,7 +262,7 @@ export function WorkspaceShell({ activeSection, isAdmin, userName, verified, gre
       <FeedbackWishlistModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <GuidedTour steps={TOUR_STEPS} storageKey="saltnpepper" />
 
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:top-8 lg:bottom-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
         <RailContents isAdmin={isAdmin} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
       </aside>
 

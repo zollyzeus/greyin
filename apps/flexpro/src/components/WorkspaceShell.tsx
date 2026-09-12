@@ -50,12 +50,18 @@ interface WorkspaceShellProps {
   children: React.ReactNode
 }
 
+// Sequenced per a sidebar-organization request (2026-09-12): Feed first,
+// Profile last (index 5 -- referenced explicitly as BASE_NAV[5] below,
+// so its position in this array must stay last), everything else by
+// usage frequency/impact -- Dashboard (home base) > Orders (active
+// transaction status, checked most often by both sides) > My Gigs
+// (listing management) > Client Jobs (the less-used posting side).
 const BASE_NAV = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'dashboard' },
   { href: '/feed', label: 'Feed', icon: Rss, key: 'feed' },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'dashboard' },
+  { href: '/orders', label: 'Orders', icon: ShoppingCart, key: 'orders' },
   { href: '/gigs', label: 'My Gigs', icon: Package, key: 'gigs' },
   { href: '/client-jobs', label: 'Client Jobs', icon: Briefcase, key: 'client-jobs' },
-  { href: '/orders', label: 'Orders', icon: ShoppingCart, key: 'orders' },
   { href: '/profile', label: 'Profile', icon: Settings, key: 'profile' },
 ] as const
 
@@ -277,7 +283,7 @@ export function WorkspaceShell({ activeSection, role, userName, verified, greyin
       <FeedbackWishlistModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <GuidedTour steps={TOUR_STEPS} storageKey="flexpro" />
 
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:top-8 lg:bottom-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
         <RailContents role={role} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
       </aside>
 

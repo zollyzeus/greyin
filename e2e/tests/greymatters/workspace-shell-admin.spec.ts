@@ -56,3 +56,15 @@ test('the rail\'s Across Greyin list and the EcosystemWidget show real pillar ic
   await expect(ecosystemWidget.locator('a', { hasText: 'GreyMatters' }).locator('svg.lucide-book-open')).toBeVisible()
   await expect(ecosystemWidget.locator('span.rounded-full')).toHaveCount(0)
 })
+
+/**
+ * Sidebar-organization request (2026-09-12): Feed first, Profile last,
+ * everything else sequenced by usage frequency/impact.
+ */
+test('the rail lists Feed first and Profile last', async ({ page, cleanup }) => {
+  const author = await signUpGreyMatters(page, cleanup)
+  await login(page, author, '/dashboard')
+  const links = await page.locator('aside').first().locator('nav > div').first().locator('a').allTextContents()
+  expect(links[0]).toContain('Feed')
+  expect(links[links.length - 1]).toContain('Profile')
+})

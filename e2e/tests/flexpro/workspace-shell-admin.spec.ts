@@ -30,3 +30,15 @@ test('a non-admin does not see an Admin link in the rail', async ({ page, cleanu
 
   await expect(page.locator('aside').first().getByRole('link', { name: 'Admin' })).toHaveCount(0)
 })
+
+/**
+ * Sidebar-organization request (2026-09-12): Feed first, Profile last,
+ * everything else sequenced by usage frequency/impact.
+ */
+test('the rail lists Feed first and Profile last', async ({ page, cleanup }) => {
+  const freelancer = await signUpFlexPro(page, 'freelancer', cleanup)
+  await login(page, freelancer, '/dashboard')
+  const links = await page.locator('aside').first().locator('nav > div').first().locator('a').allTextContents()
+  expect(links[0]).toContain('Feed')
+  expect(links[links.length - 1]).toContain('Profile')
+})

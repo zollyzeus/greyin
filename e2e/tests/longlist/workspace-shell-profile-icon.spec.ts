@@ -17,3 +17,17 @@ test('the rail\'s Profile link uses the same Settings icon every other pillar us
   await expect(profileLink.locator('svg.lucide-settings')).toBeVisible()
   await expect(profileLink.locator('svg.lucide-send')).toHaveCount(0)
 })
+
+/**
+ * Sidebar-organization request (2026-09-12): Feed-first/Profile-last
+ * applies everywhere else on the platform, but Longlist has no Feed
+ * feature at all -- Dashboard stays the practical first item here, and
+ * Profile stays last.
+ */
+test('the rail lists Dashboard first (no Feed exists here) and Profile last', async ({ page, cleanup }) => {
+  const candidate = await signUpLongList(page, cleanup)
+  await login(page, candidate, '/dashboard')
+  const links = await page.locator('aside').first().locator('nav > div').first().locator('a').allTextContents()
+  expect(links[0]).toContain('Dashboard')
+  expect(links[links.length - 1]).toContain('Profile')
+})

@@ -52,11 +52,16 @@ interface WorkspaceShellProps {
   children: React.ReactNode
 }
 
+// Sequenced per a sidebar-organization request (2026-09-12): Feed first,
+// Profile last, everything else by usage frequency/impact -- Dashboard
+// (home base) > My Applications (frequent status checks) > Browse
+// Projects (the core browsing action) > People (peer discovery, least
+// frequent of the four).
 const BASE_NAV = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'dashboard' },
   { href: '/feed', label: 'Feed', icon: Rss, key: 'feed' },
-  { href: '/projects', label: 'Browse Projects', icon: FolderKanban, key: 'projects' },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'dashboard' },
   { href: '/applications', label: 'My Applications', icon: ClipboardList, key: 'applications' },
+  { href: '/projects', label: 'Browse Projects', icon: FolderKanban, key: 'projects' },
   { href: '/people', label: 'People', icon: Users, key: 'people' },
   { href: '/profile', label: 'Profile', icon: Settings, key: 'profile' },
 ] as const
@@ -102,7 +107,11 @@ function RailContents({ builder, isAdmin, activeSection, userName, verified, gre
   onLogNav: (key: string) => void
   onLogPillarSwitch: (to: string) => void
 }) {
-  const nav = BASE_NAV
+  // Profile must render last (sidebar-organization rule, 2026-09-12) --
+  // split BASE_NAV so the builder-only "Post a Project" link (rendered
+  // separately below) lands before it, not after.
+  const nav = BASE_NAV.slice(0, -1)
+  const profileItem = BASE_NAV[BASE_NAV.length - 1]
 
   return (
     <>
@@ -153,6 +162,24 @@ function RailContents({ builder, isAdmin, activeSection, userName, verified, gre
               Post a Project
             </Link>
           )}
+          <Link
+            key={profileItem.key}
+            href={profileItem.href}
+            data-tour={`nav-${profileItem.key}`}
+            onClick={() => {
+              onLogNav(profileItem.key)
+              onNavigate?.()
+            }}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeSection === profileItem.key
+                ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400'
+                : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
+            }`}
+          >
+            <profileItem.icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+            {profileItem.label}
+            {NAV_BADGE_TYPES[profileItem.key] && <SectionBadge types={NAV_BADGE_TYPES[profileItem.key]} />}
+          </Link>
           <button
             type="button"
             data-testid="rail-feedback-button"
@@ -289,7 +316,7 @@ export function WorkspaceShell({ activeSection, builder, isAdmin, userName, veri
       <FeedbackWishlistModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <GuidedTour steps={TOUR_STEPS} storageKey="stackworks" />
 
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:top-8 lg:bottom-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
         <RailContents builder={builder} isAdmin={isAdmin} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
       </aside>
 
