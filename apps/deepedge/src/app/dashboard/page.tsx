@@ -76,6 +76,15 @@ export default async function DashboardPage() {
     ? await supabase.from('applications').select('id', { count: 'exact', head: true }).eq('candidate_id', candidateRow.id)
     : { count: 0 }
 
+  // Profile-view insights (Skillmeet.ai comparison round, 2026-09-12):
+  // the tile above was hardcoded 0 since the 2026-09-05 integrity audit
+  // explicitly flagged there was no backing counter -- profile_views
+  // (150) is that counter now. viewer_names comes back non-null only if
+  // this candidate holds an active candidate_subscriptions row.
+  const { data: viewSummary } = await supabase.rpc('get_profile_view_summary')
+  const weeklyViewCount = viewSummary?.[0]?.view_count ?? 0
+  const viewerNames: string[] | null = viewSummary?.[0]?.viewer_names ?? null
+
   return (
     <WorkspaceShell
       activeSection="dashboard"
@@ -214,13 +223,38 @@ export default async function DashboardPage() {
           <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-900">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm dark:text-gray-400">Profile Views</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2 dark:text-gray-50">0</p>
+                <p className="text-gray-500 text-sm dark:text-gray-400">Profile Views (7d)</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2 dark:text-gray-50">{weeklyViewCount}</p>
               </div>
               <Users className="h-12 w-12 text-purple-500 dark:text-purple-400" />
             </div>
           </div>
         </div>
+
+        {/* Who viewed you -- free tier gets the count above only;
+            viewerNames comes back non-null exclusively for an active
+            candidate_subscriptions holder (get_profile_view_summary, 150). */}
+        {weeklyViewCount > 0 && (
+          <div className="mb-8 bg-white rounded-lg shadow p-6 dark:bg-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 mb-1 dark:text-gray-50">Who viewed your profile</h2>
+            {viewerNames ? (
+              <ul className="mt-3 space-y-1.5">
+                {viewerNames.map((name, i) => (
+                  <li key={i} className="text-sm text-gray-700 dark:text-gray-300">{name}</li>
+                ))}
+              </ul>
+            ) : (
+              <>
+                <p className="text-sm text-gray-500 mt-1 dark:text-gray-400">
+                  {weeklyViewCount} employer{weeklyViewCount === 1 ? '' : 's'} viewed your profile this week. Upgrade to Profile Insights to see exactly who.
+                </p>
+                <Link href="/premium" className="inline-block mt-3 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
+                  See who viewed you &rarr;
+                </Link>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div className="bg-white rounded-lg shadow dark:bg-gray-900">

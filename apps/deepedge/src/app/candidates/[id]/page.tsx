@@ -149,6 +149,15 @@ export default async function CandidateDetailPage({ params }: { params: Promise<
   let peerRaterStats: any = null
   const reciprocityFlagsByProject = new Set<string>()
 
+  // Profile-view insights (Skillmeet.ai comparison round, 2026-09-12):
+  // record a real view iff a different, real employer actually reached
+  // this page -- independent of whether it cost them a credit, since the
+  // point is "a real employer looked at you," same free-own-applicant/
+  // paid-search split canView already governs above.
+  if (profile?.role === 'employer' && !isSelf) {
+    await supabase.rpc('record_profile_view', { p_viewed_user_id: id })
+  }
+
   if (canView) {
     if (!isSelf) {
       const { data: collabRows } = await supabase

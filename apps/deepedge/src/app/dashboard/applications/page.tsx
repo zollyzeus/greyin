@@ -23,12 +23,16 @@ const STATUS_STYLES: Record<string, string> = {
 // withdrawn already is one).
 const WITHDRAWABLE_STATUSES = new Set(['submitted', 'reviewing', 'shortlisted', 'interview', 'offer'])
 
+// Matches interview_question_logs' own INSERT policy (151) -- only once
+// an application has actually reached the interview stage or beyond.
+const QUESTION_SHARE_STATUSES = new Set(['interview', 'offer', 'rejected', 'accepted'])
+
 export default async function MyApplicationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ success?: string }>
+  searchParams: Promise<{ success?: string; question_submitted?: string; question_error?: string }>
 }) {
-  const { success } = await searchParams
+  const { success, question_submitted, question_error } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -48,7 +52,7 @@ export default async function MyApplicationsPage({
   const { data: applications } = candidate
     ? await supabase
         .from('applications')
-        .select('id, status, applied_at, expected_salary, jobs ( id, title, location, companies ( name, user_id ) )')
+        .select('id, status, applied_at, expected_salary, jobs ( id, title, location, companies ( id, name, user_id ) )')
         .eq('candidate_id', candidate.id)
         .order('applied_at', { ascending: false })
     : { data: [] }
@@ -73,6 +77,17 @@ export default async function MyApplicationsPage({
           <div className="mb-6 flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
             <CheckCircle className="h-4 w-4" />
             Application submitted successfully!
+          </div>
+        )}
+        {question_submitted && (
+          <div className="mb-6 flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
+            <CheckCircle className="h-4 w-4" />
+            Thanks -- your question was shared to help future candidates.
+          </div>
+        )}
+        {question_error && (
+          <div className="mb-6 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-400">
+            {question_error}
           </div>
         )}
 
@@ -120,6 +135,32 @@ export default async function MyApplicationsPage({
                   <div className="w-full basis-full">
                     <InterviewPrepAssist applicationId={app.id} />
                   </div>
+                )}
+                {QUESTION_SHARE_STATUSES.has(app.status) && app.jobs?.companies?.id && (
+                  <details className="w-full basis-full mt-3 border-t pt-3 dark:border-gray-800">
+                    <summary className="text-xs font-semibold text-indigo-600 cursor-pointer select-none dark:text-indigo-400">
+                      Share an interview question you were asked
+                    </summary>
+                    <form action="/api/interview-questions/submit" method="POST" className="mt-3 flex flex-col gap-2">
+                      <input type="hidden" name="company_id" value={app.jobs.companies.id} />
+                      <input
+                        type="text"
+                        name="round_label"
+                        placeholder="Round (e.g. Technical screen) -- optional"
+                        className="border border-gray-300 rounded-lg px-3 py-1.5 text-xs dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+                      />
+                      <textarea
+                        name="question_text"
+                        rows={2}
+                        required
+                        placeholder="e.g. Design a rate limiter for a multi-tenant API"
+                        className="border border-gray-300 rounded-lg px-3 py-1.5 text-xs dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+                      />
+                      <button type="submit" className="self-start bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:hover:bg-indigo-950/70">
+                        Submit
+                      </button>
+                    </form>
+                  </details>
                 )}
               </div>
             ))}

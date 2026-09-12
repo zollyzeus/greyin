@@ -45,11 +45,11 @@ test.describe('Career re-entry track', () => {
     // Still shows up in the general Verified Expert search -- the whole
     // point of the additive design over Pivoter's exclusion.
     await employerPage.goto('/candidates')
-    // Candidate cards render as whole-card <Link>s (an <a>, not a <div>) --
-    // fixed to match after this failed against real DOM (see the RPC-based
-    // candidates.spec.ts rewrite this same session): the selector had been
-    // stale since whichever earlier pass made the card itself the link.
-    const candidateCard = employerPage.locator('a.bg-white.rounded-lg.shadow-md', { hasText: `${candidate.firstName} ${candidate.lastName}` })
+    // Candidate cards are now a <div> wrapping a <Link> (Skillmeet.ai
+    // comparison round, 149) rather than the whole card being one <a> --
+    // the invite-to-job form needed to sit outside the clickable link, not
+    // nested inside it. Selector updated to match the outer <div>.
+    const candidateCard = employerPage.locator('div.bg-white.rounded-lg.shadow-md', { hasText: `${candidate.firstName} ${candidate.lastName}` })
     await expect(candidateCard).toBeVisible()
     await expect(candidateCard.getByText('Returning to work · caregiving')).toBeVisible()
 

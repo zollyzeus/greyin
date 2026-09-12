@@ -1,15 +1,15 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Users, ArrowLeft, Briefcase, BadgeCheck, Lock, RotateCcw } from 'lucide-react'
+import { Users, ArrowLeft, Briefcase, BadgeCheck, Lock, RotateCcw, Send } from 'lucide-react'
 import { WorkspaceShell } from '@/components/WorkspaceShell'
 
 export default async function CandidatesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ skill?: string; min_experience?: string; availability?: string; remote_preference?: string }>
+  searchParams: Promise<{ skill?: string; min_experience?: string; availability?: string; remote_preference?: string; min_score?: string; invited?: string; invite_error?: string }>
 }) {
-  const { skill, min_experience, availability, remote_preference } = await searchParams
+  const { skill, min_experience, availability, remote_preference, min_score, invited, invite_error } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -103,7 +103,15 @@ export default async function CandidatesPage({
     p_min_experience: min_experience ? parseInt(min_experience, 10) : null,
     p_availability: availability || null,
     p_remote_preference: remote_preference || null,
+    p_min_score: min_score ? parseInt(min_score, 10) : null,
   })
+
+  // For the "Invite to job" action below -- an employer can only invite
+  // to one of their own OPEN postings, same ownership boundary
+  // job_invites' own RLS enforces server-side (149).
+  const { data: ownOpenJobs } = company
+    ? await supabase.from('jobs').select('id, title').eq('company_id', company.id).eq('status', 'open').order('created_at', { ascending: false })
+    : { data: [] }
 
   const scoreByUserId = new Map((candidateRows || []).map((r: any) => [r.user_id, r.greyin_score]))
   const candidates = (candidateRows || []).map((r: any) => ({
@@ -139,6 +147,17 @@ export default async function CandidatesPage({
         </Link>
 
         <h1 className="text-3xl font-bold text-gray-900 mb-6 dark:text-gray-50">Browse Candidates</h1>
+
+        {invited && (
+          <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
+            Invite sent.
+          </div>
+        )}
+        {invite_error && (
+          <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-400">
+            {invite_error}
+          </div>
+        )}
 
         <form className="mb-6 flex flex-wrap gap-3">
           <input
@@ -181,15 +200,27 @@ export default async function CandidatesPage({
             <option value="onsite">On-site</option>
             <option value="flexible">Flexible</option>
           </select>
+          <select
+            name="min_score"
+            defaultValue={min_score || ''}
+            className="border border-gray-300 rounded-lg px-4 py-2 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+          >
+            <option value="">Any Greyin Score</option>
+            <option value="60">60+</option>
+            <option value="75">75+</option>
+            <option value="85">85+</option>
+          </select>
           <button type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 font-semibold">
             Search
           </button>
         </form>
+        <p className="text-xs text-gray-500 mb-4 -mt-3 dark:text-gray-400">Results are ranked by Greyin Score, highest first.</p>
 
         {candidates && candidates.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {candidates.map((candidate: any) => (
-              <Link key={candidate.id} href={`/candidates/${candidate.user_id}`} className="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow dark:bg-gray-900">
+              <div key={candidate.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow dark:bg-gray-900">
+              <Link href={`/candidates/${candidate.user_id}`} className="block">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center dark:bg-gray-800">
                     <Users className="h-6 w-6 text-gray-400 dark:text-gray-500" />
@@ -228,6 +259,28 @@ export default async function CandidatesPage({
                   </div>
                 )}
               </Link>
+
+              {ownOpenJobs && ownOpenJobs.length > 0 && (
+                <form action={`/api/candidates/${candidate.user_id}/invite`} method="POST" className="mt-4 pt-4 border-t border-gray-100 flex gap-2 dark:border-gray-800">
+                  <select
+                    name="job_id"
+                    required
+                    className="flex-1 min-w-0 border border-gray-300 rounded-lg px-2 py-1.5 text-xs dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+                  >
+                    {ownOpenJobs.map((j: any) => (
+                      <option key={j.id} value={j.id}>{j.title}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="submit"
+                    className="shrink-0 flex items-center gap-1 bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:hover:bg-indigo-950/70"
+                  >
+                    <Send className="h-3 w-3" />
+                    Invite
+                  </button>
+                </form>
+              )}
+              </div>
             ))}
           </div>
         ) : (
