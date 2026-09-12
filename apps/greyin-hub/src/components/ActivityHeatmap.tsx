@@ -144,15 +144,25 @@ export function ActivityHeatmap({ activity, joinDate }: { activity: ActivityEven
                       .map(([pillar, n]) => `${n} ${PILLAR_LABELS[pillar] ?? pillar}`)
                       .join(', ')
                   : date.toLocaleDateString()
+                // "No activity" cells previously hardcoded a light-gray
+                // fill (#e5e7eb) via inline style with no dark-mode
+                // branch -- inline `style` always wins over `className`,
+                // so no amount of dark: CSS elsewhere could ever apply
+                // to it. Every empty cell (guaranteed to exist for any
+                // real date range) rendered as a pale square standing
+                // out against the dark dashboard. Fixed by only setting
+                // backgroundColor via style when there's a real pillar
+                // color to show, and using a themed className for the
+                // empty case instead.
+                const isEmpty = inRange && count === 0
                 return (
                   <div
                     key={key}
                     title={inRange ? `${date.toLocaleDateString()} — ${tooltip}` : undefined}
-                    className="w-3 h-3 rounded-sm"
+                    className={`w-3 h-3 rounded-sm ${isEmpty ? 'bg-gray-200 dark:bg-gray-800 border border-gray-300 dark:border-gray-700' : ''}`}
                     style={{
-                      backgroundColor: inRange ? (color ?? '#e5e7eb') : 'transparent',
+                      backgroundColor: inRange && !isEmpty ? color : undefined,
                       opacity: inRange ? (count === 0 ? 1 : opacity) : 0,
-                      border: inRange && count === 0 ? '1px solid #e5e7eb' : undefined,
                     }}
                   />
                 )

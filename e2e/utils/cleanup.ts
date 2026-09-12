@@ -86,7 +86,17 @@ export class Cleanup {
       // ai_quality_scores use subject_user_id, not user_id; peer_project_ratings
       // has no single user_id at all, only rater_id/ratee_id).
       for (const [table, filter] of [
-        ['verified_outcomes', `subject_user_id=eq.${id}`],
+        // subject_user_id cascades on delete (verified_outcomes_subject_user_id_fkey,
+        // ON DELETE CASCADE) so was never actually the blocker on its own --
+        // verified_by has NO cascade action at all. A reviewer/verifier
+        // account (e.g. a StackWorks builder who reviews a candidate's
+        // submitted work) is deleted here even though they're never the
+        // subject of the row, hitting verified_outcomes_verified_by_fkey
+        // and aborting the whole GoTrue delete with the same class of
+        // silent 500 this file's own comment above already root-caused
+        // for the subject-side columns -- confirmed live via hub-dashboard.spec.ts's
+        // own builder account failing to delete with exactly this FK name.
+        ['verified_outcomes', `or=(subject_user_id.eq.${id},verified_by.eq.${id})`],
         ['reputation_events', `user_id=eq.${id}`],
         ['ai_quality_scores', `subject_user_id=eq.${id}`],
         ['peer_project_ratings', `or=(rater_id.eq.${id},ratee_id.eq.${id})`],

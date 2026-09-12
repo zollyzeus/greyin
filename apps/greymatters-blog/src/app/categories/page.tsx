@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/app/lib/supabase/server'
 import { BookOpen, Tag } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { safeCategoryColor } from '@/app/lib/safe-color'
 
 export default async function CategoriesPage() {
   const supabase = await createClient()
@@ -42,7 +43,7 @@ export default async function CategoriesPage() {
                 className="bg-white rounded-lg shadow-md hover:shadow-lg transition p-6 dark:bg-gray-900"
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <Tag className="h-5 w-5" style={{ color: category.color || '#2563eb' }} />
+                  <Tag className="h-5 w-5" style={{ color: safeCategoryColor(category.color) }} />
                   <h3 className="font-semibold text-gray-900 dark:text-gray-50">{category.name}</h3>
                 </div>
                 {category.description && (
