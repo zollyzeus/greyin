@@ -214,8 +214,13 @@ test('the sidebar can be collapsed to an icon-only rail, and the state persists 
   await expect(jobsLink).toHaveText('')
   await expect(jobsLink.locator('svg')).toBeVisible()
 
-  const collapsedBox = await rail.boundingBox()
-  expect(collapsedBox!.width).toBeLessThan(expandedBox!.width - 100)
+  // The rail animates width via a CSS transition (duration-200) -- poll
+  // rather than take one boundingBox() snapshot, which can race the
+  // animation and read a mid-transition width.
+  await expect(async () => {
+    const collapsedBox = await rail.boundingBox()
+    expect(collapsedBox!.width).toBeLessThan(expandedBox!.width - 100)
+  }).toPass({ timeout: 2000 })
 
   // The rail still navigates correctly while collapsed.
   await jobsLink.click()
