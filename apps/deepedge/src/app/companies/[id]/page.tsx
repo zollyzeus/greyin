@@ -9,10 +9,10 @@ export default async function CompanyDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ success?: string; error?: string }>
+  searchParams: Promise<{ success?: string; error?: string; reported?: string; report_error?: string }>
 }) {
   const { id } = await params
-  const { success, error } = await searchParams
+  const { success, error, reported, report_error } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -96,6 +96,16 @@ export default async function CompanyDetailPage({
         {error && (
           <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900 dark:text-red-400">
             {decodeURIComponent(error)}
+          </div>
+        )}
+        {reported && (
+          <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
+            Report submitted -- an admin will review it.
+          </div>
+        )}
+        {report_error && (
+          <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-400">
+            {report_error}
           </div>
         )}
 
@@ -205,6 +215,28 @@ export default async function CompanyDetailPage({
                     <span className="text-xs text-gray-400 ml-2 dark:text-gray-500">{new Date(review.created_at).toLocaleDateString()}</span>
                   </div>
                   {review.review_text && <p className="text-sm text-gray-700 dark:text-gray-300">{review.review_text}</p>}
+                  {user && (
+                    <details className="mt-2">
+                      <summary className="text-xs text-gray-400 hover:text-red-600 cursor-pointer select-none dark:text-gray-500 dark:hover:text-red-400">
+                        Report
+                      </summary>
+                      <form action="/api/reports/submit" method="POST" className="mt-2 flex flex-col gap-2 max-w-sm">
+                        <input type="hidden" name="content_type" value="company_review" />
+                        <input type="hidden" name="content_id" value={review.id} />
+                        <input type="hidden" name="return_to" value={`/companies/${id}`} />
+                        <textarea
+                          name="reason"
+                          required
+                          rows={2}
+                          placeholder="Why are you reporting this review?"
+                          className="border border-gray-300 rounded-lg px-3 py-1.5 text-xs dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+                        />
+                        <button type="submit" className="self-start bg-red-50 text-red-700 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-100 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-950/70">
+                          Submit report
+                        </button>
+                      </form>
+                    </details>
+                  )}
                 </div>
               ))}
             </div>

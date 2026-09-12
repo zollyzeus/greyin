@@ -340,6 +340,28 @@ messages (per-pillar, e.g., stackworks_messages, flexpro_messages)
 message_recipients (if > 2-way convos needed)
   ├─ message_id, user_id, read_at
 ```
+*(Actual live schema, Migration 021: `conversations` + `conversation_participants` + `direct_messages`, one shared set across DeepEdge and Salt & Pepper -- 2-participant conversations via `get_or_create_conversation()`, not per-pillar tables.)*
+
+#### Content Moderation & Reporting (Migration 152, 2026-09-13)
+**Feature:** Receiver-side "Report" action + a centralized admin moderation queue + user blocking, added after a platform-wide abuse-vector audit found no member-facing report action existed anywhere (only automatic system checks: Salt & Pepper's pre-publish moderation LLM, StackWorks' peer-rating reciprocity flags, GreyMatters' post authenticity flag).
+```sql
+content_reports (shared table, all apps -- not one per content type)
+  ├─ reporter_id, content_type ('company_review'|'direct_message'|'greymatters_comment')
+  ├─ content_id, reason
+  ├─ status ('open'|'resolved'|'dismissed'), admin_notes
+  └─ resolved_by, resolved_at
+
+blocked_users
+  ├─ blocker_id, blocked_id (PK)
+  └─ created_at
+```
+**Enforcement:**
+- `submit_content_report()` (SECURITY DEFINER): validates content_type, inserts the report, soft-hides a reported GreyMatters comment (flips its pre-existing `status` to `'pending'`, which that table's own RLS then excludes from public view), and pages every admin via the existing shared `notifications` table/bell.
+- `resolve_content_report()` (SECURITY DEFINER, admin-only): sets `status`; a `'dismissed'` GreyMatters-comment report restores `status='approved'`.
+- `block_user()` (SECURITY DEFINER) + `blocked_users`: `get_or_create_conversation()` refuses to start a conversation between a blocked pair; the `direct_messages` INSERT policy separately refuses a send into an *existing* conversation once blocked.
+- **Gotcha (caught live via e2e, fixed same day):** the block-check inside that INSERT policy can't be a bare correlated subquery on `blocked_users` -- that table's own RLS (`blocker_id = auth.uid()`) hides the block row from the blocked *sender's* point of view (they're the `blocked_id`, not the `blocker_id`), so a bare subquery silently never blocks anything. Fixed via a SECURITY DEFINER helper, `sender_is_blocked_in_conversation()`, which runs with elevated privilege and isn't subject to that same RLS-visibility gap.
+
+Admin UI: one centralized `/admin/reports` queue on Greyin Hub (not three separate per-pillar UIs) listing every open report across all three content types with Resolve/Dismiss actions.
 
 #### Activity & Follow Graph (FR-PW-09, FR-PW-10, FR-PW-23)
 **Feature:** Follow users, see their activity, discover collaborators

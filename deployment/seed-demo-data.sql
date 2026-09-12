@@ -588,6 +588,55 @@ INSERT INTO public.notifications (user_id, type, title, body, link) VALUES
   ('fa700248-dd35-4c20-b674-7d741e9f8620', 'proactive_job_match', 'A new job matches your profile', 'Senior Product Manager', '/jobs/e6c68e95-2239-48ad-87fa-31abf609db7d'),
   ('ec37f634-2151-40a0-a62c-96301bc61a54', 'proactive_candidate_match', 'New candidates match your job posting', '1 candidate matching "VP of Finance" hasn''t applied yet', '/employer/jobs/52c305b2-593c-45c9-852c-38efc8b00a28');
 
+-- ------------------------------------------------------------
+-- PHASE 9: "Report this" workflow demo data (152, added 2026-09-13)
+-- ------------------------------------------------------------
+-- One conversation+message (no DM seed data existed before this) so a
+-- reported DM has something real to point at, then 3 content_reports
+-- rows covering both expected end states an admin should see: 2 still
+-- open (a company review, the new DM), 1 already resolved by "Demo
+-- Admin" (a GreyMatters comment, dismissed as genuine and restored --
+-- the full report -> soft-hide -> admin review -> restore cycle, not
+-- just the open-queue state).
+INSERT INTO public.conversations (id, created_at, last_message_at)
+VALUES ('d0000000-0000-0000-0000-000000000001', now() - interval '2 days', now() - interval '2 days')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.conversation_participants (conversation_id, user_id) VALUES
+  ('d0000000-0000-0000-0000-000000000001', 'fa700248-dd35-4c20-b674-7d741e9f8620'),
+  ('d0000000-0000-0000-0000-000000000001', '6ffb6dc3-e082-4c69-835c-c866f6de5ef5')
+ON CONFLICT (conversation_id, user_id) DO NOTHING;
+
+INSERT INTO public.direct_messages (conversation_id, sender_id, body, created_at) VALUES
+  ('d0000000-0000-0000-0000-000000000001', '6ffb6dc3-e082-4c69-835c-c866f6de5ef5', 'Hey, saw your profile -- I run a totally unrelated side business, want to hear about a quick opportunity?', now() - interval '2 days')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO public.content_reports (reporter_id, content_type, content_id, reason, status, created_at)
+SELECT 'a1b29015-1a85-451a-9efb-7ea534d29ec1', 'company_review', cr.id,
+  'This reads like it was written by someone who never actually interviewed here -- generic praise with no specifics, and it appeared right after we posted a negative Glassdoor callout.',
+  'open', now() - interval '6 hours'
+FROM public.company_reviews cr
+WHERE cr.company_id = 'ed21b453-0583-4074-98bf-b564d1a7ca5b' AND cr.reviewer_id = '3bddb1a4-dc65-4786-af29-93aa1515bd5c'
+  AND NOT EXISTS (SELECT 1 FROM public.content_reports WHERE content_type = 'company_review' AND content_id = cr.id);
+
+INSERT INTO public.content_reports (reporter_id, content_type, content_id, reason, status, created_at)
+SELECT 'fa700248-dd35-4c20-b674-7d741e9f8620', 'direct_message', 'd0000000-0000-0000-0000-000000000001',
+  'This person is using DeepEdge messaging to pitch an unrelated business opportunity, not to discuss a job.',
+  'open', now() - interval '1 hour'
+WHERE NOT EXISTS (SELECT 1 FROM public.content_reports WHERE content_type = 'direct_message' AND content_id = 'd0000000-0000-0000-0000-000000000001');
+
+UPDATE public.comments SET status = 'approved'
+WHERE post_id = 'e5e2d6e9-264e-4684-af8a-06305e219e7d' AND user_id = '89018def-f57b-42ac-b2d1-2454b52d4e2d' AND status = 'pending';
+
+INSERT INTO public.content_reports (reporter_id, content_type, content_id, reason, status, admin_notes, resolved_by, resolved_at, created_at)
+SELECT '6d6ceb53-eb38-4d89-9fd3-c455f2cf3632', 'greymatters_comment', c.id,
+  'This feels like a competitor plugging their own product, not a genuine comment.',
+  'dismissed', 'Reviewed -- genuine comment from a real reader, no promotional content or links. Restored to approved.',
+  'f3d6979c-7e8a-46ad-98ca-c3311bd3c6a5', now() - interval '3 hours', now() - interval '1 day'
+FROM public.comments c
+WHERE c.post_id = 'e5e2d6e9-264e-4684-af8a-06305e219e7d' AND c.user_id = '89018def-f57b-42ac-b2d1-2454b52d4e2d'
+  AND NOT EXISTS (SELECT 1 FROM public.content_reports WHERE content_type = 'greymatters_comment' AND content_id = c.id);
+
 COMMIT;
 
 -- ------------------------------------------------------------

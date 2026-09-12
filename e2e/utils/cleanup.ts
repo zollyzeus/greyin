@@ -100,6 +100,11 @@ export class Cleanup {
         ['reputation_events', `user_id=eq.${id}`],
         ['ai_quality_scores', `subject_user_id=eq.${id}`],
         ['peer_project_ratings', `or=(rater_id.eq.${id},ratee_id.eq.${id})`],
+        // content_reports.reporter_id cascades (152); resolved_by does not --
+        // same class of bug as verified_by above, caught live the same way
+        // (an admin test account that resolves a report failing to delete
+        // with content_reports_resolved_by_fkey).
+        ['content_reports', `or=(reporter_id.eq.${id},resolved_by.eq.${id})`],
       ]) {
         await fetch(`${SUPABASE_URL}/rest/v1/${table}?${filter}`, {
           method: 'DELETE',

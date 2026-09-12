@@ -15,10 +15,12 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 
 interface PostDetailPageProps {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ reported?: string; report_error?: string }>
 }
 
-export default async function PostDetailPage({ params }: PostDetailPageProps) {
+export default async function PostDetailPage({ params, searchParams }: PostDetailPageProps) {
   const resolvedParams = await params
+  const { reported, report_error } = await searchParams
   const supabase = await createClient()
   
   const { data: post } = await supabase
@@ -309,6 +311,17 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
             Comments ({comments?.length || 0})
           </h2>
 
+          {reported && (
+            <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 dark:bg-green-950/40 dark:border-green-900 dark:text-green-400">
+              Report submitted -- this comment is hidden pending review, and an admin will take a look.
+            </div>
+          )}
+          {report_error && (
+            <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-400">
+              {report_error}
+            </div>
+          )}
+
           {/* Comment Form */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6 dark:bg-gray-900">
             {user ? (
@@ -355,6 +368,28 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
                         </span>
                       </div>
                       <p className="text-gray-700 dark:text-gray-300">{comment.content}</p>
+                      {user && user.id !== comment.user_id && (
+                        <details className="mt-2">
+                          <summary className="text-xs text-gray-400 hover:text-red-600 cursor-pointer select-none dark:text-gray-500 dark:hover:text-red-400">
+                            Report
+                          </summary>
+                          <form action="/api/reports/submit" method="POST" className="mt-2 flex flex-col gap-2 max-w-sm">
+                            <input type="hidden" name="content_type" value="greymatters_comment" />
+                            <input type="hidden" name="content_id" value={comment.id} />
+                            <input type="hidden" name="return_to" value={`/posts/${post.slug}`} />
+                            <textarea
+                              name="reason"
+                              required
+                              rows={2}
+                              placeholder="Why are you reporting this comment?"
+                              className="border border-gray-300 rounded-lg px-3 py-1.5 text-xs dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+                            />
+                            <button type="submit" className="self-start bg-red-50 text-red-700 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-100 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-950/70">
+                              Submit report
+                            </button>
+                          </form>
+                        </details>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { ShieldCheck, Bot, BadgeCheck, Briefcase, Trash2, Lightbulb, MessageSquareHeart, Scale, MessageSquareWarning, TrendingUp, ShieldAlert, Mail } from 'lucide-react'
+import { ShieldCheck, Bot, BadgeCheck, Briefcase, Trash2, Lightbulb, MessageSquareHeart, Scale, MessageSquareWarning, TrendingUp, ShieldAlert, Mail, Flag } from 'lucide-react'
 
 /**
  * Platform-wide admin lives here, not on any one pillar app -- Greyin
@@ -76,6 +76,11 @@ export default async function AdminPage({
             <Mail className="h-6 w-6 text-indigo-600 mb-2 dark:text-indigo-400" />
             <h2 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">Business Inquiries</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">Sales/partnership messages from the public "Contact" link, any app.</p>
+          </Link>
+          <Link href="/admin/reports" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition dark:bg-gray-900">
+            <Flag className="h-6 w-6 text-indigo-600 mb-2 dark:text-indigo-400" />
+            <h2 className="font-semibold text-gray-900 mb-1 dark:text-gray-50">Content Reports</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Member-reported company reviews, DMs, and GreyMatters comments, any app.</p>
           </Link>
           <Link href="/admin/bias-audit" className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition dark:bg-gray-900">
             <Scale className="h-6 w-6 text-indigo-600 mb-2 dark:text-indigo-400" />
