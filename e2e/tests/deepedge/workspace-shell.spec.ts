@@ -183,3 +183,50 @@ test('a non-admin does not see an Admin link in the rail', async ({ page, cleanu
 
   await expect(page.locator('aside').first().getByRole('link', { name: 'Admin' })).toHaveCount(0)
 })
+
+/**
+ * Collapsible sidebar (2026-09-13): a toggle button on the rail's right
+ * edge shrinks it from w-64 to an icon-only w-16 strip -- labels hidden,
+ * a `title` tooltip added to every icon so meaning isn't lost, state
+ * persisted in localStorage (not a profiles column -- a pure per-browser
+ * display preference, matching the theme toggle's own persistence).
+ */
+test('the sidebar can be collapsed to an icon-only rail, and the state persists across reload', async ({ page, cleanup }) => {
+  const candidate = await signUpDeepEdge(page, 'candidate', cleanup)
+  await login(page, candidate, '/dashboard')
+
+  const rail = page.locator('aside').first()
+  await expect(rail.getByRole('link', { name: 'Browse Jobs' })).toBeVisible()
+  const expandedBox = await rail.boundingBox()
+
+  const toggle = page.getByRole('button', { name: 'Collapse sidebar' })
+  await toggle.click()
+
+  // Labels disappear, icons (and their tooltips) remain. Note: a
+  // collapsed link's accessible NAME still resolves to the label via its
+  // `title` attribute (the browser's accessible-name algorithm falls
+  // back to `title` when there's no visible text) -- that's deliberate,
+  // it's what makes the tooltip meaningful to a screen reader too. So
+  // "hidden" has to be asserted via visible text content, not
+  // getByRole(name), which would still match.
+  const jobsLink = rail.locator('a[title="Browse Jobs"]')
+  await expect(jobsLink).toBeVisible()
+  await expect(jobsLink).toHaveText('')
+  await expect(jobsLink.locator('svg')).toBeVisible()
+
+  const collapsedBox = await rail.boundingBox()
+  expect(collapsedBox!.width).toBeLessThan(expandedBox!.width - 100)
+
+  // The rail still navigates correctly while collapsed.
+  await jobsLink.click()
+  await page.waitForURL(/\/jobs$/)
+
+  // Persists across a reload, same as the theme toggle's own persistence.
+  await page.goto('/dashboard')
+  await expect(page.locator('aside').first().locator('a[title="Browse Jobs"]')).toBeVisible()
+  await expect(page.locator('aside').first().locator('a[title="Browse Jobs"]')).toHaveText('')
+
+  // Expanding again restores labels and the wider rail.
+  await page.getByRole('button', { name: 'Expand sidebar' }).click()
+  await expect(page.locator('aside').first().getByRole('link', { name: 'Browse Jobs' })).toBeVisible()
+})

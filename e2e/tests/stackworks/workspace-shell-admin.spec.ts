@@ -41,3 +41,30 @@ test('the rail lists Feed first and Profile last', async ({ page, cleanup }) => 
   expect(links[0]).toContain('Feed')
   expect(links[links.length - 1]).toContain('Profile')
 })
+
+/**
+ * Collapsible sidebar (2026-09-13), StackWorks-specific regression: this
+ * app's RailContents splits BASE_NAV into `nav` (all but Profile) and a
+ * separately-rendered `profileItem`, plus a builder-only "Post a Project"
+ * insert in between -- three independent render paths that each needed
+ * their own collapsed-state treatment. Confirms the split didn't miss one.
+ */
+test('collapsing the rail hides labels on every nav item, including the separately-rendered Profile link', async ({ page, cleanup }) => {
+  const builder = await signUpStackWorksBuilder(page, cleanup)
+  await login(page, builder, '/dashboard')
+
+  const rail = page.locator('aside').first()
+  await page.getByRole('button', { name: 'Collapse sidebar' }).click()
+
+  // A collapsed link's accessible NAME still resolves via its `title`
+  // attribute (browser accessible-name fallback when there's no visible
+  // text) -- deliberate, for screen-reader tooltip parity -- so "hidden"
+  // is asserted via visible text content, not getByRole(name).
+  const profileLink = rail.locator('a[title="Profile"]')
+  await expect(profileLink).toBeVisible()
+  await expect(profileLink).toHaveText('')
+  await expect(profileLink.locator('svg')).toBeVisible()
+
+  await profileLink.click()
+  await page.waitForURL(/\/profile$/)
+})

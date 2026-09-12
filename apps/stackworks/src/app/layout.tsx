@@ -19,7 +19,7 @@ export const metadata = {
 // own comment for why this is duplicated per app rather than shared.
 function PreviewBanner() {
   return (
-    <div className="bg-gray-900 text-gray-300 text-xs text-center py-1.5 px-4 lg:h-8 lg:flex lg:items-center lg:justify-center lg:py-0">
+    <div className="bg-gray-900 dark:bg-black text-gray-300 text-xs text-center py-1.5 px-4 lg:h-8 lg:flex lg:items-center lg:justify-center lg:py-0">
       <span className="font-medium text-white">Preview build</span> — people, companies, and activity shown across Greyin are seeded demonstration data, not real users.
     </div>
   )

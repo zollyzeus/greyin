@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   Telescope,
+  ChevronLeft,
+  ChevronRight,
   LayoutDashboard,
   Compass,
   RotateCcw,
@@ -107,13 +109,14 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'ecosystem', title: 'Across Greyin', description: 'Longlist is one of six connected platforms — jump to any of them any time, same login.' },
 ]
 
-function RailContents({ hasCompany, role, activeSection, userName, verified, greyinScore, onNavigate, onOpenFeedback, onLogNav, onLogPillarSwitch }: {
+function RailContents({ hasCompany, role, activeSection, userName, verified, greyinScore, collapsed, onNavigate, onOpenFeedback, onLogNav, onLogPillarSwitch }: {
   hasCompany?: boolean
   role?: string | null
   activeSection?: string
   userName: string
   verified: boolean
   greyinScore: number | null
+  collapsed?: boolean
   onNavigate?: () => void
   onOpenFeedback: () => void
   onLogNav: (key: string) => void
@@ -132,10 +135,10 @@ function RailContents({ hasCompany, role, activeSection, userName, verified, gre
 
   return (
     <>
-      <div className="flex items-center gap-2 px-5 h-16 border-b border-gray-200 dark:border-gray-800 shrink-0">
+      <div className={`flex items-center h-16 border-b border-gray-200 dark:border-gray-800 shrink-0 ${collapsed ? 'justify-center px-2' : 'gap-2 px-5'}`}>
         <a href="https://greyin.net" className="flex items-center gap-2" title="Go to Greyin Hub">
-          <Telescope className="h-6 w-6 text-amber-700 dark:text-amber-400" />
-          <span className="text-lg font-bold text-gray-900 dark:text-gray-50">Longlist</span>
+          <Telescope className="h-6 w-6 text-amber-700 dark:text-amber-400 shrink-0" />
+          {!collapsed && <span className="text-lg font-bold text-gray-900 dark:text-gray-50">Longlist</span>}
         </a>
       </div>
 
@@ -146,34 +149,36 @@ function RailContents({ hasCompany, role, activeSection, userName, verified, gre
               key={key}
               href={href}
               data-tour={`nav-${key}`}
+              title={collapsed ? label : undefined}
               onClick={() => {
                 onLogNav(key)
                 onNavigate?.()
               }}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center rounded-lg text-sm font-medium transition-colors ${collapsed ? 'justify-center px-2 py-2' : 'gap-3 px-3 py-2'} ${
                 activeSection === key
                   ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
                   : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-              {label}
-              {NAV_BADGE_TYPES[key] && <SectionBadge types={NAV_BADGE_TYPES[key]} />}
+              {!collapsed && label}
+              {!collapsed && NAV_BADGE_TYPES[key] && <SectionBadge types={NAV_BADGE_TYPES[key]} />}
             </Link>
           ))}
           <button
             type="button"
             data-testid="rail-feedback-button"
             data-tour="feedback"
+            title={collapsed ? 'Feedback & Ideas' : undefined}
             onClick={() => {
               onOpenFeedback()
               onNavigate?.()
             }}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+            className={`w-full flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 ${collapsed ? 'justify-center px-2 py-2' : 'gap-3 px-3 py-2'}`}
           >
             <MessageSquareHeart className="h-4 w-4 shrink-0" aria-hidden="true" />
-            Feedback &amp; Ideas
-            <SectionBadge types={['feedback_replied']} />
+            {!collapsed && <>Feedback &amp; Ideas</>}
+            {!collapsed && <SectionBadge types={['feedback_replied']} />}
           </button>
         </div>
 
@@ -182,26 +187,30 @@ function RailContents({ hasCompany, role, activeSection, userName, verified, gre
             <a
               href="https://greyin.net/admin/longlist"
               data-tour="nav-admin"
+              title={collapsed ? 'Admin' : undefined}
               onClick={() => onLogNav('admin')}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+              className={`flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 ${collapsed ? 'justify-center px-2 py-2' : 'gap-3 px-3 py-2'}`}
             >
               <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
-              Admin
+              {!collapsed && 'Admin'}
             </a>
           </div>
         )}
 
         <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800" data-tour="ecosystem">
-          <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
-            Across Greyin
-          </p>
+          {!collapsed && (
+            <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
+              Across Greyin
+            </p>
+          )}
           <div className="space-y-0.5" data-testid="pillar-nav">
             <a
               href="https://greyin.net"
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 mb-1"
+              title={collapsed ? 'Greyin Hub' : undefined}
+              className={`flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800 mb-1 ${collapsed ? 'justify-center px-2 py-2' : 'gap-3 px-3 py-2'}`}
             >
               <Home className="h-4 w-4 shrink-0" aria-hidden="true" />
-              Greyin Hub
+              {!collapsed && 'Greyin Hub'}
             </a>
             {PILLARS.map((p) => {
               const Icon = PILLAR_ICONS[p.key]
@@ -209,15 +218,16 @@ function RailContents({ hasCompany, role, activeSection, userName, verified, gre
                 <a
                   key={p.key}
                   href={p.url}
+                  title={collapsed ? p.label : undefined}
                   onClick={() => p.key !== 'longlist' && onLogPillarSwitch(p.key)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                  className={`flex items-center rounded-lg text-sm transition-colors ${collapsed ? 'justify-center px-2 py-2' : 'gap-3 px-3 py-2'} ${
                     p.key === 'longlist'
                       ? 'font-semibold text-gray-900 dark:text-gray-50'
                       : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'
                   }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" style={{ color: p.color }} aria-hidden="true" />
-                  {p.label}
+                  {!collapsed && p.label}
                   {p.key === 'longlist' && <span className="sr-only"> (current)</span>}
                 </a>
               )
@@ -227,7 +237,7 @@ function RailContents({ hasCompany, role, activeSection, userName, verified, gre
       </nav>
 
       <div className="border-t border-gray-200 p-3 space-y-2 shrink-0 dark:border-gray-800">
-        {greyinScore != null && (
+        {greyinScore != null && !collapsed && (
           <div
             className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-50 dark:bg-amber-950/40"
             data-testid="dashboard-score-badge"
@@ -236,30 +246,46 @@ function RailContents({ hasCompany, role, activeSection, userName, verified, gre
             <span className="text-sm font-bold text-amber-700 dark:text-amber-400">{greyinScore}</span>
           </div>
         )}
-        <div className="flex items-center gap-2 px-3 py-1.5">
-          <div className="h-8 w-8 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400 flex items-center justify-center text-xs font-semibold shrink-0">
+        {greyinScore != null && collapsed && (
+          <div
+            className="flex items-center justify-center px-2 py-2 rounded-lg bg-amber-50 dark:bg-amber-950/40"
+            data-testid="dashboard-score-badge"
+            title={`Greyin Score ${greyinScore}`}
+          >
+            <span className="text-xs font-bold text-amber-700 dark:text-amber-400">{greyinScore}</span>
+          </div>
+        )}
+        <div className={`flex items-center px-3 py-1.5 ${collapsed ? 'justify-center px-2' : 'gap-2'}`}>
+          <div
+            className="h-8 w-8 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400 flex items-center justify-center text-xs font-semibold shrink-0"
+            title={collapsed ? userName : undefined}
+          >
             {userName.slice(0, 2).toUpperCase()}
           </div>
-          <p className="min-w-0 flex-1 text-sm font-medium text-gray-900 dark:text-gray-50 truncate">
-            {userName}
-            {verified && <span title="Verified Expert"> ✓</span>}
-          </p>
+          {!collapsed && (
+            <p className="min-w-0 flex-1 text-sm font-medium text-gray-900 dark:text-gray-50 truncate">
+              {userName}
+              {verified && <span title="Verified Expert"> ✓</span>}
+            </p>
+          )}
         </div>
         <button
           type="button"
           onClick={replayTour}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+          title={collapsed ? 'Replay tour' : undefined}
+          className={`w-full flex items-center rounded-lg text-sm text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 ${collapsed ? 'justify-center px-2 py-2' : 'gap-2 px-3 py-2'}`}
         >
-          <RotateCcw className="h-4 w-4" aria-hidden="true" /> Replay tour
+          <RotateCcw className="h-4 w-4 shrink-0" aria-hidden="true" /> {!collapsed && 'Replay tour'}
         </button>
         <form action="/auth/logout" method="post">
           <button
             type="submit"
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+            title={collapsed ? 'Logout' : undefined}
+            className={`w-full flex items-center rounded-lg text-sm text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800 ${collapsed ? 'justify-center px-2 py-2' : 'gap-2 px-3 py-2'}`}
           >
             {/* "Logout", matching the old hand-rolled dashboard bar's
                 exact word -- same lesson as the other apps' shells. */}
-            <LogOut className="h-4 w-4" aria-hidden="true" /> Logout
+            <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" /> {!collapsed && 'Logout'}
           </button>
         </form>
       </div>
@@ -272,10 +298,31 @@ export function WorkspaceShell({ activeSection, hasCompany, role, userName, veri
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [supabase] = useState(() => createClient())
   const [userId, setUserId] = useState<string | null>(null)
+  const [collapsed, setCollapsed] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => setUserId(user?.id ?? null))
   }, [supabase])
+
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem('greyin:sidebar-collapsed') === '1')
+    } catch {
+      /* storage blocked -- stays expanded */
+    }
+  }, [])
+
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem('greyin:sidebar-collapsed', next ? '1' : '0')
+      } catch {
+        /* storage blocked -- toggle still works for this page view */
+      }
+      return next
+    })
+  }
 
   const onLogNav = (key: string) => {
     if (userId) logEvent(supabase, userId, 'rail_nav_click', { key })
@@ -290,8 +337,16 @@ export function WorkspaceShell({ activeSection, hasCompany, role, userName, veri
       <FeedbackWishlistModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <GuidedTour steps={TOUR_STEPS} storageKey="longlist" />
 
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:top-8 lg:bottom-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
-        <RailContents hasCompany={hasCompany} role={role} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
+      <aside className={`hidden lg:flex lg:flex-col lg:fixed lg:top-8 lg:bottom-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800 transition-[width] duration-200 ${collapsed ? 'lg:w-16' : 'lg:w-64'}`}>
+        <RailContents hasCompany={hasCompany} role={role} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} collapsed={collapsed} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
+        <button
+          type="button"
+          onClick={toggleCollapsed}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className="hidden lg:flex absolute -right-3 top-20 z-10 h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white shadow hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:hover:bg-gray-800"
+        >
+          {collapsed ? <ChevronRight className="h-3.5 w-3.5 text-gray-500" /> : <ChevronLeft className="h-3.5 w-3.5 text-gray-500" />}
+        </button>
       </aside>
 
       {mobileOpen && (
@@ -317,7 +372,7 @@ export function WorkspaceShell({ activeSection, hasCompany, role, userName, veri
         </div>
       )}
 
-      <div className="flex-1 min-w-0 lg:pl-64">
+      <div className={`flex-1 min-w-0 transition-[padding] duration-200 ${collapsed ? 'lg:pl-16' : 'lg:pl-64'}`}>
         <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-4 sm:px-6 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:bg-gray-950/80 dark:border-gray-800">
           <div className="flex items-center gap-3 min-w-0">
             <button

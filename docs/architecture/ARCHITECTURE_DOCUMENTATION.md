@@ -363,6 +363,14 @@ blocked_users
 
 Admin UI: one centralized `/admin/reports` queue on Greyin Hub (not three separate per-pillar UIs) listing every open report across all three content types with Resolve/Dismiss actions.
 
+#### Collapsible Sidebar & Preview-Banner Dark Color (2026-09-13)
+**Feature:** The persistent left rail in `WorkspaceShell.tsx` (all 6 apps that have one: DeepEdge, FlexPro, StackWorks, Salt & Pepper, GreyMatters, Longlist) can be collapsed to an icon-only strip; the preview-build banner gets its own color in dark mode instead of blending into the rail/header below it.
+- **Collapse state:** a `collapsed` boolean on `WorkspaceShell`, toggled by a chevron button on the rail's right edge, persisted to `localStorage` (`greyin:sidebar-collapsed`) and read back on mount -- a per-browser display preference, not a `profiles` column, matching how the theme toggle already persists. Collapsed shrinks the aside `lg:w-64` → `lg:w-16` (and the content column's matching `lg:pl-64` → `lg:pl-16`), hiding every nav label/section header/user name (`{!collapsed && label}`) while keeping icons (`shrink-0`) and adding a `title` tooltip carrying the hidden label.
+- **Mobile drawer is unaffected:** its own separate `<RailContents>` call site never receives `collapsed` -- it's a temporary full-width overlay, never rendered collapsed.
+- **Per-app quirks preserved:** StackWorks' RailContents splits its nav array around a builder-only "Post a Project" insert plus a separately-rendered trailing `profileItem`; Longlist's Admin link is a plain external `<a>` (no local `/admin` route); GreyMatters has no separate "Greyin Hub" row in its Across-Greyin block (it renders itself as the current pillar). Each got the same collapsed treatment adapted to its own structure.
+- **Gotcha (a11y, not a bug):** a collapsed link's accessible *name* still resolves via its `title` attribute (the browser's accessible-name algorithm falls back to `title` when there's no visible text) -- so `getByRole('link', {name})` still matches a visually icon-only link. e2e coverage asserts hidden state via `toHaveText('')` instead, not accessible name.
+- **Banner color:** `bg-gray-900` → `bg-gray-900 dark:bg-black` on the preview-build banner in every app's `layout.tsx` (7 apps, greyin-hub included) -- pure black is a deliberately different shade from the rail/header's own `dark:bg-gray-900`, not just a darker gray, so the banner reads as its own strip.
+
 #### Activity & Follow Graph (FR-PW-09, FR-PW-10, FR-PW-23)
 **Feature:** Follow users, see their activity, discover collaborators
 **Schema:**

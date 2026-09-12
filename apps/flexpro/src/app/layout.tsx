@@ -42,9 +42,17 @@ export const metadata = {
 // `lg:inset-y-0`, see WorkspaceShell.tsx) fixes both: the banner now
 // spans the full width including behind where the rail begins, and the
 // two h-16 rows start from the same y and stay in sync.
+//
+// dark:bg-black (2026-09-13): the rail/header both use bg-gray-900 in
+// dark mode -- this banner used the exact same gray-900 unconditionally,
+// so in dark mode it visually blended into the sidebar right below it
+// with no visible seam. Pure black is a deliberately different shade
+// from gray-900 (not just a slightly darker gray, which could still
+// read as "the same panel") so the banner reads as its own strip in
+// both themes, not an extension of the sidebar/header.
 function PreviewBanner() {
   return (
-    <div className="bg-gray-900 text-gray-300 text-xs text-center py-1.5 px-4 lg:h-8 lg:flex lg:items-center lg:justify-center lg:py-0">
+    <div className="bg-gray-900 dark:bg-black text-gray-300 text-xs text-center py-1.5 px-4 lg:h-8 lg:flex lg:items-center lg:justify-center lg:py-0">
       <span className="font-medium text-white">Preview build</span> — people, companies, and activity shown across Greyin are seeded demonstration data, not real users.
     </div>
   )

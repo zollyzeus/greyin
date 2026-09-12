@@ -20,7 +20,7 @@ export const metadata = {
 // classes needed -- it reads correctly against either page theme.
 function PreviewBanner() {
   return (
-    <div className="bg-gray-900 text-gray-300 text-xs text-center py-1.5 px-4">
+    <div className="bg-gray-900 dark:bg-black text-gray-300 text-xs text-center py-1.5 px-4">
       <span className="font-medium text-white">Preview build</span> — people, companies, and activity shown across Greyin are seeded demonstration data, not real users.
     </div>
   )
