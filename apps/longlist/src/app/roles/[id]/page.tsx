@@ -33,7 +33,7 @@ export default async function RoleDetailPage({ params }: { params: Promise<{ id:
 
   const subscribed = !!sub
 
-  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
+  const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle()
   const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
   const { data: company } = await supabase.from('companies').select('id').eq('user_id', user.id).maybeSingle()
 
@@ -44,6 +44,7 @@ export default async function RoleDetailPage({ params }: { params: Promise<{ id:
       userName={profile?.full_name || 'User'}
       verified={!!scoreRow?.is_verified_expert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle={role.title}
     >
       <div className="max-w-2xl mx-auto px-4 py-10">

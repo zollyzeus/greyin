@@ -13,7 +13,7 @@ export default async function NotificationsPage() {
     redirect('/login?next=/notifications')
   }
 
-  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
+  const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle()
   const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
   const { data: company } = await supabase.from('companies').select('id').eq('user_id', user.id).maybeSingle()
 
@@ -32,6 +32,7 @@ export default async function NotificationsPage() {
       userName={profile?.full_name || 'User'}
       verified={!!scoreRow?.is_verified_expert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="Notifications"
     >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

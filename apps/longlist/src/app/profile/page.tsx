@@ -20,7 +20,7 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, future_interests, future_interests_note')
+    .select('full_name, role, future_interests, future_interests_note')
     .eq('id', user.id)
     .single()
 
@@ -50,6 +50,7 @@ export default async function ProfilePage() {
       userName={profile?.full_name || 'User'}
       verified={!!scoreRow?.is_verified_expert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="Your Future Interests"
     >
       <div className="max-w-3xl mx-auto px-4 py-8">

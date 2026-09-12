@@ -13,6 +13,7 @@ import {
   Home,
   MessageSquareHeart,
   Search,
+  ShieldCheck,
   LogOut,
   Menu,
   X,
@@ -29,10 +30,9 @@ import { logEvent } from '@/lib/analytics'
 
 /**
  * UI/UX elevation plan, Phase 1 rollout to Longlist (2026-09-05) --
- * ported from the other five apps' WorkspaceShell. No admin section at
- * all in this app (unlike the other five); the only conditional nav
- * items are "Post a Future Role" / "Your Roles", gated on whether the
- * user has a company profile (set up on DeepEdge, shared across all
+ * ported from the other five apps' WorkspaceShell. The only conditional
+ * nav items are "Post a Future Role" / "Your Roles", gated on whether
+ * the user has a company profile (set up on DeepEdge, shared across all
  * pillars) -- mirroring the dashboard card's own `company ? (...) : (...)`
  * branch. Several of this app's authenticated pages (`/roles`,
  * `/roles/[id]`, `/employer/roles`, `/employer/roles/[id]/candidates`)
@@ -42,11 +42,26 @@ import { logEvent } from '@/lib/analytics'
  * too keeps every authenticated page's chrome consistent, matching how
  * the other five apps' auth-gated pages were converted regardless of
  * which header they started from.
+ *
+ * No local /admin route (2026-09-12, real gap investigated and
+ * answered): Longlist genuinely had no admin page at all when this
+ * comment was first written -- that changed 2026-09-08 (migration 140),
+ * but its moderation (view + force-expire a future_roles posting) was
+ * built directly into Greyin Hub's /admin/longlist rather than as a
+ * local panel here, since Longlist has no financial actions to protect
+ * the way FlexPro/DeepEdge/StackWorks's local admin panels do. This
+ * rail was never revisited after that shipped, so an admin looking at
+ * Longlist had zero indication any admin capability existed for this
+ * pillar at all, let alone where to find it. The Admin item below
+ * points to that external Hub URL (a plain `<a>`, not a Next `<Link>`,
+ * same as the "Greyin Hub"/pillar links further down) rather than a
+ * local /admin this app doesn't have.
  */
 
 interface WorkspaceShellProps {
   activeSection?: string
   hasCompany?: boolean
+  role?: string | null
   userName: string
   verified: boolean
   greyinScore: number | null
@@ -85,14 +100,16 @@ const TOUR_STEPS: TourStep[] = [
   { target: 'nav-post', title: 'Post a Future Role', description: 'As a company, let members subscribe as future-interested ahead of an opening.' },
   { target: 'nav-employer-roles', title: 'Your Roles', description: 'See who’s subscribed as future-interested to the roles you’ve posted.' },
   { target: 'nav-profile', title: 'Profile', description: 'Keep your profile sharp, and set your own future interests.' },
+  { target: 'nav-admin', title: 'Admin', description: 'Longlist moderation lives on Greyin Hub -- opens in that app.' },
   { target: 'search', title: 'Search everything', description: 'Press ⌘K anytime to jump to jobs, gigs, articles, discussions, projects, or people — across all six Greyin platforms.' },
   { target: 'feedback', title: 'Feedback & Ideas', description: 'Tell us what’s working or missing, or suggest a feature and upvote other members’ ideas.' },
   { target: 'notifications', title: 'Notifications', description: 'Live updates land here the moment something happens — new subscribers, filled roles, and more.' },
   { target: 'ecosystem', title: 'Across Greyin', description: 'Longlist is one of six connected platforms — jump to any of them any time, same login.' },
 ]
 
-function RailContents({ hasCompany, activeSection, userName, verified, greyinScore, onNavigate, onOpenFeedback, onLogNav, onLogPillarSwitch }: {
+function RailContents({ hasCompany, role, activeSection, userName, verified, greyinScore, onNavigate, onOpenFeedback, onLogNav, onLogPillarSwitch }: {
   hasCompany?: boolean
+  role?: string | null
   activeSection?: string
   userName: string
   verified: boolean
@@ -159,6 +176,20 @@ function RailContents({ hasCompany, activeSection, userName, verified, greyinSco
             <SectionBadge types={['feedback_replied']} />
           </button>
         </div>
+
+        {role === 'admin' && (
+          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
+            <a
+              href="https://greyin.net/admin/longlist"
+              data-tour="nav-admin"
+              onClick={() => onLogNav('admin')}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Admin
+            </a>
+          </div>
+        )}
 
         <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800" data-tour="ecosystem">
           <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
@@ -236,7 +267,7 @@ function RailContents({ hasCompany, activeSection, userName, verified, greyinSco
   )
 }
 
-export function WorkspaceShell({ activeSection, hasCompany, userName, verified, greyinScore, pageTitle, children }: WorkspaceShellProps) {
+export function WorkspaceShell({ activeSection, hasCompany, role, userName, verified, greyinScore, pageTitle, children }: WorkspaceShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [supabase] = useState(() => createClient())
@@ -260,7 +291,7 @@ export function WorkspaceShell({ activeSection, hasCompany, userName, verified, 
       <GuidedTour steps={TOUR_STEPS} storageKey="longlist" />
 
       <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:top-8 lg:bottom-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
-        <RailContents hasCompany={hasCompany} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
+        <RailContents hasCompany={hasCompany} role={role} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
       </aside>
 
       {mobileOpen && (
@@ -272,6 +303,7 @@ export function WorkspaceShell({ activeSection, hasCompany, userName, verified, 
           >
             <RailContents
               hasCompany={hasCompany}
+              role={role}
               activeSection={activeSection}
               userName={userName}
               verified={verified}

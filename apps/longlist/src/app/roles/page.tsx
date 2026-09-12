@@ -22,7 +22,7 @@ export default async function RolesPage() {
       .select('id, title, function_area, seniority_level, target_timeframe, description, skills, location, is_remote, created_at')
       .order('created_at', { ascending: false }),
     supabase.from('future_role_subscriptions').select('future_role_id').eq('user_id', user.id),
-    supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle(),
+    supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle(),
     supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle(),
     supabase.from('companies').select('id').eq('user_id', user.id).maybeSingle(),
   ])
@@ -36,6 +36,7 @@ export default async function RolesPage() {
       userName={profile?.full_name || 'User'}
       verified={!!scoreRow?.is_verified_expert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="Future Roles"
     >
       <div className="max-w-4xl mx-auto px-4 py-10">
