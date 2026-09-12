@@ -13,7 +13,7 @@ test.describe('Discussions', () => {
     await authorPage.locator('#title').fill(title)
     await authorPage.locator('#body').fill('Started by the Playwright e2e suite.')
     await authorPage.getByRole('button', { name: 'Post Discussion' }).click()
-    await authorPage.waitForURL(/\/discussions\/[^/]+$/)
+    await authorPage.waitForURL(/\/discussions\/(?!new)[^/]+$/)
     await expect(authorPage.getByRole('heading', { name: title })).toBeVisible()
 
     await authorPage.goto('/discussions')
@@ -26,7 +26,7 @@ test.describe('Discussions', () => {
 
     await replierPage.goto('/discussions')
     await replierPage.getByText(title).click()
-    await replierPage.waitForURL(/\/discussions\/[^/]+$/)
+    await replierPage.waitForURL(/\/discussions\/(?!new)[^/]+$/)
 
     const replyText = `Great point — e2e reply ${Date.now()}`
     await replierPage.locator('textarea[name="body"]').fill(replyText)

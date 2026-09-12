@@ -12,7 +12,7 @@ test('a discussion author is notified when someone replies', async ({ browser, c
   await authorPage.locator('#title').fill(title)
   await authorPage.locator('#body').fill('Started to exercise notifications.')
   await authorPage.getByRole('button', { name: 'Post Discussion' }).click()
-  await authorPage.waitForURL(/\/discussions\/[^/]+$/)
+  await authorPage.waitForURL(/\/discussions\/(?!new)[^/]+$/)
 
   const replierCtx = await browser.newContext()
   const replierPage = await replierCtx.newPage()

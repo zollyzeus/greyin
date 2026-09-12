@@ -28,9 +28,14 @@ test('an admin can sweep the AI quality backlog and it scores a real unscored re
   const title = `E2E Sweep Backlog Discussion ${Date.now()}`
   await page.goto('/discussions/new')
   await page.locator('#title').fill(title)
-  await page.locator('#body').fill('Seeded so a reply can be added directly, bypassing the lazy per-thread sweep.')
+  // Substantive-sounding content, not meta "seeded/bypassing" test
+  // language -- the pre-publish moderation LLM (098) has been observed
+  // blocking phrasing that talks about testing/seeding itself as
+  // low-effort/off-topic (2026-09-12 false-positive class, see
+  // admin.spec.ts's own note).
+  await page.locator('#body').fill('Curious how others structure error handling behind one typed middleware layer instead of scattering try/catch everywhere.')
   await page.getByRole('button', { name: 'Post Discussion' }).click()
-  await page.waitForURL(/\/discussions\/[^/]+$/)
+  await page.waitForURL(/\/discussions\/(?!new)[^/]+$/)
   const discussionId = page.url().split('/discussions/')[1]
 
   const replyBody = `E2E sweep backlog reply ${Date.now()} -- structure error handling behind one typed middleware.`

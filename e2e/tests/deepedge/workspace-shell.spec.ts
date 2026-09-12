@@ -92,6 +92,13 @@ test('mobile: hamburger opens a drawer with the same rail, closes on navigation'
  * of re-visiting /dashboard or typing the URL directly. The rail now
  * appends an Admin item (role==='admin') matching the pattern
  * FlexPro/StackWorks/Salt & Pepper/GreyMatters already use.
+ *
+ * Follow-up (2026-09-12): the Admin link was moved out of the regular
+ * nav list into its own bordered section directly above "Across Greyin"
+ * (a sidebar-organization request), rather than sitting inline amongst
+ * Dashboard/Jobs/Applications/etc -- asserted below via DOM order, not
+ * just visibility, since visibility alone wouldn't catch a regression
+ * back to the old inline placement.
  */
 test('an admin sees a persistent Admin link in the rail, on a page other than the dashboard', async ({ page, cleanup }) => {
   const admin = await signUpDeepEdge(page, 'candidate', cleanup)
@@ -103,6 +110,13 @@ test('an admin sees a persistent Admin link in the rail, on a page other than th
   const rail = page.locator('aside').first()
   const adminLink = rail.getByRole('link', { name: 'Admin' })
   await expect(adminLink).toBeVisible()
+
+  // The div immediately preceding the "Across Greyin" block is the
+  // Admin item's own separated section -- not a sibling of Dashboard/
+  // Jobs/etc inside the main nav list.
+  const sectionBeforeEcosystem = rail.locator('[data-tour="ecosystem"]').locator('xpath=preceding-sibling::div[1]')
+  await expect(sectionBeforeEcosystem.getByRole('link', { name: 'Admin' })).toBeVisible()
+
   await adminLink.click()
   await page.waitForURL(/\/admin$/)
 })

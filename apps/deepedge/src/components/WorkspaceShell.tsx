@@ -175,14 +175,7 @@ function RailContents({ variant, role, activeSection, userName, verified, greyin
   onLogNav: (key: string) => void
   onLogPillarSwitch: (to: string) => void
 }) {
-  const baseNav = variant === 'employer' ? EMPLOYER_NAV : CANDIDATE_NAV
-  // Previously reachable only via the one-off Admin card on /dashboard's
-  // Quick Actions grid -- every other page had no path to /admin short of
-  // typing the URL. Matches the persistent-rail pattern FlexPro/StackWorks/
-  // Salt & Pepper/GreyMatters already use for the exact same role check.
-  const nav = role === 'admin'
-    ? [...baseNav, { href: '/admin', label: 'Admin', icon: ShieldCheck, key: 'admin' }] as const
-    : baseNav
+  const nav = variant === 'employer' ? EMPLOYER_NAV : CANDIDATE_NAV
   return (
     <>
       <div className="flex items-center gap-2 px-5 h-16 border-b border-gray-200 dark:border-gray-800 shrink-0">
@@ -229,6 +222,27 @@ function RailContents({ variant, role, activeSection, userName, verified, greyin
             <SectionBadge types={['feedback_replied']} />
           </button>
         </div>
+
+        {role === 'admin' && (
+          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
+            <Link
+              href="/admin"
+              data-tour="nav-admin"
+              onClick={() => {
+                onLogNav('admin')
+                onNavigate?.()
+              }}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeSection === 'admin'
+                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400'
+                  : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
+              }`}
+            >
+              <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Admin
+            </Link>
+          </div>
+        )}
 
         <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800" data-tour="ecosystem">
           <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">

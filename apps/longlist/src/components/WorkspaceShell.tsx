@@ -7,7 +7,7 @@ import {
   LayoutDashboard,
   Compass,
   RotateCcw,
-  Send,
+  Settings,
   Briefcase,
   Users,
   Home,
@@ -57,7 +57,7 @@ interface WorkspaceShellProps {
 const BASE_NAV = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, key: 'dashboard' },
   { href: '/roles', label: 'Browse Future Roles', icon: Compass, key: 'roles' },
-  { href: '/profile', label: 'Profile', icon: Send, key: 'profile' },
+  { href: '/profile', label: 'Profile', icon: Settings, key: 'profile' },
 ] as const
 
 // UI/UX elevation plan, Phase 2 close-out -- "Section badges", keyed

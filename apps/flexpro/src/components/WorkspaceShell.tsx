@@ -106,9 +106,6 @@ function RailContents({ role, activeSection, userName, verified, greyinScore, on
       ? [{ href: '/earnings', label: 'Earnings', icon: Wallet, key: 'earnings' }] as const
       : []),
     BASE_NAV[5],
-    ...(role === 'admin'
-      ? [{ href: '/admin', label: 'Admin', icon: ShieldCheck, key: 'admin' }] as const
-      : []),
   ]
 
   return (
@@ -157,6 +154,27 @@ function RailContents({ role, activeSection, userName, verified, greyinScore, on
             <SectionBadge types={['feedback_replied']} />
           </button>
         </div>
+
+        {role === 'admin' && (
+          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
+            <Link
+              href="/admin"
+              data-tour="nav-admin"
+              onClick={() => {
+                onLogNav('admin')
+                onNavigate?.()
+              }}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeSection === 'admin'
+                  ? 'bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400'
+                  : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
+              }`}
+            >
+              <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Admin
+            </Link>
+          </div>
+        )}
 
         <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800" data-tour="ecosystem">
           <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">

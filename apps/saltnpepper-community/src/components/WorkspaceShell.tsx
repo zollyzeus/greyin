@@ -89,13 +89,7 @@ function RailContents({ isAdmin, activeSection, userName, verified, greyinScore,
   onLogNav: (key: string) => void
   onLogPillarSwitch: (to: string) => void
 }) {
-  const nav = [
-    ...BASE_NAV.slice(0, 4),
-    ...(isAdmin
-      ? [{ href: '/admin', label: 'Admin', icon: ShieldCheck, key: 'admin' }] as const
-      : []),
-    BASE_NAV[4],
-  ]
+  const nav = BASE_NAV
 
   return (
     <>
@@ -143,6 +137,27 @@ function RailContents({ isAdmin, activeSection, userName, verified, greyinScore,
             <SectionBadge types={['feedback_replied']} />
           </button>
         </div>
+
+        {isAdmin && (
+          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
+            <Link
+              href="/admin"
+              data-tour="nav-admin"
+              onClick={() => {
+                onLogNav('admin')
+                onNavigate?.()
+              }}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeSection === 'admin'
+                  ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400'
+                  : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
+              }`}
+            >
+              <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Admin
+            </Link>
+          </div>
+        )}
 
         <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800" data-tour="ecosystem">
           <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">

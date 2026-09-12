@@ -25,7 +25,7 @@ test('posting a reply triggers a lazy AI mentoring-quality score visible on the 
   await authorPage.locator('#title').fill(title)
   await authorPage.locator('#body').fill('How should I structure error handling in a small Node.js API?')
   await authorPage.getByRole('button', { name: 'Post Discussion' }).click()
-  await authorPage.waitForURL(/\/discussions\/[^/]+$/)
+  await authorPage.waitForURL(/\/discussions\/(?!new)[^/]+$/)
 
   const replierCtx = await browser.newContext()
   const replierPage = await replierCtx.newPage()

@@ -8,12 +8,20 @@ test('an admin can delete a discussion', async ({ browser, cleanup }) => {
   const author = await signUpSaltNPepper(authorPage, cleanup)
   await login(authorPage, author, '/dashboard')
 
-  const title = `E2E Admin Moderation Discussion ${Date.now()}`
+  // Content reads as a genuine discussion post, not meta "this is a
+  // test/exercise" language -- the pre-publish moderation LLM (098) has
+  // been observed blocking phrasing that talks ABOUT testing/moderation/
+  // admin flows as low-effort or off-topic (against its own system
+  // prompt's instruction not to), a false-positive class discovered
+  // while root-causing a waitForURL race that used to mask exactly this
+  // (2026-09-12). Matches the substantive-content style that already
+  // passes reliably elsewhere in this suite (moderation.spec.ts).
+  const title = `E2E Admin Cleanup Discussion ${Date.now()}`
   await authorPage.goto('/discussions/new')
   await authorPage.locator('#title').fill(title)
-  await authorPage.locator('#body').fill('Created to exercise admin moderation.')
+  await authorPage.locator('#body').fill('Sharing a checklist we use before rolling out a schema migration to production, happy to hear what others would add.')
   await authorPage.getByRole('button', { name: 'Post Discussion' }).click()
-  await authorPage.waitForURL(/\/discussions\/[^/]+$/)
+  await authorPage.waitForURL(/\/discussions\/(?!new)[^/]+$/)
   const discussionId = authorPage.url().split('/discussions/')[1]
   await authorCtx.close()
 

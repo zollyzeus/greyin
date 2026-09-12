@@ -21,7 +21,7 @@ test('a follower sees a followed member\'s public discussion in /feed but not th
   await authorPage.locator('#body').fill('Visible to followers.')
   await authorPage.locator('select[name="feed_visibility"]').selectOption('public')
   await authorPage.getByRole('button', { name: 'Post Discussion' }).click()
-  await authorPage.waitForURL(/\/discussions\/[^/]+$/)
+  await authorPage.waitForURL(/\/discussions\/(?!new)[^/]+$/)
 
   const privateTitle = `E2E Feed Private Discussion ${Date.now()}`
   await authorPage.goto('/discussions/new')
@@ -29,7 +29,7 @@ test('a follower sees a followed member\'s public discussion in /feed but not th
   await authorPage.locator('#body').fill('Not distributed to followers.')
   await authorPage.locator('select[name="feed_visibility"]').selectOption('private')
   await authorPage.getByRole('button', { name: 'Post Discussion' }).click()
-  await authorPage.waitForURL(/\/discussions\/[^/]+$/)
+  await authorPage.waitForURL(/\/discussions\/(?!new)[^/]+$/)
 
   const followerCtx = await browser.newContext()
   const followerPage = await followerCtx.newPage()

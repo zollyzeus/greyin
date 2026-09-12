@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 import { NotificationBell } from './NotificationBell'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { PILLARS } from './EcosystemWidget'
+import { PILLARS, PILLAR_ICONS } from './EcosystemWidget'
 import { SectionBadge } from './SectionBadge'
 import { CommandPalette } from './CommandPalette'
 import { FeedbackWishlistModal } from './FeedbackWishlistModal'
@@ -88,13 +88,7 @@ function RailContents({ isAdmin, activeSection, userName, verified, greyinScore,
   onLogNav: (key: string) => void
   onLogPillarSwitch: (to: string) => void
 }) {
-  const nav = [
-    ...BASE_NAV.slice(0, 4),
-    ...(isAdmin
-      ? [{ href: '/admin', label: 'Admin', icon: ShieldCheck, key: 'admin' }] as const
-      : []),
-    BASE_NAV[4],
-  ]
+  const nav = BASE_NAV
 
   return (
     <>
@@ -143,31 +137,51 @@ function RailContents({ isAdmin, activeSection, userName, verified, greyinScore,
           </button>
         </div>
 
+        {isAdmin && (
+          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
+            <Link
+              href="/admin"
+              data-tour="nav-admin"
+              onClick={() => {
+                onLogNav('admin')
+                onNavigate?.()
+              }}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeSection === 'admin'
+                  ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-400'
+                  : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
+              }`}
+            >
+              <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Admin
+            </Link>
+          </div>
+        )}
+
         <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800" data-tour="ecosystem">
           <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
             Across Greyin
           </p>
           <div className="space-y-0.5" data-testid="pillar-nav">
-            {PILLARS.map((p) => (
-              <a
-                key={p.key}
-                href={p.url}
-                onClick={() => p.key !== 'greymatters' && onLogPillarSwitch(p.key)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                  p.key === 'greymatters'
-                    ? 'font-semibold text-gray-900 dark:text-gray-50'
-                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'
-                }`}
-              >
-                <span
-                  className="w-2 h-2 rounded-full shrink-0"
-                  style={{ backgroundColor: p.color }}
-                  aria-hidden="true"
-                />
-                {p.label}
-                {p.key === 'greymatters' && <span className="sr-only"> (current)</span>}
-              </a>
-            ))}
+            {PILLARS.map((p) => {
+              const Icon = PILLAR_ICONS[p.key]
+              return (
+                <a
+                  key={p.key}
+                  href={p.url}
+                  onClick={() => p.key !== 'greymatters' && onLogPillarSwitch(p.key)}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    p.key === 'greymatters'
+                      ? 'font-semibold text-gray-900 dark:text-gray-50'
+                      : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <Icon className="h-4 w-4 shrink-0" style={{ color: p.color }} aria-hidden="true" />
+                  {p.label}
+                  {p.key === 'greymatters' && <span className="sr-only"> (current)</span>}
+                </a>
+              )
+            })}
           </div>
         </div>
       </nav>

@@ -19,7 +19,7 @@ test.describe('Reputation and anonymous posting', () => {
     await page.locator('#title').fill(title)
     await page.locator('#body').fill('Posted to exercise the reputation system.')
     await page.getByRole('button', { name: 'Post Discussion' }).click()
-    await page.waitForURL(/\/discussions\/[^/]+$/)
+    await page.waitForURL(/\/discussions\/(?!new)[^/]+$/)
 
     await page.goto('/members')
     const cardAfter = page.locator('div.bg-white.rounded-lg.shadow-md', { has: page.getByRole('heading', { name: author.lastName }) })
@@ -38,7 +38,7 @@ test.describe('Reputation and anonymous posting', () => {
     await authorPage.locator('#body').fill('This should show as posted by Anonymous Member.')
     await authorPage.locator('input[name="is_anonymous"]').check()
     await authorPage.getByRole('button', { name: 'Post Discussion' }).click()
-    await authorPage.waitForURL(/\/discussions\/[^/]+$/)
+    await authorPage.waitForURL(/\/discussions\/(?!new)[^/]+$/)
     const discussionUrl = authorPage.url()
     await authorCtx.close()
 

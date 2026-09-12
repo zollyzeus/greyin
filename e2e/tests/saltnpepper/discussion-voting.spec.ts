@@ -17,9 +17,17 @@ test.describe('Discussion voting', () => {
     const title = `E2E Vote Discussion ${Date.now()}`
     await authorPage.goto('/discussions/new')
     await authorPage.locator('#title').fill(title)
-    await authorPage.locator('#body').fill('Vote on me, Playwright.')
+    // Content reads as a genuine discussion post -- neither "Vote on me,
+    // Playwright" (read literally as soliciting votes/attention on an
+    // individual) nor meta "test post to exercise X" phrasing (observed
+    // separately being blocked as low-effort/off-topic) survive the
+    // pre-publish moderation LLM (098) reliably; both false-positive
+    // classes were silently masked before 2026-09-12's waitForURL race
+    // fix, which had let this test "pass" without ever actually
+    // creating the discussion.
+    await authorPage.locator('#body').fill('Sharing a checklist we use before rolling out a schema migration to production, happy to hear what others would add.')
     await authorPage.getByRole('button', { name: 'Post Discussion' }).click()
-    await authorPage.waitForURL(/\/discussions\/[^/]+$/)
+    await authorPage.waitForURL(/\/discussions\/(?!new)[^/]+$/)
     const discussionUrl = authorPage.url()
 
     const voterCtx = await browser.newContext()

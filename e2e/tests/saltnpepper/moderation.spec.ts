@@ -35,7 +35,7 @@ test('a normal discussion post is not blocked by moderation', async ({ page, cle
   await page.locator('#title').fill(title)
   await page.locator('#body').fill('Sharing a real architecture decision from a recent project -- happy to discuss trade-offs.')
   await page.getByRole('button', { name: 'Post Discussion' }).click()
-  await page.waitForURL(/\/discussions\/[^/]+$/)
+  await page.waitForURL(/\/discussions\/(?!new)[^/]+$/)
   await expect(page.getByText(title)).toBeVisible()
 })
 

@@ -22,7 +22,7 @@ test('a thread with 5+ replies shows an AI summary; a thread with fewer does not
   await page.locator('#title').fill(longTitle)
   await page.locator('#body').fill('What is the best way to structure error handling in a small Node.js API?')
   await page.getByRole('button', { name: 'Post Discussion' }).click()
-  await page.waitForURL(/\/discussions\/[^/]+$/)
+  await page.waitForURL(/\/discussions\/(?!new)[^/]+$/)
   const longThreadId = page.url().split('/discussions/')[1]
 
   for (let i = 0; i < 5; i++) {
@@ -34,7 +34,7 @@ test('a thread with 5+ replies shows an AI summary; a thread with fewer does not
   await page.locator('#title').fill(shortTitle)
   await page.locator('#body').fill('Anyone using Terraform for multi-cloud setups?')
   await page.getByRole('button', { name: 'Post Discussion' }).click()
-  await page.waitForURL(/\/discussions\/[^/]+$/)
+  await page.waitForURL(/\/discussions\/(?!new)[^/]+$/)
   const shortThreadId = page.url().split('/discussions/')[1]
   await createTestDiscussionReply(shortThreadId, authorId, 'E2E seeded reply — yes, works well.')
 
