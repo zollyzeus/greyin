@@ -59,6 +59,7 @@ export default async function EmployerDashboardPage() {
       userName={profile?.full_name || 'User'}
       verified={!!scoreRow?.is_verified_expert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="Dashboard"
     >
 

@@ -140,6 +140,7 @@ export default async function ProfilePage() {
       userName={profile?.full_name || 'User'}
       verified={!!greyinScoreRow?.is_verified_expert}
       greyinScore={greyinScoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="My Profile"
     >
       <div className="max-w-4xl mx-auto px-4 py-8">

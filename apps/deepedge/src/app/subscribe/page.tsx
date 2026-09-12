@@ -46,6 +46,7 @@ export default async function SubscribePage() {
       userName={profile?.full_name || 'User'}
       verified={!!scoreRow?.is_verified_expert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="Subscribe"
     >
       <div className="max-w-4xl mx-auto px-4 py-12">

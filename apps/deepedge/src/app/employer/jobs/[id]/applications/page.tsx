@@ -38,7 +38,7 @@ export default async function JobApplicationsPage({
     redirect('/employer/dashboard')
   }
 
-  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle()
+  const { data: profile } = await supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle()
   const { data: scoreRow } = await supabase.from('greyin_scores').select('greyin_score, is_verified_expert').eq('user_id', user.id).maybeSingle()
 
   const { data: applications } = await supabase
@@ -77,6 +77,7 @@ export default async function JobApplicationsPage({
       userName={profile?.full_name || 'User'}
       verified={!!scoreRow?.is_verified_expert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="Applications"
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

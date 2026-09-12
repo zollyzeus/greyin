@@ -61,6 +61,7 @@ export default async function EnterpriseContactPage({
       userName={profile?.full_name || 'User'}
       verified={!!scoreRow?.is_verified_expert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle={copy.heading}
     >
       <div className="max-w-lg mx-auto px-4 py-12">

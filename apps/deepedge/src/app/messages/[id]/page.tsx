@@ -51,6 +51,7 @@ export default async function MessageThreadPage({ params }: { params: Promise<{ 
       userName={profile?.full_name || 'User'}
       verified={!!scoreRow?.is_verified_expert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="Messages"
     >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">

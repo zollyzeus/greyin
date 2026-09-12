@@ -54,6 +54,7 @@ export default async function CandidatesPage({
         userName={profile?.full_name || 'User'}
         verified={!!scoreRow?.is_verified_expert}
         greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
         pageTitle="Find Talent"
       >
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">

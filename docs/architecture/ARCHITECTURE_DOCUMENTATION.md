@@ -419,29 +419,82 @@ peer_contribution_ratings
 **Model:** Admin-priced self-serve subscription tiers (Basic/Pro/Premium)
 ```sql
 subscription_tiers (admin-configured)
-  ├─ product ('deepedge_hiring'|'flexpro_selling')
-  ├─ tier_name, price_usd
-  ├─ job_post (credits per month, -1=unlimited)
-  ├─ profile_view, contact_view, job_invite (same)
-  ├─ outplacement_post, placement_request (future features)
-  └─ created_at
+  ├─ product ('flexpro_posting'|'deepedge_hiring'|'deepedge_candidate')
+  ├─ tier_key, name, price_inr, billing_cycle
+  ├─ razorpay_plan_id (created/cached lazily on first checkout)
+  └─ subscription_tier_credits (tier_id, credit_type, monthly_allowance, -1=unlimited)
+      ├─ deepedge_hiring credit_types: job_post, profile_view, contact_view,
+      │  job_invite, outplacement_post, placement_request
+      └─ deepedge_candidate: no metered credit_types -- a single binary tier
+         (see Profile-View Insights below), not consume_credit-gated
 
 company_subscriptions
-  ├─ company_id, tier_id, status ('active'|'cancelled')
-  ├─ razorpay_subscription_id (for recurring charges)
-  ├─ current_period_start/end
-  └─ created_at
+  ├─ company_id (UNIQUE), tier_id, status ('pending'|'active'|'past_due'|'cancelled'|'expired')
+  ├─ razorpay_subscription_id, current_period_end
+  └─ activated_by/activated_at
 
-credit_consumption
-  ├─ company_id, resource_type ('job_post'|'profile_view')
-  ├─ amount_used, period (monthly rollover)
-  └─ consumed_at
+credit_usage (the real usage ledger -- consume_credit()'s own table)
+  ├─ user_id, product, credit_type, period_start (calendar month)
+  ├─ used_count
+  └─ UNIQUE(user_id, product, credit_type, period_start)
 ```
 
-**Credit Enforcement:**
-- `POST /api/jobs/create`: calls `consume_credit(company_id, 'job_post', 1)` before insert
-- `GET /candidates/[id]`: calls `consume_credit(employer_id, 'profile_view', 1)` before SSR
+**Credit Enforcement:** all real enforcement goes through `consume_credit(p_user_id, p_product, p_credit_type)` (SECURITY DEFINER, atomic check-and-increment, migration 096) -- routes only ever call it and branch on the boolean result, never touch `credit_usage` directly.
+- `POST /api/jobs/create`: `consume_credit(user_id, 'deepedge_hiring', 'job_post')` before insert
+- `GET /candidates/[id]`: `consume_credit(user_id, 'deepedge_hiring', 'profile_view')` before SSR (skipped for the employer's own applicant)
+- `POST /api/candidates/[id]/invite`: `consume_credit(user_id, 'deepedge_hiring', 'job_invite')` before insert (149 -- see Recruiter Outreach below; this credit_type was seeded per-tier since 096 but had no real consumer until this feature)
 - Grandfathering (Migration 109): pre-2026-09-04 companies get free 'basic' tier, new companies enforce from day one
+
+#### DeepEdge: Recruiter Outreach + Score-Ranked Search (Migration 149)
+**Feature:** Talent Search (`/candidates`) ranks/filters by Greyin Score, and an employer can proactively invite a searched candidate to a specific one of their own job postings -- Skillmeet.ai comparison round (2026-09-12), matching that platform's "companies reach ranked candidates" inversion rather than only accepting inbound applications.
+```sql
+search_verified_candidates(p_skill, p_min_experience, p_availability, p_remote_preference, p_min_score)
+  -- p_min_score is COALESCE(greyin_score, 0)-compared, not a bare
+  -- column compare -- a verified expert who qualifies purely via
+  -- years_experience with zero pillar evidence yet has a NULL
+  -- greyin_score (041's CASE WHEN ... branch), and a bare compare would
+  -- silently exclude them even at threshold 0.
+  -- ORDER BY greyin_score DESC NULLS LAST, created_at DESC (was created_at DESC only)
+
+job_invites
+  ├─ job_id, candidate_user_id, invited_by, UNIQUE(job_id, candidate_user_id)
+  ├─ RLS: employer acts only on invites for jobs they own; candidate reads own
+  └─ AFTER INSERT trigger -> notifications (type='job_invite', link=/jobs/[id])
+```
+
+#### DeepEdge: Profile-View Insights (Migration 150)
+**Feature:** candidates see a real weekly "N recruiters viewed your profile" count for free; seeing exactly *who* viewed requires a new, separate self-serve subscription. Replaces a dashboard tile that had been hardcoded to `0` since a 2026-09-05 integrity audit explicitly flagged no backing counter existed.
+```sql
+profile_views (viewer_id, viewed_user_id, created_at)
+  -- No direct SELECT/INSERT policy -- every read/write goes through the
+  -- two functions below, so the paid gate is enforced server-side.
+
+record_profile_view(p_viewed_user_id)   -- SECURITY DEFINER, called from
+                                          -- candidates/[id]/page.tsx for
+                                          -- any real employer view
+get_profile_view_summary(p_since)        -- returns {view_count, viewer_names}
+                                          -- viewer_names is non-NULL only
+                                          -- for an active candidate_subscriptions holder
+
+candidate_subscriptions (product='deepedge_candidate', one tier: 'premium' ₹199/mo)
+  ├─ user_id (UNIQUE), tier_id, status, razorpay_subscription_id, current_period_end
+  └─ mirrors company_subscriptions' shape/trust model exactly (service-role-
+     only writes via /api/candidate-subscriptions/checkout/{create,verify},
+     HMAC-verified, no webhook -- same as company_subscriptions, which also
+     has none and instead relies on current_period_end lapsing)
+```
+Self-serve page: `/premium`. Deliberately NOT wired into `consume_credit()`/`credit_usage` -- this is a binary monthly unlock, not a countable/renewable resource.
+
+#### DeepEdge: Crowdsourced Interview-Question Corpus (Migration 151)
+**Feature:** a candidate who reaches the interview stage can share a real question they were asked, tied to the company; the existing AI interview-prep generator (`apps/deepedge/src/lib/interview-prep.ts`, Phase B1) now grounds its output in the 15 most recent real questions for that company instead of purely generic LLM output.
+```sql
+interview_question_logs (company_id, submitted_by, round_label, question_text, created_at)
+  ├─ SELECT: any authenticated user (same "shared real signal" shape as company_reviews)
+  └─ INSERT: only if submitted_by has a real applications row against one of
+     company_id's jobs that reached status IN ('interview','offer','rejected','accepted')
+     -- mirrors company_reviews' own real-application-tie RLS shape
+```
+Submission UI: a collapsible form on `/dashboard/applications`, shown once an application reaches an eligible status.
 
 #### FlexPro: Freelancer Subscriptions
 ```sql

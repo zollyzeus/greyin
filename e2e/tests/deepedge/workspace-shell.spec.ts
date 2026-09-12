@@ -1,5 +1,6 @@
 import { test, expect } from '../../utils/fixtures'
 import { signUpDeepEdge, login } from '../../utils/auth'
+import { getUserIdByEmail, promoteToAdmin } from '../../utils/admin'
 
 /**
  * UI/UX elevation plan, Phase 1 pilot (2026-09-06): the persistent left
@@ -82,4 +83,33 @@ test('mobile: hamburger opens a drawer with the same rail, closes on navigation'
   // is what's now showing, not by re-querying a menu button that
   // wouldn't exist on this page either way.
   await expect(page).toHaveURL(/\/jobs$/)
+})
+
+/**
+ * Previously the ONLY way to reach /admin was a one-off card on
+ * /dashboard's own Quick Actions grid -- every other WorkspaceShell page
+ * (profile, applications, candidates, ...) had no path back to it short
+ * of re-visiting /dashboard or typing the URL directly. The rail now
+ * appends an Admin item (role==='admin') matching the pattern
+ * FlexPro/StackWorks/Salt & Pepper/GreyMatters already use.
+ */
+test('an admin sees a persistent Admin link in the rail, on a page other than the dashboard', async ({ page, cleanup }) => {
+  const admin = await signUpDeepEdge(page, 'candidate', cleanup)
+  const adminId = await getUserIdByEmail(admin.email)
+  await promoteToAdmin(adminId)
+  await login(page, admin, '/dashboard')
+
+  await page.goto('/profile')
+  const rail = page.locator('aside').first()
+  const adminLink = rail.getByRole('link', { name: 'Admin' })
+  await expect(adminLink).toBeVisible()
+  await adminLink.click()
+  await page.waitForURL(/\/admin$/)
+})
+
+test('a non-admin does not see an Admin link in the rail', async ({ page, cleanup }) => {
+  const candidate = await signUpDeepEdge(page, 'candidate', cleanup)
+  await login(page, candidate, '/dashboard')
+
+  await expect(page.locator('aside').first().getByRole('link', { name: 'Admin' })).toHaveCount(0)
 })

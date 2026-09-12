@@ -31,6 +31,7 @@ export default async function NotificationsPage() {
       userName={profile?.full_name || 'User'}
       verified={!!scoreRow?.is_verified_expert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="Notifications"
     >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

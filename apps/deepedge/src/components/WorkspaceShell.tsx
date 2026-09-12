@@ -18,6 +18,7 @@ import {
   Rss,
   Search,
   Settings,
+  ShieldCheck,
   X,
 } from 'lucide-react'
 import { NotificationBell } from './NotificationBell'
@@ -76,6 +77,7 @@ import { logEvent } from '@/lib/analytics'
 interface WorkspaceShellProps {
   activeSection?: string
   variant?: 'candidate' | 'employer'
+  role?: string | null
   userName: string
   verified: boolean
   greyinScore: number | null
@@ -146,6 +148,7 @@ const CANDIDATE_TOUR_STEPS: TourStep[] = [
   { target: 'nav-applications', title: 'My Applications', description: 'Track every job you’ve applied to and its current status.' },
   { target: 'nav-candidates', title: 'Find Talent', description: 'See how employers browse the Greyin candidate pool — useful once you’re on the other side of the table too.' },
   { target: 'nav-profile', title: 'Profile', description: 'Keep your profile sharp — it’s what employers and the rest of the ecosystem see.' },
+  { target: 'nav-admin', title: 'Admin', description: 'Platform administration tools.' },
   ...SHARED_TOUR_TAIL,
 ]
 
@@ -156,11 +159,13 @@ const EMPLOYER_TOUR_STEPS: TourStep[] = [
   { target: 'nav-feed', title: 'Feed', description: 'See what’s happening across your network — new posts, discussions, and updates.' },
   { target: 'nav-messages', title: 'Messages', description: 'Direct conversations with candidates, in one place.' },
   { target: 'nav-employer-settings', title: 'Company Settings', description: 'Manage your company profile and job-post credits.' },
+  { target: 'nav-admin', title: 'Admin', description: 'Platform administration tools.' },
   ...SHARED_TOUR_TAIL,
 ]
 
-function RailContents({ variant, activeSection, userName, verified, greyinScore, onNavigate, onOpenFeedback, onLogNav, onLogPillarSwitch }: {
+function RailContents({ variant, role, activeSection, userName, verified, greyinScore, onNavigate, onOpenFeedback, onLogNav, onLogPillarSwitch }: {
   variant: 'candidate' | 'employer'
+  role?: string | null
   activeSection?: string
   userName: string
   verified: boolean
@@ -170,7 +175,14 @@ function RailContents({ variant, activeSection, userName, verified, greyinScore,
   onLogNav: (key: string) => void
   onLogPillarSwitch: (to: string) => void
 }) {
-  const nav = variant === 'employer' ? EMPLOYER_NAV : CANDIDATE_NAV
+  const baseNav = variant === 'employer' ? EMPLOYER_NAV : CANDIDATE_NAV
+  // Previously reachable only via the one-off Admin card on /dashboard's
+  // Quick Actions grid -- every other page had no path to /admin short of
+  // typing the URL. Matches the persistent-rail pattern FlexPro/StackWorks/
+  // Salt & Pepper/GreyMatters already use for the exact same role check.
+  const nav = role === 'admin'
+    ? [...baseNav, { href: '/admin', label: 'Admin', icon: ShieldCheck, key: 'admin' }] as const
+    : baseNav
   return (
     <>
       <div className="flex items-center gap-2 px-5 h-16 border-b border-gray-200 dark:border-gray-800 shrink-0">
@@ -292,7 +304,7 @@ function RailContents({ variant, activeSection, userName, verified, greyinScore,
   )
 }
 
-export function WorkspaceShell({ activeSection, variant = 'candidate', userName, verified, greyinScore, pageTitle, children }: WorkspaceShellProps) {
+export function WorkspaceShell({ activeSection, variant = 'candidate', role, userName, verified, greyinScore, pageTitle, children }: WorkspaceShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [supabase] = useState(() => createClient())
@@ -317,7 +329,7 @@ export function WorkspaceShell({ activeSection, variant = 'candidate', userName,
 
       {/* Desktop rail -- persistent, fixed width, full height */}
       <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
-        <RailContents variant={variant} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
+        <RailContents variant={variant} role={role} activeSection={activeSection} userName={userName} verified={verified} greyinScore={greyinScore} onOpenFeedback={() => setFeedbackOpen(true)} onLogNav={onLogNav} onLogPillarSwitch={onLogPillarSwitch} />
       </aside>
 
       {/* Mobile rail -- slide-over drawer, same content */}
@@ -330,6 +342,7 @@ export function WorkspaceShell({ activeSection, variant = 'candidate', userName,
           >
             <RailContents
               variant={variant}
+              role={role}
               activeSection={activeSection}
               userName={userName}
               verified={verified}

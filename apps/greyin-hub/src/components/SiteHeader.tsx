@@ -45,11 +45,24 @@ export function SiteHeader() {
   // null while checking -- render nothing until resolved rather than
   // flash the wrong state.
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null)
+  // Previously the ONLY way to reach /admin (20+ sub-pages) was a single
+  // Quick Actions card on /dashboard itself -- any other page (wishlist,
+  // pivoting, an admin sub-page navigated to directly) had no link at
+  // all. Fetched here alongside isLoggedIn since this header has no
+  // server-side prop to receive it through.
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     let active = true
-    createClient().auth.getUser().then(({ data: { user } }) => {
-      if (active) setIsLoggedIn(!!user)
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!active) return
+      setIsLoggedIn(!!user)
+      if (user) {
+        supabase.from('profiles').select('role').eq('id', user.id).maybeSingle().then(({ data }) => {
+          if (active) setIsAdmin(data?.role === 'admin')
+        })
+      }
     })
     return () => { active = false }
   }, [])
@@ -105,6 +118,9 @@ export function SiteHeader() {
                 {!onDashboard && (
                   <Link href="/dashboard" className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Dashboard</Link>
                 )}
+                {isAdmin && (
+                  <Link href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition">Admin</Link>
+                )}
                 <form action="/auth/logout" method="POST">
                   <button type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Sign Out</button>
                 </form>
@@ -153,6 +169,11 @@ export function SiteHeader() {
                 {!onDashboard && (
                   <Link href="/dashboard" className="text-center py-2.5 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg" onClick={() => setMobileOpen(false)}>
                     Dashboard
+                  </Link>
+                )}
+                {isAdmin && (
+                  <Link href="/admin" className="text-center py-2.5 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg" onClick={() => setMobileOpen(false)}>
+                    Admin
                   </Link>
                 )}
                 <form action="/auth/logout" method="POST">

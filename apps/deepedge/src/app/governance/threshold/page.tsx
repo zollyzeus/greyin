@@ -21,7 +21,7 @@ export default async function ThresholdGovernancePage({
     supabase.from('platform_gate_settings').select('*').eq('id', 1).single(),
     supabase.from('threshold_votes').select('*').eq('user_id', user.id).maybeSingle(),
     supabase.from('greyin_scores').select('is_verified_expert, greyin_score').eq('user_id', user.id).maybeSingle(),
-    supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle(),
+    supabase.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle(),
   ])
 
   return (
@@ -29,6 +29,7 @@ export default async function ThresholdGovernancePage({
       userName={profile?.full_name || 'User'}
       verified={!!myScore?.is_verified_expert}
       greyinScore={myScore?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="Governance"
     >
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

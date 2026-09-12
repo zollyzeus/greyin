@@ -91,6 +91,7 @@ export default async function DashboardPage() {
       userName={profile?.full_name || 'User'}
       verified={isVerifiedExpert}
       greyinScore={scoreRow?.greyin_score ?? null}
+      role={profile?.role}
       pageTitle="Dashboard"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

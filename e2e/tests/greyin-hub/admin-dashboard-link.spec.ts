@@ -30,3 +30,25 @@ test('a regular member does not see the admin link', async ({ page, cleanup }) =
 
   await expect(page.getByRole('link', { name: /Admin/ })).toHaveCount(0)
 })
+
+/**
+ * The dashboard card above was still the ONLY reachable link -- any other
+ * Hub page (pivoting, reentry, an admin sub-page navigated to directly)
+ * had no way back to /admin short of re-visiting /dashboard or typing the
+ * URL. SiteHeader.tsx (rendered on every Hub page) now fetches the
+ * viewer's own role and shows a persistent "Admin" nav link, same as the
+ * per-app WorkspaceShell rail's own admin item.
+ */
+test('the persistent header shows an Admin link on pages other than the dashboard', async ({ page, cleanup }) => {
+  const admin = await signUpDeepEdge(page, 'candidate', cleanup, 15, 'https://deepedge.greyin.net')
+  const adminId = await getUserIdByEmail(admin.email)
+  await promoteToAdmin(adminId)
+  await login(page, admin, 'https://greyin.net/dashboard', 'https://greyin.net')
+  await page.goto('https://greyin.net/pivoting')
+
+  const headerAdminLink = page.locator('header').getByRole('link', { name: 'Admin' })
+  await expect(headerAdminLink).toBeVisible()
+  await headerAdminLink.click()
+  await page.waitForURL(/\/admin$/)
+  await expect(page.getByRole('heading', { name: /Admin/i }).first()).toBeVisible()
+})
